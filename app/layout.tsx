@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerClient } from "@/components/service-worker-client";
+import { QueryClientProviderWrapper } from "@/components/query-client-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +23,6 @@ export const metadata: Metadata = {
   description:
     "Clarydo ist deine minimalistische Todo-App, die sich Schritt für Schritt zur persönlichen Produktivitätszentrale ausbauen lässt.",
   applicationName: "Clarydo",
-  themeColor: "#0f172a",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/icon-192.png",
@@ -30,19 +31,27 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-slate-50 text-slate-900 antialiased`}
-      >
-        {children}
-        <ServiceWorkerClient />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} bg-slate-50 text-slate-900 antialiased`}
+        >
+          <QueryClientProviderWrapper>
+            {children}
+            <ServiceWorkerClient />
+          </QueryClientProviderWrapper>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
