@@ -81,7 +81,6 @@ export async function DELETE(
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { id } = await context.params;
     console.error(`DELETE /api/todos/${todoId} failed`, error);
     return NextResponse.json({ error: "Failed to delete todo" }, { status: 500 });
   }

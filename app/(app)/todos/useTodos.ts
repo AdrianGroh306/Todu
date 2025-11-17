@@ -62,7 +62,24 @@ export function useTodos() {
         method: "PATCH",
         body: JSON.stringify({ done }),
       }),
-    onSuccess: invalidateTodos,
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey);
+
+      queryClient.setQueryData<Todo[]>(todosQueryKey, (current = []) =>
+        current.map((todo) =>
+          todo.id === variables.id ? { ...todo, done: variables.done } : todo,
+        ),
+      );
+
+      return { previousTodos };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+      }
+    },
+    onSettled: invalidateTodos,
   });
 
   const deleteTodo = useMutation({
@@ -77,7 +94,20 @@ export function useTodos() {
         ids.map((id) => jsonFetch(`/api/todos/${id}`, { method: "DELETE" })),
       );
     },
-    onSuccess: invalidateTodos,
+    onMutate: async (ids) => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey);
+      queryClient.setQueryData<Todo[]>(todosQueryKey, (current = []) =>
+        current.filter((todo) => !ids.includes(todo.id)),
+      );
+      return { previousTodos };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+      }
+    },
+    onSettled: invalidateTodos,
   });
 
   return {
