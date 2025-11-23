@@ -2,20 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, CheckCircle, X } from "lucide-react";
+import type { Todo } from "./useTodos";
 import { useTodos } from "./useTodos";
-
-type ExitPreviewTodo = {
-  id: string;
-  text: string;
-};
 
 const EXIT_ANIMATION_MS = 280;
 
+type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
+
 export function TodosHomeView() {
   const [text, setText] = useState("");
-  const [exitingTodos, setExitingTodos] = useState<ExitPreviewTodo[]>([]);
+  const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [showCompleted, setShowCompleted] = useState(false);
-  const exitTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const animationTimers = useRef<TimerMap>({});
   const {
     todos,
     isPending,
@@ -50,41 +48,65 @@ export function TodosHomeView() {
     );
   };
 
-  const scheduleExitRemoval = (id: string) => {
-    if (exitTimers.current[id]) return;
-    exitTimers.current[id] = setTimeout(() => {
-      setExitingTodos((prev) => prev.filter((todo) => todo.id !== id));
-      delete exitTimers.current[id];
+  const startExitAnimation = (todo: Todo) => {
+    setAnimatingIds((prev) => {
+      if (prev.has(todo.id)) return prev;
+      const next = new Set(prev);
+      next.add(todo.id);
+      return next;
+    });
+
+    if (animationTimers.current[todo.id]) {
+      clearTimeout(animationTimers.current[todo.id]);
+    }
+
+    animationTimers.current[todo.id] = setTimeout(() => {
+      setAnimatingIds((prev) => {
+        if (!prev.has(todo.id)) return prev;
+        const next = new Set(prev);
+        next.delete(todo.id);
+        return next;
+      });
+      delete animationTimers.current[todo.id];
     }, EXIT_ANIMATION_MS);
   };
 
-  const cancelExitAnimation = (id: string) => {
-    if (exitTimers.current[id]) {
-      clearTimeout(exitTimers.current[id]);
-      delete exitTimers.current[id];
+  const clearExitAnimation = (id: string) => {
+    if (animationTimers.current[id]) {
+      clearTimeout(animationTimers.current[id]);
+      delete animationTimers.current[id];
     }
-    setExitingTodos((prev) => prev.filter((todo) => todo.id !== id));
+    setAnimatingIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
-  const handleToggleTodo = (todo: (typeof todos)[number]) => {
-    const isCompleting = !todo.done;
-    if (isCompleting) {
-      setExitingTodos((prev) =>
-        prev.some((entry) => entry.id === todo.id)
-          ? prev
-          : [...prev, { id: todo.id, text: todo.text }],
-      );
-      scheduleExitRemoval(todo.id);
+  const handleToggleTodo = (todo: Todo) => {
+    const nextDone = !todo.done;
+    if (nextDone) {
+      startExitAnimation(todo);
     } else {
-      cancelExitAnimation(todo.id);
+      clearExitAnimation(todo.id);
     }
 
     updateTodo.mutate(
-      { id: todo.id, done: !todo.done },
+      { id: todo.id, done: nextDone },
       {
-        onError: () => cancelExitAnimation(todo.id),
+        onError: () => {
+          if (nextDone) {
+            clearExitAnimation(todo.id);
+          }
+        },
       },
     );
+  };
+
+  const handleReopenTodo = (todo: Todo) => {
+    clearExitAnimation(todo.id);
+    updateTodo.mutate({ id: todo.id, done: false });
   };
 
   const clearCompletedTodos = () => {
@@ -92,21 +114,19 @@ export function TodosHomeView() {
     clearCompleted.mutate(completedTodos.map((todo) => todo.id));
   };
 
-  const pendingExitTodos = useMemo(
+  const visibleActiveTodos = useMemo(
     () =>
-      exitingTodos.filter(
-        (todo) => !activeTodos.some((active) => active.id === todo.id),
-      ),
-    [activeTodos, exitingTodos],
+      todos.filter((todo) => !todo.done || animatingIds.has(todo.id)),
+    [todos, animatingIds],
   );
 
-  const hasVisibleTodos =
-    activeTodos.length > 0 || pendingExitTodos.length > 0;
+  const hasVisibleTodos = visibleActiveTodos.length > 0;
 
   useEffect(() => {
-    const timers = exitTimers.current;
     return () => {
-      Object.values(timers).forEach((timer) => clearTimeout(timer));
+      Object.values(animationTimers.current).forEach((timer) =>
+        clearTimeout(timer),
+      );
     };
   }, []);
 
@@ -161,40 +181,33 @@ export function TodosHomeView() {
             </p>
           ) : (
             <ul className="space-y-2">
-              {activeTodos.map((todo) => (
-                <li
-                  key={todo.id}
-                  className="group flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 transition-all duration-200 ease-out"
-                >
-                  <label className="flex w-full cursor-pointer items-center gap-3">
-                    <span className="flex-1 text-base text-slate-100 transition-all duration-200">
-                      {todo.text}
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={todo.done}
-                      onChange={() => handleToggleTodo(todo)}
-                      className="h-6 w-6 cursor-pointer rounded-lg border border-slate-600 bg-slate-900 transition duration-150 hover:border-slate-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 checked:border-slate-100 checked:bg-slate-100"
-                    />
-                  </label>
-                </li>
-              ))}
-              {pendingExitTodos.map((todo) => (
-                <li
-                  key={`exit-${todo.id}`}
-                  className="group flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 text-slate-400 line-through transition-all duration-300 ease-in translate-x-4 opacity-0"
-                >
-                  <div className="flex w-full items-center gap-3">
-                    <span className="flex-1">{todo.text}</span>
-                    <input
-                      type="checkbox"
-                      checked
-                      disabled
-                      className="h-6 w-6 cursor-default appearance-none rounded-lg border border-slate-500 bg-slate-100"
-                    />
-                  </div>
-                </li>
-              ))}
+              {visibleActiveTodos.map((todo) => {
+                const isExiting = animatingIds.has(todo.id);
+                return (
+                  <li
+                    key={todo.id}
+                    className={`group flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 transition-all duration-200 ease-out ${
+                      isExiting ? "translate-x-4 opacity-0" : "opacity-100"
+                    }`}
+                  >
+                    <label className="flex w-full cursor-pointer items-center gap-3">
+                      <span
+                        className={`flex-1 text-base transition-all duration-200 ${
+                          todo.done ? "text-slate-500 line-through" : "text-slate-100"
+                        }`}
+                      >
+                        {todo.text}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={todo.done}
+                        onChange={() => handleToggleTodo(todo)}
+                        className="h-6 w-6 cursor-pointer rounded-lg border border-slate-600 bg-slate-900 transition duration-150 hover:border-slate-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 checked:border-slate-100 checked:bg-slate-100"
+                      />
+                    </label>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
@@ -261,10 +274,7 @@ export function TodosHomeView() {
                     <input
                       type="checkbox"
                       checked
-                      onChange={() => {
-                        cancelExitAnimation(todo.id);
-                        updateTodo.mutate({ id: todo.id, done: false });
-                      }}
+                      onChange={() => handleReopenTodo(todo)}
                       className="h-5 w-5 appearance-auto border-slate-600 bg-slate-900 text-slate-100 focus:ring-slate-200"
                     />
                   </li>
