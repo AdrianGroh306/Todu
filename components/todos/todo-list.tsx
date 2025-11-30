@@ -93,8 +93,16 @@ export function TodoList() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!text.trim()) return;
-    createTodo.mutate({ text: text.trim() }, { onSuccess: () => setText("") });
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
+    setText("");
+    createTodo.mutate(
+      { text: trimmedText },
+      {
+        onError: () => setText(trimmedText),
+      },
+    );
   };
 
   const handleClearCompleted = () => {
@@ -159,17 +167,6 @@ export function TodoList() {
             </ul>
           )}
         </div>
-
-        {completedTodos.length > 0 && (
-          <button
-            onClick={handleClearCompleted}
-            className="text-sm font-medium text-slate-400 transition hover:text-slate-100 disabled:cursor-not-allowed"
-            disabled={clearCompleted.isPending}
-          >
-            {clearCompleted.isPending ? "Lösche erledigte…" : "Erledigte Todos entfernen"}
-          </button>
-        )}
-
         <form
           className="sticky bottom-0 flex items-center gap-3 border-t border-slate-800 pt-4 backdrop-blur"
           onSubmit={handleSubmit}

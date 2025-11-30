@@ -53,7 +53,27 @@ export function useTodos() {
         method: "POST",
         body: JSON.stringify(payload),
       }),
-    onSuccess: invalidateTodos,
+    onMutate: async ({ text }) => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey) ?? [];
+
+      const optimisticTodo: Todo = {
+        id: `optimistic-${crypto.randomUUID?.() ?? Date.now().toString()}`,
+        text,
+        done: false,
+        created_at: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData(todosQueryKey, [optimisticTodo, ...previousTodos]);
+
+      return { previousTodos };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+      }
+    },
+    onSettled: invalidateTodos,
   });
 
   const updateTodo = useMutation({
