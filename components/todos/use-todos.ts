@@ -77,18 +77,32 @@ export function useTodos() {
   });
 
   const updateTodo = useMutation({
-    mutationFn: ({ id, done }: { id: string; done: boolean }) =>
-      jsonFetch<Todo>(`/api/todos/${id}`, {
+    mutationFn: ({ id, done, text }: { id: string; done?: boolean; text?: string }) => {
+      const body: Record<string, unknown> = {};
+      if (typeof done !== "undefined") body.done = done;
+      if (typeof text !== "undefined") body.text = text;
+      if (Object.keys(body).length === 0) {
+        throw new Error("Nothing to update");
+      }
+
+      return jsonFetch<Todo>(`/api/todos/${id}`, {
         method: "PATCH",
-        body: JSON.stringify({ done }),
-      }),
+        body: JSON.stringify(body),
+      });
+    },
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: todosQueryKey });
       const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey);
 
       queryClient.setQueryData<Todo[]>(todosQueryKey, (current = []) =>
         current.map((todo) =>
-          todo.id === variables.id ? { ...todo, done: variables.done } : todo,
+          todo.id === variables.id
+            ? {
+                ...todo,
+                ...(typeof variables.done !== "undefined" ? { done: variables.done } : {}),
+                ...(typeof variables.text !== "undefined" ? { text: variables.text } : {}),
+              }
+            : todo,
         ),
       );
 

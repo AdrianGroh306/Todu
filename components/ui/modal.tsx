@@ -26,7 +26,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
           <button
-            className="rounded-full border border-slate-600 p-1 text-slate-400 hover:text-slate-100"
+            className="rounded-full border cursor-pointer border-slate-600 p-1 text-slate-400 hover:text-slate-100"
             onClick={onClose}
             aria-label="Schließen"
           >

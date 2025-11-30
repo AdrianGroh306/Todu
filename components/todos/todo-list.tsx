@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, CheckCircle } from "lucide-react";
+import type { PointerEvent } from "react";
+import { Plus, CheckCircle, Save } from "lucide-react";
 import type { Todo } from "./use-todos";
 import { useTodos } from "./use-todos";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,6 +10,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
 
 const EXIT_ANIMATION_MS = 280;
+const LONG_PRESS_MS = 500;
 
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
@@ -16,6 +18,8 @@ export function TodoList() {
   const [text, setText] = useState("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [showCompleted, setShowCompleted] = useState(false);
+  const [actionTodo, setActionTodo] = useState<Todo | null>(null);
+  const [editValue, setEditValue] = useState("");
   const animationTimers = useRef<TimerMap>({});
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,6 +30,7 @@ export function TodoList() {
     createTodo,
     updateTodo,
     clearCompleted,
+    deleteTodo,
     invalidateTodos,
   } = useTodos();
 
@@ -118,6 +123,39 @@ export function TodoList() {
     clearCompleted.mutate(completedTodos.map((t) => t.id));
   };
 
+  const openActionMenu = (todo: Todo) => {
+    setActionTodo(todo);
+    setEditValue(todo.text);
+  };
+
+  const closeActionMenu = () => {
+    setActionTodo(null);
+    setEditValue("");
+  };
+
+  const handleDeleteAction = () => {
+    if (!actionTodo) return;
+    deleteTodo.mutate(actionTodo.id, {
+      onSettled: closeActionMenu,
+    });
+  };
+
+  const handleEditSubmit = () => {
+    if (!actionTodo) return;
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === actionTodo.text) {
+      closeActionMenu();
+      return;
+    }
+    updateTodo.mutate(
+      { id: actionTodo.id, text: trimmed },
+      {
+        onSuccess: () => closeActionMenu(),
+        onError: () => setEditValue(actionTodo.text),
+      },
+    );
+  };
+
   useEffect(() => {
     const timers = animationTimers.current;
     return () => {
@@ -126,18 +164,17 @@ export function TodoList() {
   }, []);
 
   return (
-    <main className="mx-auto flex h-screen max-w-3xl flex-col gap-6 overflow-hidden px-4 pt-4 text-slate-100">
-      <header className="space-y-4">
+    <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-slate-100">
+      <header className="space-y-3">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-4xl font-semibold uppercase tracking-[0.35em] text-slate-400">
             Clarydo
           </h1>
           <button
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${
-              completedTodos.length === 0
-                ? "cursor-not-allowed border-slate-800 text-slate-600"
-                : "border-slate-700 text-slate-100 hover:border-slate-500"
-            }`}
+            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedTodos.length === 0
+              ? "cursor-not-allowed border-slate-800 text-slate-600"
+              : "border-slate-700 text-slate-100 hover:border-slate-500"
+              }`}
             onClick={() => setShowCompleted(true)}
             disabled={completedTodos.length === 0}
           >
@@ -148,8 +185,8 @@ export function TodoList() {
         <ProgressBar value={completedCount} max={totalTodos} label="Todo-Fortschritt" />
       </header>
 
-      <section className="flex flex-1 flex-col gap-6 overflow-hidden rounded-2xl p-6 backdrop-blur">
-        <div className="flex-1 space-y-2 overflow-y-auto pr-1">
+      <section className="flex flex-1 flex-col gap-4 overflow-hidden rounded-2xl p-6 backdrop-blur">
+        <div className="flex-1 overflow-y-auto pr-1">
           {isPending ? (
             <EmptyState>Lade Aufgaben…</EmptyState>
           ) : isError ? (
@@ -163,20 +200,21 @@ export function TodoList() {
               Alle Todos sind erledigt – öffne die Erledigt-Ansicht oben rechts.
             </EmptyState>
           ) : (
-            <ul className="space-y-2">
+            <ul className="divide-y divide-slate-800">
               {visibleTodos.map((todo) => (
                 <TodoItem
                   key={todo.id}
                   todo={todo}
                   isExiting={animatingIds.has(todo.id)}
                   onToggle={() => handleToggleTodo(todo)}
+                  onLongPress={() => openActionMenu(todo)}
                 />
               ))}
             </ul>
           )}
         </div>
         <form
-          className="sticky bottom-0 flex items-center gap-3 border-t border-slate-800 pt-4 backdrop-blur"
+          className="sticky bottom-0 flex items-center gap-3 pt-3 backdrop-blur"
           onSubmit={handleSubmit}
         >
           <input
@@ -228,6 +266,47 @@ export function TodoList() {
           </ul>
         )}
       </Modal>
+
+      <Modal open={Boolean(actionTodo)} onClose={closeActionMenu} title="Todo-Aktionen">
+        {actionTodo && (
+          <div className="space-y-4">
+            <div className="flex flex-row gap-2">
+              <input
+                id="edit-todo-text"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
+              />
+              <button
+                type="button"
+                aria-label="Änderungen speichern"
+                className="flex items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300 h-auto w-12"
+                onClick={handleEditSubmit}
+                disabled={!editValue.trim() || updateTodo.isPending}
+              >
+                {updateTodo.isPending ? (
+                  <span className="text-sm font-semibold">Speichere…</span>
+                ) : (
+                  <Save className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+
+            <p className="text-xs flex justify-center text-slate-500">oder</p>
+            <div className="flex justify-center">
+   <button
+              type="button"
+              className="rounded-xl bg-rose-500 px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+              onClick={handleDeleteAction}
+              disabled={deleteTodo.isPending}
+            >
+              {deleteTodo.isPending ? "Lösche…" : "Todo löschen"}
+            </button>
+            </div>
+         
+          </div>
+        )}
+      </Modal>
     </main>
   );
 }
@@ -236,25 +315,73 @@ type TodoItemProps = {
   todo: Todo;
   isExiting: boolean;
   onToggle: () => void;
+  onLongPress: () => void;
 };
 
-function TodoItem({ todo, isExiting, onToggle }: TodoItemProps) {
+function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
   const disabled = isExiting;
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTriggeredRef = useRef(false);
+
+  const clearLongPress = (event?: PointerEvent<HTMLLIElement>) => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+    if (longPressTriggeredRef.current) {
+      event?.preventDefault();
+      event?.stopPropagation();
+      longPressTriggeredRef.current = false;
+    }
+  };
+
+  const handlePointerDown = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+    }
+    longPressTriggeredRef.current = false;
+    pressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      pressTimerRef.current = null;
+      onLongPress();
+    }, LONG_PRESS_MS);
+  };
+
+  const handleCheckboxChange = () => {
+    if (longPressTriggeredRef.current) {
+      longPressTriggeredRef.current = false;
+      return;
+    }
+    onToggle();
+  };
+
   return (
     <li
-      className={`group flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 transition-all duration-200 ease-out ${
-        isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
-      }`}
+      className={`group flex items-center justify-between px-2 py-4 transition-all duration-200 ease-out ${isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
+        } ${!isExiting ? "hover:bg-slate-900/40" : ""}`}
+      onPointerDown={handlePointerDown}
+      onPointerUp={clearLongPress}
+      onPointerLeave={() => clearLongPress()}
+      onPointerCancel={clearLongPress}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        longPressTriggeredRef.current = true;
+        onLongPress();
+      }}
     >
       <label className="flex w-full cursor-pointer items-center gap-3">
         <span
-          className={`flex-1 text-base transition-all duration-200 ${
-            todo.done ? "text-slate-500 line-through" : "text-slate-100"
-          }`}
+          className={`flex-1 text-base transition-all duration-200 ${todo.done ? "text-slate-500 line-through" : "text-slate-100"
+            }`}
         >
           {todo.text}
         </span>
-        <Checkbox checked={todo.done} onChange={onToggle} disabled={disabled} aria-disabled={disabled} />
+        <Checkbox
+          checked={todo.done}
+          onChange={handleCheckboxChange}
+          disabled={disabled}
+          aria-disabled={disabled}
+        />
       </label>
     </li>
   );
@@ -268,9 +395,8 @@ type EmptyStateProps = {
 function EmptyState({ children, dashed }: EmptyStateProps) {
   return (
     <p
-      className={`rounded-xl px-4 py-8 text-center text-sm text-slate-400 ${
-        dashed ? "border border-dashed border-slate-700/80" : ""
-      }`}
+      className={`rounded-xl px-4 py-8 text-center text-sm text-slate-400 ${dashed ? "border border-dashed border-slate-700/80" : ""
+        }`}
     >
       {children}
     </p>
