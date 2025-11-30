@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorkerClient } from "@/components/service-worker-client";
 import { QueryClientProviderWrapper } from "@/components/query-client-provider";
+import { ClerkProviderWrapper } from "@/components/providers/clerk-provider-wrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,29 +35,13 @@ export const viewport: Viewport = {
   themeColor: "#0f172a",
 };
 
-const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-type ProviderProps = { children: React.ReactNode };
-
-function OptionalClerkProvider({ children }: ProviderProps) {
-  if (!clerkPublishableKey) {
-    return <>{children}</>;
-  }
-
-  return (
-    <ClerkProvider publishableKey={clerkPublishableKey}>
-      {children}
-    </ClerkProvider>
-  );
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <OptionalClerkProvider>
+    <ClerkProviderWrapper>
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} bg-slate-950 text-slate-100 antialiased`}
@@ -68,6 +52,6 @@ export default function RootLayout({
           </QueryClientProviderWrapper>
         </body>
       </html>
-    </OptionalClerkProvider>
+    </ClerkProviderWrapper>
   );
 }
