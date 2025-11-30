@@ -280,12 +280,12 @@ export function TodoList() {
               <button
                 type="button"
                 aria-label="Änderungen speichern"
-                className="flex items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300 h-auto w-12"
+                className="flex items-center cursor-pointer justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300 h-auto w-12"
                 onClick={handleEditSubmit}
                 disabled={!editValue.trim() || updateTodo.isPending}
               >
                 {updateTodo.isPending ? (
-                  <span className="text-sm font-semibold">Speichere…</span>
+                  <span className="text-sm font-semibold">…</span>
                 ) : (
                   <Save className="h-5 w-5" aria-hidden="true" />
                 )}
@@ -296,7 +296,7 @@ export function TodoList() {
             <div className="flex justify-center">
    <button
               type="button"
-              className="rounded-xl bg-rose-500 px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+              className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
               onClick={handleDeleteAction}
               disabled={deleteTodo.isPending}
             >
