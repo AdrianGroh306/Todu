@@ -17,6 +17,7 @@ export function TodoList() {
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [showCompleted, setShowCompleted] = useState(false);
   const animationTimers = useRef<TimerMap>({});
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const {
     todos,
@@ -73,6 +74,9 @@ export function TodoList() {
   };
 
   const handleToggleTodo = (todo: Todo) => {
+    if (animatingIds.has(todo.id)) {
+      return;
+    }
     const nextDone = !todo.done;
     if (nextDone) {
       startExitAnimation(todo);
@@ -97,10 +101,14 @@ export function TodoList() {
     if (!trimmedText) return;
 
     setText("");
+    inputRef.current?.focus();
     createTodo.mutate(
       { text: trimmedText },
       {
-        onError: () => setText(trimmedText),
+        onError: () => {
+          setText(trimmedText);
+          inputRef.current?.focus();
+        },
       },
     );
   };
@@ -172,10 +180,12 @@ export function TodoList() {
           onSubmit={handleSubmit}
         >
           <input
+            ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Neues Todo hinzufügen"
             className="flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
+            autoFocus
           />
           <button
             type="submit"
@@ -229,10 +239,11 @@ type TodoItemProps = {
 };
 
 function TodoItem({ todo, isExiting, onToggle }: TodoItemProps) {
+  const disabled = isExiting;
   return (
     <li
       className={`group flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 transition-all duration-200 ease-out ${
-        isExiting ? "translate-x-4 opacity-0" : "opacity-100"
+        isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
       }`}
     >
       <label className="flex w-full cursor-pointer items-center gap-3">
@@ -243,7 +254,7 @@ function TodoItem({ todo, isExiting, onToggle }: TodoItemProps) {
         >
           {todo.text}
         </span>
-        <Checkbox checked={todo.done} onChange={onToggle} />
+        <Checkbox checked={todo.done} onChange={onToggle} disabled={disabled} aria-disabled={disabled} />
       </label>
     </li>
   );

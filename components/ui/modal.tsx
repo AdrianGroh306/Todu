@@ -13,8 +13,16 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur">
-      <section className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur"
+      role="dialog"
+      aria-modal
+      onClick={onClose}
+    >
+      <section
+        className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
           <button
