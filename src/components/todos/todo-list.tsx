@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Plus, CheckCircle, Save } from "lucide-react";
-import type { Todo } from "./use-todos";
-import { useTodos } from "./use-todos";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
+import { ListPicker } from "@/components/lists/list-picker";
+import { useActiveList } from "@/components/providers/active-list-provider";
+import { useTodos, type Todo } from "@/hooks/use-todos";
 
 const EXIT_ANIMATION_MS = 280;
 const LONG_PRESS_MS = 500;
@@ -22,6 +23,7 @@ export function TodoList() {
   const [editValue, setEditValue] = useState("");
   const animationTimers = useRef<TimerMap>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const { activeList, isLoadingLists } = useActiveList();
 
   const {
     todos,
@@ -32,7 +34,8 @@ export function TodoList() {
     clearCompleted,
     deleteTodo,
     invalidateTodos,
-  } = useTodos();
+  } = useTodos(activeList?.id ?? null);
+  const hasActiveList = Boolean(activeList);
 
   const completedTodos = useMemo(() => todos.filter((t) => t.done), [todos]);
   const totalTodos = todos.length;
@@ -42,6 +45,20 @@ export function TodoList() {
     () => todos.filter((t) => !t.done || animatingIds.has(t.id)),
     [todos, animatingIds],
   );
+
+  useEffect(() => {
+    if (hasActiveList) return;
+    setShowCompleted(false);
+    setActionTodo(null);
+    setEditValue("");
+  }, [hasActiveList]);
+
+  const listStatusLabel = isLoadingLists
+    ? "Liste wird geladen…"
+    : activeList
+      ? activeList.name
+      : "Erstelle oder wähle eine Liste";
+  const completedButtonDisabled = !hasActiveList || completedTodos.length === 0;
 
   const startExitAnimation = (todo: Todo) => {
     setAnimatingIds((prev) => {
@@ -103,7 +120,7 @@ export function TodoList() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedText = text.trim();
-    if (!trimmedText) return;
+    if (!trimmedText || !hasActiveList) return;
 
     setText("");
     inputRef.current?.focus();
@@ -119,7 +136,7 @@ export function TodoList() {
   };
 
   const handleClearCompleted = () => {
-    if (completedTodos.length === 0) return;
+    if (!hasActiveList || completedTodos.length === 0) return;
     clearCompleted.mutate(completedTodos.map((t) => t.id));
   };
 
@@ -134,14 +151,14 @@ export function TodoList() {
   };
 
   const handleDeleteAction = () => {
-    if (!actionTodo) return;
+    if (!actionTodo || !hasActiveList) return;
     deleteTodo.mutate(actionTodo.id, {
       onSettled: closeActionMenu,
     });
   };
 
   const handleEditSubmit = () => {
-    if (!actionTodo) return;
+    if (!actionTodo || !hasActiveList) return;
     const trimmed = editValue.trim();
     if (!trimmed || trimmed === actionTodo.text) {
       closeActionMenu();
@@ -166,28 +183,34 @@ export function TodoList() {
   return (
     <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-slate-100">
       <header className="space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-4xl font-semibold uppercase tracking-[0.35em] text-slate-400">
-            Clarydo
-          </h1>
-          <button
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedTodos.length === 0
-              ? "cursor-not-allowed border-slate-800 text-slate-600"
-              : "border-slate-700 text-slate-100 hover:border-slate-500"
-              }`}
-            onClick={() => setShowCompleted(true)}
-            disabled={completedTodos.length === 0}
-          >
-            <CheckCircle className="h-4 w-4" />
-            Erledigt
-          </button>
+        <div className="flex gap-3 flex-row items-center">
+          <ListPicker />
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <button
+              className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
+                ? "cursor-not-allowed border-slate-800 text-slate-600"
+                : "border-slate-700 text-slate-100 hover:border-slate-500"
+                }`}
+              onClick={() => setShowCompleted(true)}
+              disabled={completedButtonDisabled}
+            >
+              <CheckCircle className="h-4 w-4" />
+              Erledigt
+            </button>
+          </div>
         </div>
         <ProgressBar value={completedCount} max={totalTodos} label="Todo-Fortschritt" />
       </header>
 
       <section className="flex flex-1 flex-col gap-4 overflow-hidden rounded-2xl p-6 backdrop-blur">
         <div className="flex-1 overflow-y-auto pr-1">
-          {isPending ? (
+          {isLoadingLists ? (
+            <EmptyState>Listen werden geladen…</EmptyState>
+          ) : !hasActiveList ? (
+            <EmptyState dashed>
+              Wähle oben eine Liste aus oder lege eine neue Liste an, um zu starten.
+            </EmptyState>
+          ) : isPending ? (
             <EmptyState>Lade Aufgaben…</EmptyState>
           ) : isError ? (
             <ErrorState>Fehler beim Laden der Aufgaben.</ErrorState>
@@ -221,15 +244,16 @@ export function TodoList() {
             ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Neues Todo hinzufügen"
+            placeholder={hasActiveList ? "Neues Todo hinzufügen" : "Liste auswählen, um Todos anzulegen"}
             className="flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
-            autoFocus
+            autoFocus={hasActiveList}
+            disabled={!hasActiveList}
           />
           <button
             type="submit"
             className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
             aria-label="Aufgabe speichern"
-            disabled={!text.trim() || createTodo.isPending}
+            disabled={!hasActiveList || !text.trim() || createTodo.isPending}
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -237,14 +261,14 @@ export function TodoList() {
       </section>
 
       <Modal
-        open={showCompleted}
+        open={Boolean(showCompleted && hasActiveList)}
         onClose={() => setShowCompleted(false)}
         title="Erledigte Todos"
         footer={
           <button
             className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
             onClick={handleClearCompleted}
-            disabled={completedTodos.length === 0 || clearCompleted.isPending}
+            disabled={completedButtonDisabled || clearCompleted.isPending}
           >
             {clearCompleted.isPending ? "Lösche erledigte…" : "Alle erledigten löschen"}
           </button>
@@ -267,7 +291,7 @@ export function TodoList() {
         )}
       </Modal>
 
-      <Modal open={Boolean(actionTodo)} onClose={closeActionMenu} title="Todo-Aktionen">
+      <Modal open={Boolean(actionTodo && hasActiveList)} onClose={closeActionMenu} title="Todo-Aktionen">
         {actionTodo && (
           <div className="space-y-4">
             <div className="flex flex-row gap-2">
@@ -294,16 +318,16 @@ export function TodoList() {
 
             <p className="text-xs flex justify-center text-slate-500">oder</p>
             <div className="flex justify-center">
-   <button
-              type="button"
-              className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
-              onClick={handleDeleteAction}
-              disabled={deleteTodo.isPending}
-            >
-              {deleteTodo.isPending ? "Lösche…" : "Todo löschen"}
-            </button>
+              <button
+                type="button"
+                className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+                onClick={handleDeleteAction}
+                disabled={deleteTodo.isPending}
+              >
+                {deleteTodo.isPending ? "Lösche…" : "Todo löschen"}
+              </button>
             </div>
-         
+
           </div>
         )}
       </Modal>

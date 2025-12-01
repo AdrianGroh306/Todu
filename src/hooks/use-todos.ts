@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { jsonFetch } from "@/lib/json-fetch";
 
 export type Todo = {
   id: string;
@@ -13,49 +10,44 @@ export type Todo = {
   created_at: string;
 };
 
-const todosQueryKey = ["todos"] as const;
+const todosQueryKey = (listId: string | null) => ["todos", listId ?? "none"] as const;
 
-async function jsonFetch<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers || {}),
-    },
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || "Request failed");
-  }
-
-  return response.json();
-}
-
-export function useTodos() {
+export function useTodos(listId: string | null) {
   const queryClient = useQueryClient();
-
-  const invalidateTodos = () =>
-    queryClient.invalidateQueries({ queryKey: todosQueryKey });
+  const hasActiveList = Boolean(listId);
+  const queryKey = todosQueryKey(listId);
 
   const {
     data: todos = [],
-    isPending,
+    isPending: queryPending,
     isError,
   } = useQuery<Todo[]>({
-    queryKey: todosQueryKey,
-    queryFn: () => jsonFetch<Todo[]>("/api/todos"),
+    queryKey,
+    queryFn: () => jsonFetch<Todo[]>(`/api/todos?listId=${encodeURIComponent(listId ?? "")}`),
+    enabled: hasActiveList,
   });
 
+  const invalidateTodos = () => {
+    if (!hasActiveList) return;
+    queryClient.invalidateQueries({ queryKey });
+  };
+
   const createTodo = useMutation({
-    mutationFn: (payload: { text: string }) =>
-      jsonFetch<Todo>("/api/todos", {
+    mutationFn: async (payload: { text: string }) => {
+      if (!hasActiveList || !listId) {
+        throw new Error("Keine aktive Liste ausgewählt");
+      }
+      return jsonFetch<Todo>("/api/todos", {
         method: "POST",
-        body: JSON.stringify(payload),
-      }),
+        body: JSON.stringify({ ...payload, listId }),
+      });
+    },
     onMutate: async ({ text }) => {
-      await queryClient.cancelQueries({ queryKey: todosQueryKey });
-      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey) ?? [];
+      if (!hasActiveList || !listId) {
+        return { previousTodos: undefined };
+      }
+      await queryClient.cancelQueries({ queryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(queryKey) ?? [];
 
       const optimisticTodo: Todo = {
         id: `optimistic-${crypto.randomUUID?.() ?? Date.now().toString()}`,
@@ -64,13 +56,13 @@ export function useTodos() {
         created_at: new Date().toISOString(),
       };
 
-      queryClient.setQueryData(todosQueryKey, [optimisticTodo, ...previousTodos]);
+      queryClient.setQueryData(queryKey, [optimisticTodo, ...previousTodos]);
 
       return { previousTodos };
     },
     onError: (_error, _variables, context) => {
       if (context?.previousTodos) {
-        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+        queryClient.setQueryData(queryKey, context.previousTodos);
       }
     },
     onSettled: invalidateTodos,
@@ -91,10 +83,13 @@ export function useTodos() {
       });
     },
     onMutate: async (variables) => {
-      await queryClient.cancelQueries({ queryKey: todosQueryKey });
-      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey);
+      if (!hasActiveList) {
+        return { previousTodos: undefined };
+      }
+      await queryClient.cancelQueries({ queryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(queryKey);
 
-      queryClient.setQueryData<Todo[]>(todosQueryKey, (current = []) =>
+      queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
         current.map((todo) =>
           todo.id === variables.id
             ? {
@@ -110,34 +105,34 @@ export function useTodos() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previousTodos) {
-        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+        queryClient.setQueryData(queryKey, context.previousTodos);
       }
     },
   });
 
   const deleteTodo = useMutation({
-    mutationFn: (id: string) =>
-      jsonFetch(`/api/todos/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => jsonFetch(`/api/todos/${id}`, { method: "DELETE" }),
     onSuccess: invalidateTodos,
   });
 
   const clearCompleted = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(
-        ids.map((id) => jsonFetch(`/api/todos/${id}`, { method: "DELETE" })),
-      );
+      await Promise.all(ids.map((id) => jsonFetch(`/api/todos/${id}`, { method: "DELETE" })));
     },
     onMutate: async (ids) => {
-      await queryClient.cancelQueries({ queryKey: todosQueryKey });
-      const previousTodos = queryClient.getQueryData<Todo[]>(todosQueryKey);
-      queryClient.setQueryData<Todo[]>(todosQueryKey, (current = []) =>
+      if (!hasActiveList) {
+        return { previousTodos: undefined };
+      }
+      await queryClient.cancelQueries({ queryKey });
+      const previousTodos = queryClient.getQueryData<Todo[]>(queryKey);
+      queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
         current.filter((todo) => !ids.includes(todo.id)),
       );
       return { previousTodos };
     },
     onError: (_error, _variables, context) => {
       if (context?.previousTodos) {
-        queryClient.setQueryData(todosQueryKey, context.previousTodos);
+        queryClient.setQueryData(queryKey, context.previousTodos);
       }
     },
     onSettled: invalidateTodos,
@@ -145,8 +140,8 @@ export function useTodos() {
 
   return {
     todos,
-    isPending,
-    isError,
+    isPending: hasActiveList ? queryPending : false,
+    isError: hasActiveList ? isError : false,
     createTodo,
     updateTodo,
     deleteTodo,

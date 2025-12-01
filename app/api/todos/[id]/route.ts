@@ -1,24 +1,20 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { clerkUserIdToUuid } from "@/lib/user-id";
+import { getUserId, UnauthorizedError } from "@/lib/api-auth";
+import { ensureListAccess } from "@/lib/list-access";
 
-// Fallback user ID for development without Clerk
-const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
+async function getTodoListId(todoId: string) {
+  const { data, error } = await supabase
+    .from("todos")
+    .select("id, list_id")
+    .eq("id", todoId)
+    .single<{ id: string; list_id: string }>();
 
-class UnauthorizedError extends Error {}
-
-async function getUserId(): Promise<string> {
-  // Skip Clerk auth if not configured
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return DEV_USER_ID;
+  if (error || !data) {
+    throw error ?? new Error("Todo not found");
   }
 
-  const session = await auth();
-  if (!session?.userId) {
-    throw new UnauthorizedError("Unauthorized");
-  }
-  return clerkUserIdToUuid(session.userId);
+  return data.list_id;
 }
 
 export async function PATCH(
@@ -38,6 +34,9 @@ export async function PATCH(
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
+    const listId = await getTodoListId(todoId);
+    await ensureListAccess(listId, userUuid);
+
     const update: Record<string, unknown> = {};
     if (typeof text !== "undefined") update.text = text.trim();
     if (typeof done !== "undefined") update.done = done;
@@ -46,8 +45,7 @@ export async function PATCH(
       .from("todos")
       .update(update)
       .eq("id", todoId)
-      .eq("user_id", userUuid)
-      .select("id, text, done, created_at")
+      .select("id, text, done, created_at, list_id")
       .single();
 
     if (error) {
@@ -72,12 +70,13 @@ export async function DELETE(
   try {
     ({ id: todoId } = await context.params);
     const userUuid = await getUserId();
+    const listId = await getTodoListId(todoId);
+    await ensureListAccess(listId, userUuid);
 
     const { error } = await supabase
       .from("todos")
       .delete()
-      .eq("id", todoId)
-      .eq("user_id", userUuid);
+      .eq("id", todoId);
 
     if (error) {
       throw error;

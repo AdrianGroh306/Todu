@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorkerClient } from "@/components/service-worker-client";
 import { QueryClientProviderWrapper } from "@/components/query-client-provider";
 import { ClerkProviderWrapper } from "@/components/providers/clerk-provider-wrapper";
+import { ActiveListProvider } from "@/components/providers/active-list-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,8 +48,10 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} bg-slate-950 text-slate-100 antialiased`}
         >
           <QueryClientProviderWrapper>
-            {children}
-            <ServiceWorkerClient />
+            <ActiveListProvider>
+              {children}
+              <ServiceWorkerClient />
+            </ActiveListProvider>
           </QueryClientProviderWrapper>
         </body>
       </html>

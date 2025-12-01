@@ -1,34 +1,22 @@
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { clerkUserIdToUuid } from "@/lib/user-id";
+import { getUserId, UnauthorizedError } from "@/lib/api-auth";
+import { ensureListAccess } from "@/lib/list-access";
 
-// Fallback user ID for development without Clerk
-const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
-
-async function getUserId(): Promise<string> {
-  // Skip Clerk auth if not configured
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return DEV_USER_ID;
-  }
-
-  const session = await auth();
-  if (!session?.userId) {
-    throw new UnauthorizedError("Unauthorized");
-  }
-  return clerkUserIdToUuid(session.userId);
-}
-
-class UnauthorizedError extends Error {}
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const userId = await getUserId();
+    const listId = new URL(request.url).searchParams.get("listId");
+    if (!listId) {
+      return NextResponse.json({ error: "listId is required" }, { status: 400 });
+    }
+
+    await ensureListAccess(listId, userId);
 
     const { data, error } = await supabase
       .from("todos")
       .select("id, text, done, created_at")
-      .eq("user_id", userId)
+      .eq("list_id", listId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -45,19 +33,25 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const userId = await getUserId();
-    const { text } = (await request.json()) as { text?: string };
+    const { text, listId } = (await request.json()) as { text?: string; listId?: string };
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
+    if (!listId) {
+      return NextResponse.json({ error: "listId is required" }, { status: 400 });
+    }
+
+    await ensureListAccess(listId, userId);
+
     const { data, error } = await supabase
       .from("todos")
-      .insert({ user_id: userId, text: text.trim(), done: false })
-      .select("id, text, done, created_at")
+      .insert({ list_id: listId, text: text.trim(), done: false })
+      .select("id, text, done, created_at, list_id")
       .single();
 
     if (error) {
