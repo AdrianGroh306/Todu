@@ -47,5 +47,15 @@ export function useLists() {
     },
   });
 
-  return { lists, isPending, isError, createList, renameList };
+  const deleteList = useMutation({
+    mutationFn: (id: string) =>
+      jsonFetch(`/api/lists/${id}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: listsQueryKey });
+    },
+  });
+
+  return { lists, isPending, isError, createList, renameList, deleteList };
 }

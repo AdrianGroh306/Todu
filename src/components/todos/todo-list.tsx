@@ -6,9 +6,9 @@ import { Plus, CheckCircle, Save } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
-import { ListPicker } from "@/components/lists/list-picker";
 import { useActiveList } from "@/components/providers/active-list-provider";
 import { useTodos, type Todo } from "@/hooks/use-todos";
+import { ListPicker } from "../lists/list-picker";
 
 const EXIT_ANIMATION_MS = 280;
 const LONG_PRESS_MS = 500;
