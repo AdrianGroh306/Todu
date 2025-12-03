@@ -7,9 +7,10 @@ type ModalProps = {
   title?: string;
   children: ReactNode;
   footer?: ReactNode;
+  titleActions?: ReactNode;
 };
 
-export function Modal({ open, onClose, title, children, footer }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, titleActions }: ModalProps) {
   if (!open) return null;
 
   return (
@@ -24,7 +25,10 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+          <div className="flex items-center gap-1">
+            <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+            {titleActions}
+          </div>
           <button
             className="rounded-full border cursor-pointer border-slate-600 p-1 text-slate-400 hover:text-slate-100"
             onClick={onClose}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
-import { ensureListOwnership } from "@/lib/list-access";
+import { ensureListAccess, ensureListOwnership } from "@/lib/list-access";
 
 export async function GET(
   _request: NextRequest,
@@ -38,8 +38,17 @@ export async function DELETE(
   const { listId } = await context.params;
   try {
     const userId = await getUserId();
-    await ensureListOwnership(listId, userId);
-    const targetUserId = new URL(request.url).searchParams.get("userId");
+    const targetUserId = new URL(request.url).searchParams.get("userId") ?? userId;
+    const access = await ensureListAccess(listId, userId);
+    const isOwner = access.role === "owner";
+
+    if (targetUserId !== userId && !isOwner) {
+      return NextResponse.json({ error: "Nur Besitzer können andere entfernen" }, { status: 403 });
+    }
+
+    if (targetUserId === userId && isOwner) {
+      return NextResponse.json({ error: "Owner können ihre eigene Liste nicht verlassen" }, { status: 400 });
+    }
 
     if (!targetUserId) {
       return NextResponse.json({ error: "userId query param is required" }, { status: 400 });

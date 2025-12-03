@@ -1,0 +1,135 @@
+import { useState } from "react";
+import { Loader2, Plus } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
+import type { ListSummary } from "@/hooks/use-lists";
+import { ListPickerItem } from "./list-picker-item";
+
+const MAX_LIST_NAME_LENGTH = 25;
+
+type ListSelectionModalProps = {
+  open: boolean;
+  onClose: () => void;
+  selectableLists: ListSummary[];
+  isLoading: boolean;
+  onSelectList: (listId: string) => void;
+  onListLongPress: (list: ListSummary) => void;
+  onCreateList: (name: string) => Promise<void>;
+  isCreatingList: boolean;
+};
+
+export function ListSelectionModal({
+  open,
+  onClose,
+  selectableLists,
+  isLoading,
+  onSelectList,
+  onListLongPress,
+  onCreateList,
+  isCreatingList,
+}: ListSelectionModalProps) {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newListName, setNewListName] = useState("");
+
+  const handleClose = () => {
+    setShowCreateForm(false);
+    setNewListName("");
+    onClose();
+  };
+
+  const handleCreateList = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = newListName.trim();
+    if (!trimmed) return;
+    try {
+      await onCreateList(trimmed);
+      setNewListName("");
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error("Failed to create list", error);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={handleClose} title="Weitere Listen">
+      <div className="space-y-4">
+        <div className="rounded-2xl bg-slate-900/50 p-2">
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2 py-4 text-sm text-slate-400">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Listen werden geladen…
+            </div>
+          ) : selectableLists.length === 0 ? (
+            <p className="py-2 text-sm text-slate-400">
+              Keine weiteren Listen – nutze unten den Button, um eine neue Liste anzulegen.
+            </p>
+          ) : (
+            <ul className="max-h-56 space-y-1 overflow-y-auto pr-1">
+              {selectableLists.map((list) => (
+                <li key={list.id}>
+                  <ListPickerItem
+                    list={list}
+                    onSelect={() => {
+                      onSelectList(list.id);
+                      handleClose();
+                    }}
+                    onLongPress={() => {
+                      handleClose();
+                      onListLongPress(list);
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="rounded-2xl bg-slate-900/40 p-4">
+          {showCreateForm ? (
+            <form className="space-y-3" onSubmit={handleCreateList}>
+              <input
+                type="text"
+                value={newListName}
+                onChange={(event) => setNewListName(event.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-slate-400"
+                maxLength={MAX_LIST_NAME_LENGTH}
+                placeholder="Neue Liste"
+                autoFocus
+              />
+              <div className="text-right text-xs text-slate-500">
+                {newListName.length}/{MAX_LIST_NAME_LENGTH}
+              </div>
+              <div className="flex items-center justify-end gap-2 text-sm">
+                <button
+                  type="button"
+                  className="rounded-xl border border-transparent px-3 py-1.5 text-slate-400 transition hover:text-slate-200"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setNewListName("");
+                  }}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1 rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  disabled={!newListName.trim() || isCreatingList}
+                >
+                  {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Speichern
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl border border-dashed border-slate-700/60 px-4 py-3 text-sm font-medium text-slate-200 transition hover:border-slate-500"
+              onClick={() => setShowCreateForm(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Neue Liste
+            </button>
+          )}
+        </div>
+      </div>
+    </Modal>
+  );
+}

@@ -7,11 +7,12 @@ import { useLists, type ListSummary } from "@/hooks/use-lists";
 type ActiveListContextValue = {
   lists: ListSummary[];
   activeList: ListSummary | null;
-  setActiveListId: (id: string) => void;
+  setActiveListId: (id: string | null) => void;
   isLoadingLists: boolean;
   createList: ReturnType<typeof useLists>["createList"];
   renameList: ReturnType<typeof useLists>["renameList"];
   deleteList: ReturnType<typeof useLists>["deleteList"];
+  leaveList: ReturnType<typeof useLists>["leaveList"];
 };
 
 const ActiveListContext = createContext<ActiveListContextValue | undefined>(undefined);
@@ -19,7 +20,14 @@ const ActiveListContext = createContext<ActiveListContextValue | undefined>(unde
 const ACTIVE_LIST_STORAGE_KEY = "clarydo-active-list-id";
 
 export function ActiveListProvider({ children }: { children: ReactNode }) {
-  const { lists, isPending: isLoadingLists, createList, renameList, deleteList } = useLists();
+  const {
+    lists,
+    isPending: isLoadingLists,
+    createList,
+    renameList,
+    deleteList,
+    leaveList,
+  } = useLists();
   const [activeListId, setActiveListId] = useState<string | null>(null);
 
   // Hydrate from localStorage on mount
@@ -67,8 +75,9 @@ export function ActiveListProvider({ children }: { children: ReactNode }) {
       createList,
       renameList,
       deleteList,
+      leaveList,
     }),
-    [lists, activeList, isLoadingLists, createList, renameList, deleteList],
+    [lists, activeList, isLoadingLists, createList, renameList, deleteList, leaveList],
   );
 
   return <ActiveListContext.Provider value={value}>{children}</ActiveListContext.Provider>;

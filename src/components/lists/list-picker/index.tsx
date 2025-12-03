@@ -1,0 +1,167 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { ChevronsUpDown } from "lucide-react";
+import { useActiveList } from "@/components/providers/active-list-provider";
+import type { ListSummary } from "@/hooks/use-lists";
+import { ListSelectionModal } from "./list-selection-modal";
+import { ListActionsModal } from "./list-actions-modal";
+import { ShareListModal } from "./share-list-modal";
+
+export function ListPicker() {
+  const {
+    lists,
+    activeList,
+    setActiveListId,
+    isLoadingLists,
+    createList,
+    renameList,
+    deleteList,
+    leaveList,
+  } = useActiveList();
+
+  const [isSelectionOpen, setIsSelectionOpen] = useState(false);
+  const [actionList, setActionList] = useState<ListSummary | null>(null);
+  const [shareList, setShareList] = useState<ListSummary | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selectableLists = lists.filter((list) => list.id !== activeList?.id);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(event.target as Node)) {
+        setIsSelectionOpen(false);
+      }
+    }
+
+    if (isSelectionOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return undefined;
+  }, [isSelectionOpen]);
+
+  const toggleOpen = () => {
+    if (isLoadingLists && !activeList) return;
+    setIsSelectionOpen((prev) => !prev);
+  };
+
+  const handleCreateList = async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    try {
+      const created = await createList.mutateAsync({ name: trimmed });
+      setIsSelectionOpen(false);
+      setActiveListId(created.id);
+    } catch (error) {
+      console.error("Failed to create list", error);
+    }
+  };
+
+  const handleListLongPress = (list: ListSummary) => {
+    setIsSelectionOpen(false);
+    setActionList(list);
+  };
+
+  const closeActionModal = () => {
+    setActionList(null);
+  };
+
+  const handleRename = (newName: string) => {
+    if (!actionList || actionList.role !== "owner") return;
+    renameList.mutate(
+      { id: actionList.id, name: newName },
+      {
+        onSuccess: closeActionModal,
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    if (!actionList || actionList.role !== "owner") return;
+    const listIdToDelete = actionList.id;
+    const deletingActive = listIdToDelete === activeList?.id;
+    deleteList.mutate(listIdToDelete, {
+      onSuccess: () => {
+        closeActionModal();
+        if (deletingActive) {
+          const fallback = lists.find((list) => list.id !== listIdToDelete)?.id ?? null;
+          setActiveListId(fallback);
+        }
+      },
+    });
+  };
+
+  const handleLeave = () => {
+    if (!actionList || actionList.role === "owner") return;
+    const listIdToLeave = actionList.id;
+    const leavingActive = listIdToLeave === activeList?.id;
+    leaveList.mutate(listIdToLeave, {
+      onSuccess: () => {
+        closeActionModal();
+        if (leavingActive) {
+          const fallback = lists.find((list) => list.id !== listIdToLeave)?.id ?? null;
+          setActiveListId(fallback);
+        }
+      },
+    });
+  };
+
+  const handleShare = () => {
+    if (!actionList) return;
+    setShareList(actionList);
+    closeActionModal();
+  };
+
+  const closeShareModal = () => {
+    setShareList(null);
+  };
+
+  const triggerLabel = activeList?.name ?? (isLoadingLists ? "Listen laden…" : "Liste wählen");
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-3 rounded-xl cursor-pointer bg-slate-900/60 px-3 py-2 text-left text-sm font-medium text-slate-100 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/60 sm:w-auto"
+        onClick={toggleOpen}
+        aria-expanded={isSelectionOpen}
+        aria-haspopup="listbox"
+      >
+        <span className="max-w-56 text-left text-base leading-tight text-slate-100 line-clamp-2 wrap-break-word sm:text-lg">
+          {triggerLabel}
+        </span>
+        <ChevronsUpDown className="h-4 w-4 shrink-0" />
+      </button>
+
+      <ListSelectionModal
+        open={isSelectionOpen}
+        onClose={() => setIsSelectionOpen(false)}
+        selectableLists={selectableLists}
+        isLoading={isLoadingLists}
+        onSelectList={(listId) => {
+          setActiveListId(listId);
+          setIsSelectionOpen(false);
+        }}
+        onListLongPress={handleListLongPress}
+        onCreateList={handleCreateList}
+        isCreatingList={createList.isPending}
+      />
+
+      <ListActionsModal
+        list={actionList}
+        onClose={closeActionModal}
+        onRename={handleRename}
+        isRenaming={renameList.isPending}
+        onDelete={handleDelete}
+        isDeleting={deleteList.isPending}
+        onLeave={handleLeave}
+        isLeaving={leaveList.isPending}
+        onShare={handleShare}
+      />
+
+      <ShareListModal list={shareList} onClose={closeShareModal} />
+    </div>
+  );
+}

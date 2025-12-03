@@ -183,21 +183,19 @@ export function TodoList() {
   return (
     <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-slate-100">
       <header className="space-y-3">
-        <div className="flex gap-3 flex-row items-center">
+        <div className="flex items-center justify-between gap-3">
           <ListPicker />
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            <button
-              className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
-                ? "cursor-not-allowed border-slate-800 text-slate-600"
-                : "border-slate-700 text-slate-100 hover:border-slate-500"
-                }`}
-              onClick={() => setShowCompleted(true)}
-              disabled={completedButtonDisabled}
-            >
-              <CheckCircle className="h-4 w-4" />
-              Erledigt
-            </button>
-          </div>
+          <button
+            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
+              ? "cursor-not-allowed border-slate-800 text-slate-600"
+              : "border-slate-700 text-slate-100 hover:border-slate-500"
+              }`}
+            onClick={() => setShowCompleted(true)}
+            disabled={completedButtonDisabled}
+          >
+            <CheckCircle className="h-4 w-4" />
+            Erledigt
+          </button>
         </div>
         <ProgressBar value={completedCount} max={totalTodos} label="Todo-Fortschritt" />
       </header>
