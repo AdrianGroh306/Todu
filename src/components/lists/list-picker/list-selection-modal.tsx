@@ -110,7 +110,7 @@ export function ListSelectionModal({
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-white transition hover:bg-theme-primary-hover"
                   disabled={!newListName.trim() || isCreatingList}
                 >
                   {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
