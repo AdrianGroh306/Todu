@@ -108,6 +108,7 @@ export function useTodos(listId: string | null) {
         queryClient.setQueryData(queryKey, context.previousTodos);
       }
     },
+    onSettled: invalidateTodos,
   });
 
   const deleteTodo = useMutation({
