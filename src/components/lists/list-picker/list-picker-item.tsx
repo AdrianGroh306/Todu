@@ -52,7 +52,7 @@ export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemPr
   return (
     <button
       type="button"
-      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-slate-800/80"
+      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm text-theme-text transition hover:bg-theme-surface/80"
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}
@@ -64,12 +64,12 @@ export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemPr
         onLongPress();
       }}
     >
-      <span className="flex-1 text-left text-sm font-medium leading-tight text-slate-100 line-clamp-2 wrap-break-word">
+      <span className="flex-1 text-left text-sm font-medium leading-tight text-theme-text line-clamp-2 wrap-break-word">
         {list.name}
       </span>
       {list.role !== "owner" && (
         <span
-          className="text-slate-400"
+          className="text-theme-text-muted"
           title={list.role === "editor" ? "Editor" : "Viewer"}
           aria-label={`Rolle: ${list.role}`}
         >

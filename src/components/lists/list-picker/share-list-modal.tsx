@@ -55,28 +55,28 @@ export function ShareListModal({ list, onClose }: ShareListModalProps) {
     <Modal open={Boolean(list)} onClose={onClose} title="Liste teilen">
       {list && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-theme-text-muted">
             Teile diesen Link, damit andere deiner Liste <strong>{list.name}</strong> beitreten können.
           </p>
           <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase tracking-wide text-slate-500">Einladungslink</label>
+            <label className="text-xs uppercase tracking-wide text-theme-text-muted">Einladungslink</label>
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 readOnly
                 value={shareUrl}
-                className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-100 outline-none"
+                className="flex-1 rounded-xl border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text outline-none"
               />
               <button
                 type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 text-slate-100 transition hover:border-slate-400"
+                className="flex h-11 w-11 items-center justify-center rounded-xl border border-theme-border text-theme-text transition hover:border-theme-primary"
                 onClick={handleCopy}
               >
                 {hasCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </button>
             </div>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-theme-text-muted">
             Hinweis: Wer den Link öffnet, erhält Zugriff entsprechend der Standardrolle deiner Liste.
           </p>
         </div>

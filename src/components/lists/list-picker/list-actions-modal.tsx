@@ -61,11 +61,11 @@ export function ListActionsModal({
         isOwner ? (
           <button
             type="button"
-            className="flex items-center justify-start gap-2 cursor-pointer rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-900"
+            className="flex items-center justify-start gap-2 cursor-pointer rounded-xl bg-theme-surface px-4 py-2 text-sm font-semibold"
             onClick={onShare}
             aria-label="Liste teilen"
           >
-            <Share2 className="h-4 w-4 text-slate-400 hover:text-white" />
+            <Share2 className="h-4 w-4 text-theme-text-muted hover:text-theme-text" />
           </button>
         ) : null
       }
@@ -79,24 +79,24 @@ export function ListActionsModal({
                   type="text"
                   value={renameValue}
                   onChange={(event) => setRenameValue(event.target.value)}
-                  className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
+                  className="flex-1 rounded-xl border border-theme-border bg-theme-surface px-4 py-3 text-theme-text outline-none focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/40"
                   maxLength={MAX_LIST_NAME_LENGTH}
                 />
                 <button
                   type="button"
                   aria-label="Änderungen speichern"
-                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-theme-primary text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleRenameSubmit}
                   disabled={renameDisabled}
                 >
                   {isRenaming ? <span className="text-sm font-semibold">…</span> : <Save className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
-              <p className="flex justify-center text-xs text-slate-500">oder</p>
+              <p className="flex justify-center text-xs text-theme-text-muted">oder</p>
               <div className="flex justify-center">
                 <button
                   type="button"
-                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-rose-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-rose-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={onDelete}
                   disabled={isDeleting}
                 >
@@ -113,13 +113,13 @@ export function ListActionsModal({
             </>
           ) : (
             <>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-theme-text-muted">
                 Du bist als {list.role} eingeladen. Du kannst diese Liste jederzeit verlassen.
               </p>
               <div className="flex justify-center">
                 <button
                   type="button"
-                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-theme-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={onLeave}
                   disabled={isLeaving}
                 >

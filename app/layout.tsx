@@ -4,6 +4,7 @@ import { ServiceWorkerClient } from "@/components/service-worker-client";
 import { QueryClientProviderWrapper } from "@/components/query-client-provider";
 import { ClerkProviderWrapper } from "@/components/providers/clerk-provider-wrapper";
 import { ActiveListProvider } from "@/components/providers/active-list-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,16 +44,18 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProviderWrapper>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} bg-slate-950 text-slate-100 antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} bg-theme-bg text-theme-text antialiased`}
         >
-          <QueryClientProviderWrapper>
-            <ActiveListProvider>
-              {children}
-              <ServiceWorkerClient />
-            </ActiveListProvider>
-          </QueryClientProviderWrapper>
+          <ThemeProvider>
+            <QueryClientProviderWrapper>
+              <ActiveListProvider>
+                {children}
+                <ServiceWorkerClient />
+              </ActiveListProvider>
+            </QueryClientProviderWrapper>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProviderWrapper>

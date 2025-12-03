@@ -15,22 +15,22 @@ export function Modal({ open, onClose, title, children, footer, titleActions }: 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-theme-bg/80 p-4 backdrop-blur"
       role="dialog"
       aria-modal
       onClick={onClose}
     >
       <section
-        className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+        className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-theme-border bg-theme-surface p-6 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+            <h2 className="text-lg font-semibold text-theme-text">{title}</h2>
             {titleActions}
           </div>
           <button
-            className="rounded-full border cursor-pointer border-slate-600 p-1 text-slate-400 hover:text-slate-100"
+            className="rounded-full border cursor-pointer border-theme-border p-1 text-theme-text-muted hover:text-theme-text"
             onClick={onClose}
             aria-label="Schließen"
           >

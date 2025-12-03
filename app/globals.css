@@ -1,12 +1,98 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0b1120;
-  --foreground: #353535;
+/* Dark Theme (Default) */
+:root,
+[data-theme="dark"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-slate-900);
+  --theme-text: var(--color-slate-100);
+  --theme-text-muted: var(--color-slate-400);
+  --theme-border: var(--color-slate-700);
+  --theme-primary: var(--color-white);
+  --theme-primary-hover: var(--color-slate-100);
 }
 
+/* Light Theme - neutral grays */
+[data-theme="light"] {
+  --theme-bg: var(--color-gray-100);
+  --theme-surface: var(--color-white);
+  --theme-text: var(--color-gray-900);
+  --theme-text-muted: var(--color-gray-500);
+  --theme-border: var(--color-gray-300);
+  --theme-primary: var(--color-gray-900);
+  --theme-primary-hover: var(--color-black);
+}
+
+/* Ocean Theme - sky/cyan-based */
+[data-theme="ocean"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-sky-950);
+  --theme-text: var(--color-sky-100);
+  --theme-text-muted: var(--color-sky-300);
+  --theme-border: var(--color-sky-800);
+  --theme-primary: var(--color-sky-500);
+  --theme-primary-hover: var(--color-sky-600);
+}
+
+/* Forest Theme - green-based */
+[data-theme="forest"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-emerald-950);
+  --theme-text: var(--color-emerald-100);
+  --theme-text-muted: var(--color-emerald-300);
+  --theme-border: var(--color-emerald-800);
+  --theme-primary: var(--color-emerald-500);
+  --theme-primary-hover: var(--color-emerald-600);
+}
+
+/* Sunset Theme - orange-based */
+[data-theme="sunset"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-orange-950);
+  --theme-text: var(--color-orange-100);
+  --theme-text-muted: var(--color-orange-300);
+  --theme-border: var(--color-orange-800);
+  --theme-primary: var(--color-orange-500);
+  --theme-primary-hover: var(--color-orange-600);
+}
+
+/* Lavender Theme - purple-based */
+[data-theme="lavender"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-purple-950);
+  --theme-text: var(--color-purple-100);
+  --theme-text-muted: var(--color-purple-300);
+  --theme-border: var(--color-purple-800);
+  --theme-primary: var(--color-purple-500);
+  --theme-primary-hover: var(--color-purple-600);
+}
+
+/* Rose Theme - rose/pink-based */
+[data-theme="rose"] {
+  --theme-bg: var(--color-slate-950);
+  --theme-surface: var(--color-rose-950);
+  --theme-text: var(--color-rose-100);
+  --theme-text-muted: var(--color-rose-300);
+  --theme-border: var(--color-rose-800);
+  --theme-primary: var(--color-rose-500);
+  --theme-primary-hover: var(--color-rose-600);
+}
+
+/* ===== THEME UTILITY CLASSES ===== */
+@theme inline {
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-surface: var(--theme-surface);
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-muted: var(--theme-text-muted);
+  --color-theme-border: var(--theme-border);
+  --color-theme-primary: var(--theme-primary);
+  --color-theme-primary-hover: var(--theme-primary-hover);
+}
+
+/* ===== BASE STYLES ===== */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--theme-bg);
+  color: var(--theme-text);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

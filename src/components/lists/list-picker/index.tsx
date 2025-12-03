@@ -124,12 +124,12 @@ export function ListPicker() {
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-3 rounded-xl cursor-pointer bg-slate-900/60 px-3 py-2 text-left text-sm font-medium text-slate-100 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/60 sm:w-auto"
+        className="flex w-full items-center justify-between gap-3 rounded-xl cursor-pointer bg-theme-surface/60 px-3 py-2 text-left text-sm font-medium text-theme-text transition hover:border-theme-border focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary/60 sm:w-auto"
         onClick={toggleOpen}
         aria-expanded={isSelectionOpen}
         aria-haspopup="listbox"
       >
-        <span className="max-w-56 text-left text-base leading-tight text-slate-100 line-clamp-2 wrap-break-word sm:text-lg">
+        <span className="max-w-56 text-left text-base leading-tight text-theme-text line-clamp-2 wrap-break-word sm:text-lg">
           {triggerLabel}
         </span>
         <ChevronsUpDown className="h-4 w-4 shrink-0" />

@@ -52,14 +52,14 @@ export function ListSelectionModal({
   return (
     <Modal open={open} onClose={handleClose} title="Weitere Listen">
       <div className="space-y-4">
-        <div className="rounded-2xl bg-slate-900/50 p-2">
+        <div className="rounded-2xl bg-theme-surface/50 p-2">
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2 py-4 text-sm text-slate-400">
+            <div className="flex items-center justify-center gap-2 py-4 text-sm text-theme-text-muted">
               <Loader2 className="h-4 w-4 animate-spin" />
               Listen werden geladen…
             </div>
           ) : selectableLists.length === 0 ? (
-            <p className="py-2 text-sm text-slate-400">
+            <p className="py-2 text-sm text-theme-text-muted">
               Keine weiteren Listen – nutze unten den Button, um eine neue Liste anzulegen.
             </p>
           ) : (
@@ -82,25 +82,25 @@ export function ListSelectionModal({
             </ul>
           )}
         </div>
-        <div className="rounded-2xl bg-slate-900/40 p-4">
+        <div className="rounded-2xl bg-theme-surface/40 p-4">
           {showCreateForm ? (
             <form className="space-y-3" onSubmit={handleCreateList}>
               <input
                 type="text"
                 value={newListName}
                 onChange={(event) => setNewListName(event.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-slate-400"
+                className="w-full rounded-xl border border-theme-border bg-theme-bg px-4 py-3 text-sm text-theme-text outline-none focus:border-theme-primary"
                 maxLength={MAX_LIST_NAME_LENGTH}
                 placeholder="Neue Liste"
                 autoFocus
               />
-              <div className="text-right text-xs text-slate-500">
+              <div className="text-right text-xs text-theme-text-muted">
                 {newListName.length}/{MAX_LIST_NAME_LENGTH}
               </div>
               <div className="flex items-center justify-end gap-2 text-sm">
                 <button
                   type="button"
-                  className="rounded-xl border border-transparent px-3 py-1.5 text-slate-400 transition hover:text-slate-200"
+                  className="rounded-xl border border-transparent px-3 py-1.5 text-theme-text-muted transition hover:text-theme-text"
                   onClick={() => {
                     setShowCreateForm(false);
                     setNewListName("");
@@ -110,7 +110,7 @@ export function ListSelectionModal({
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1 rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="flex items-center gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!newListName.trim() || isCreatingList}
                 >
                   {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -121,7 +121,7 @@ export function ListSelectionModal({
           ) : (
             <button
               type="button"
-              className="flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl border border-dashed border-slate-700/60 px-4 py-3 text-sm font-medium text-slate-200 transition hover:border-slate-500"
+              className="flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl border border-dashed border-theme-border/60 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-border"
               onClick={() => setShowCreateForm(true)}
             >
               <Plus className="h-4 w-4" />

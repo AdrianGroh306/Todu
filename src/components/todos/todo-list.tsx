@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Plus, CheckCircle, Save } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
 import { useActiveList } from "@/components/providers/active-list-provider";
 import { useTodos, type Todo } from "@/hooks/use-todos";
+import { UserAvatar } from "@/components/settings/user-avatar";
 import { ListPicker } from "../lists/list-picker";
 
 const EXIT_ANIMATION_MS = 280;
@@ -182,23 +182,17 @@ export function TodoList() {
   }, []);
 
   return (
-    <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-slate-100">
+    <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
       <header className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "h-9 w-9",
-                },
-              }}
-            />
+            <UserAvatar size="md" />
             <ListPicker />
           </div>
           <button
             className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
-              ? "cursor-not-allowed border-slate-800 text-slate-600"
-              : "border-slate-700 text-slate-100 hover:border-slate-500"
+              ? "cursor-not-allowed border-theme-border/50 text-theme-text-muted/50"
+              : "border-theme-border text-theme-text hover:border-theme-primary"
               }`}
             onClick={() => setShowCompleted(true)}
             disabled={completedButtonDisabled}
@@ -230,7 +224,7 @@ export function TodoList() {
               Alle Todos sind erledigt – öffne die Erledigt-Ansicht oben rechts.
             </EmptyState>
           ) : (
-            <ul className="divide-y divide-slate-800">
+            <ul className="divide-y divide-theme-border/50">
               {visibleTodos.map((todo) => (
                 <TodoItem
                   key={todo.id}
@@ -252,17 +246,17 @@ export function TodoList() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={hasActiveList ? "Neues Todo hinzufügen" : "Liste auswählen, um Todos anzulegen"}
-            className="flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
+            className="flex-1 rounded-xl border border-theme-border bg-theme-surface/80 px-4 py-3 text-base text-theme-text outline-none transition focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/40"
             autoFocus={hasActiveList}
             disabled={!hasActiveList}
           />
           <button
             type="submit"
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-            aria-label="Aufgabe speichern"
+            className="flex h-12 w-12 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover"
+            aria-label="Todo hinzufügen"
             disabled={!hasActiveList || !text.trim() || createTodo.isPending}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className=" h-5 w-5" />
           </button>
         </form>
       </section>
@@ -273,7 +267,7 @@ export function TodoList() {
         title="Erledigte Todos"
         footer={
           <button
-            className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+            className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleClearCompleted}
             disabled={completedButtonDisabled || clearCompleted.isPending}
           >
@@ -288,7 +282,7 @@ export function TodoList() {
             {completedTodos.map((todo) => (
               <li
                 key={todo.id}
-                className="flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/80 px-4 py-3 text-sm text-slate-400 line-through"
+                className="flex items-center justify-between rounded-xl border border-theme-border/70 bg-theme-surface/80 px-4 py-3 text-sm text-theme-text-muted line-through"
               >
                 <span>{todo.text}</span>
                 <Checkbox visualSize="sm" checked onChange={() => handleReopenTodo(todo)} />
@@ -306,12 +300,12 @@ export function TodoList() {
                 id="edit-todo-text"
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
-                className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-500/40"
+                className="flex-1 rounded-xl border border-theme-border bg-theme-surface px-4 py-3 text-theme-text outline-none focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/40"
               />
               <button
                 type="button"
                 aria-label="Änderungen speichern"
-                className="flex items-center cursor-pointer justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-300 h-auto w-12"
+                className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
                 onClick={handleEditSubmit}
                 disabled={!editValue.trim() || updateTodo.isPending}
               >
@@ -323,11 +317,11 @@ export function TodoList() {
               </button>
             </div>
 
-            <p className="text-xs flex justify-center text-slate-500">oder</p>
+            <p className="text-xs flex justify-center text-theme-text-muted">oder</p>
             <div className="flex justify-center">
               <button
                 type="button"
-                className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:bg-rose-900/50"
+                className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleDeleteAction}
                 disabled={deleteTodo.isPending}
               >
@@ -389,7 +383,7 @@ function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
   return (
     <li
       className={`group flex items-center justify-between px-2 py-4 transition-all duration-200 ease-out ${isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
-        } ${!isExiting ? "hover:bg-slate-900/40" : ""}`}
+        } ${!isExiting ? "hover:bg-theme-surface/40" : ""}`}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}
       onPointerLeave={() => clearLongPress()}
@@ -402,7 +396,7 @@ function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
     >
       <label className="flex w-full cursor-pointer items-center gap-3">
         <span
-          className={`flex-1 text-base transition-all duration-200 ${todo.done ? "text-slate-500 line-through" : "text-slate-100"
+          className={`flex-1 text-base transition-all duration-200 ${todo.done ? "text-theme-text-muted line-through" : "text-theme-text"
             }`}
         >
           {todo.text}
@@ -426,7 +420,7 @@ type EmptyStateProps = {
 function EmptyState({ children, dashed }: EmptyStateProps) {
   return (
     <p
-      className={`rounded-xl px-4 py-8 text-center text-sm text-slate-400 ${dashed ? "border border-dashed border-slate-700/80" : ""
+      className={`rounded-xl px-4 py-8 text-center text-sm text-theme-text-muted ${dashed ? "border border-dashed border-theme-border/80" : ""
         }`}
     >
       {children}
@@ -436,7 +430,7 @@ function EmptyState({ children, dashed }: EmptyStateProps) {
 
 function ErrorState({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-xl border border-red-500/50 bg-red-950/60 px-4 py-3 text-center text-sm text-red-200">
+    <p className="rounded-xl border border-rose-500/50 bg-rose-950/60 px-4 py-3 text-center text-sm text-rose-200">
       {children}
     </p>
   );

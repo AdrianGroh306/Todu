@@ -10,7 +10,7 @@ export function Checkbox({ visualSize = "md", className = "", ...props }: Checkb
   return (
     <input
       type="checkbox"
-      className={`cursor-pointer rounded-lg border border-slate-600 bg-slate-900 transition duration-150 hover:border-slate-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 checked:border-slate-100 checked:bg-slate-100 ${sizeClasses} ${className}`}
+      className={`cursor-pointer rounded-lg border border-theme-border bg-theme-surface transition duration-150 hover:border-theme-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-primary checked:border-theme-primary checked:bg-theme-primary ${sizeClasses} ${className}`}
       {...props}
     />
   );

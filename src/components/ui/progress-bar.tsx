@@ -9,7 +9,7 @@ export function ProgressBar({ value, max, label = "Fortschritt" }: ProgressBarPr
   const percent = Math.round(ratio * 100);
 
   return (
-    <div className="h-2 w-full rounded-full bg-slate-800">
+    <div className="h-2 w-full rounded-full bg-theme-surface">
       <div
         role="progressbar"
         aria-label={label}
@@ -18,7 +18,7 @@ export function ProgressBar({ value, max, label = "Fortschritt" }: ProgressBarPr
         aria-valuenow={percent}
         aria-valuetext={`${value} von ${max} erledigt`}
         style={{ width: `${percent}%` }}
-        className="h-full rounded-full bg-linear-to-r from-slate-300 to-slate-50 transition-[width] duration-300 ease-out"
+        className="h-full rounded-full bg-theme-primary transition-[width] duration-300 ease-out"
       />
     </div>
   );
