@@ -43,11 +43,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProviderWrapper>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} bg-theme-bg text-theme-text antialiased`}
-        >
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} bg-theme-bg text-theme-text antialiased`}
+      >
+        <ClerkProviderWrapper>
           <ThemeProvider>
             <QueryClientProviderWrapper>
               <ActiveListProvider>
@@ -56,8 +56,8 @@ export default function RootLayout({
               </ActiveListProvider>
             </QueryClientProviderWrapper>
           </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProviderWrapper>
+        </ClerkProviderWrapper>
+      </body>
+    </html>
   );
 }

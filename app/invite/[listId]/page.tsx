@@ -2,12 +2,13 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignIn } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 type JoinState = 
   | { status: "loading" }
+  | { status: "signing-in" }
   | { status: "success"; listName: string }
   | { status: "already-member"; listName: string }
   | { status: "error"; message: string };
@@ -23,9 +24,7 @@ export default function InvitePage({ params }: { params: Promise<{ listId: strin
     if (!isLoaded) return;
 
     if (!isSignedIn) {
-      // Redirect to sign-in with return URL
-      const returnUrl = `/invite/${listId}`;
-      router.push(`/sign-in?redirect_url=${encodeURIComponent(returnUrl)}`);
+      setState({ status: "signing-in" });
       return;
     }
 
@@ -78,6 +77,21 @@ export default function InvitePage({ params }: { params: Promise<{ listId: strin
               Bitte warte einen Moment.
             </p>
           </>
+        )}
+
+        {state.status === "signing-in" && (
+          <div className="flex flex-col items-center">
+            <h1 className="mb-4 text-xl font-semibold text-theme-text">
+              Bitte melde dich an
+            </h1>
+            <p className="mb-6 text-sm text-theme-text-muted">
+              Um der Liste beizutreten, musst du angemeldet sein.
+            </p>
+            <SignIn 
+              routing="hash"
+              forceRedirectUrl={`/invite/${listId}`}
+            />
+          </div>
         )}
 
         {state.status === "success" && (
