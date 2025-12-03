@@ -21,8 +21,8 @@ export default function SignInPage() {
 		}
 	}, [isLoaded, isSignedIn, router]);
 
-	// If already signed in, show loading while redirecting
-	if (isLoaded && isSignedIn) {
+	// Don't render SignIn if user is already signed in or still loading
+	if (!isLoaded || isSignedIn) {
 		return (
 			<main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
 				<p className="text-theme-text-muted">Weiterleitung…</p>
