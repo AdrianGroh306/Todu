@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Plus, CheckCircle, Save } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
@@ -184,7 +185,16 @@ export function TodoList() {
     <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-slate-100">
       <header className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <ListPicker />
+          <div className="flex items-center gap-3">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-9 w-9",
+                },
+              }}
+            />
+            <ListPicker />
+          </div>
           <button
             className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
               ? "cursor-not-allowed border-slate-800 text-slate-600"
@@ -194,7 +204,6 @@ export function TodoList() {
             disabled={completedButtonDisabled}
           >
             <CheckCircle className="h-4 w-4" />
-            Erledigt
           </button>
         </div>
         <ProgressBar value={completedCount} max={totalTodos} label="Todo-Fortschritt" />
