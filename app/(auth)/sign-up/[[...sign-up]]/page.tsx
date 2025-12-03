@@ -1,9 +1,38 @@
-import { SignUp } from "@clerk/nextjs";
+"use client";
+
+import { useEffect } from "react";
+import { SignUp, useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    // Check for pending invite
+    const pendingInvite = sessionStorage.getItem("pendingInvite");
+    if (pendingInvite) {
+      sessionStorage.removeItem("pendingInvite");
+      router.push(`/invite/${pendingInvite}`);
+    } else {
+      router.push("/");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  // Don't render SignUp if user is already signed in or still loading
+  if (!isLoaded || isSignedIn) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
+        <p className="text-theme-text-muted">Weiterleitung…</p>
+      </main>
+    );
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-base-200 px-4 py-16">
-      <div className="rounded-box bg-base-100 p-4 shadow-lg">
+    <main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
+      <div className="rounded-2xl bg-theme-surface p-4 shadow-lg">
         <SignUp
           appearance={{
             variables: {
@@ -16,6 +45,8 @@ export default function SignUpPage() {
           routing="path"
           path="/sign-up"
           signInUrl="/sign-in"
+          forceRedirectUrl="/"
+          fallbackRedirectUrl="/"
         />
       </div>
     </main>
