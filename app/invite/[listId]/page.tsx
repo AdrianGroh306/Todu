@@ -2,13 +2,13 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useUser, SignIn } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 type JoinState = 
   | { status: "loading" }
-  | { status: "signing-in" }
+  | { status: "joining" }
   | { status: "success"; listName: string }
   | { status: "already-member"; listName: string }
   | { status: "error"; message: string };
@@ -16,19 +16,25 @@ type JoinState =
 export default function InvitePage({ params }: { params: Promise<{ listId: string }> }) {
   const { listId } = use(params);
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
   const queryClient = useQueryClient();
   const [state, setState] = useState<JoinState>({ status: "loading" });
+  const [hasAttemptedJoin, setHasAttemptedJoin] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || hasAttemptedJoin) return;
 
     if (!isSignedIn) {
-      setState({ status: "signing-in" });
+      // Store the invite URL and redirect to sign-in
+      sessionStorage.setItem("pendingInvite", listId);
+      router.push("/sign-in");
       return;
     }
 
     // User is signed in, try to join the list
+    setHasAttemptedJoin(true);
+    setState({ status: "joining" });
+
     async function joinList() {
       try {
         const response = await fetch(`/api/lists/${listId}/join`, {
@@ -39,9 +45,7 @@ export default function InvitePage({ params }: { params: Promise<{ listId: strin
 
         if (response.ok) {
           setState({ status: "success", listName: data.listName });
-          // Invalidate lists query so the new list appears
           queryClient.invalidateQueries({ queryKey: ["lists"] });
-          // Redirect to home after a short delay
           setTimeout(() => {
             router.push("/");
           }, 2000);
@@ -62,36 +66,21 @@ export default function InvitePage({ params }: { params: Promise<{ listId: strin
     }
 
     joinList();
-  }, [isLoaded, isSignedIn, listId, router, queryClient]);
+  }, [isLoaded, isSignedIn, listId, router, queryClient, hasAttemptedJoin, getToken]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-theme-bg p-4">
       <div className="w-full max-w-md rounded-2xl border border-theme-border bg-theme-surface p-8 text-center shadow-xl">
-        {state.status === "loading" && (
+        {(state.status === "loading" || state.status === "joining") && (
           <>
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-theme-primary" />
             <h1 className="mt-4 text-xl font-semibold text-theme-text">
-              Einladung wird verarbeitet…
+              {state.status === "joining" ? "Trete Liste bei…" : "Einladung wird verarbeitet…"}
             </h1>
             <p className="mt-2 text-sm text-theme-text-muted">
               Bitte warte einen Moment.
             </p>
           </>
-        )}
-
-        {state.status === "signing-in" && (
-          <div className="flex flex-col items-center">
-            <h1 className="mb-4 text-xl font-semibold text-theme-text">
-              Bitte melde dich an
-            </h1>
-            <p className="mb-6 text-sm text-theme-text-muted">
-              Um der Liste beizutreten, musst du angemeldet sein.
-            </p>
-            <SignIn 
-              routing="hash"
-              forceRedirectUrl={`/invite/${listId}`}
-            />
-          </div>
         )}
 
         {state.status === "success" && (
