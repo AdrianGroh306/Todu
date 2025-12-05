@@ -36,13 +36,16 @@ export default function SignInPage() {
 				<SignIn
 					appearance={{
 						variables: { colorPrimary: "#2563eb" },
-						elements: { formButtonPrimary: "btn btn-primary" },
+						elements: { 
+							formButtonPrimary: "btn btn-primary",
+							rootBox: { 
+								'& > div:first-child': { display: 'none' } // Hide dev mode badge
+							}
+						},
 					}}
-					routing="path"
-					path="/sign-in"
+					afterSignInUrl="/"
+					afterSignUpUrl="/"
 					signUpUrl="/sign-up"
-					forceRedirectUrl="/"
-					fallbackRedirectUrl="/"
 				/>
 			</div>
 		</main>

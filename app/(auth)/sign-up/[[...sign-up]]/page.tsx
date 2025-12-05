@@ -40,13 +40,14 @@ export default function SignUpPage() {
             },
             elements: {
               formButtonPrimary: "btn btn-primary",
+              rootBox: {
+                '& > div:first-child': { display: 'none' } // Hide dev mode badge
+              }
             },
           }}
-          routing="path"
-          path="/sign-up"
+          afterSignInUrl="/"
+          afterSignUpUrl="/"
           signInUrl="/sign-in"
-          forceRedirectUrl="/"
-          fallbackRedirectUrl="/"
         />
       </div>
     </main>
