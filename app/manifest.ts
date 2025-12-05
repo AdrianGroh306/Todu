@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Clarydo",
     description:
       "Minimalistische Todo-App, die später zur vollständigen Produktivitätsplattform wächst.",
-    start_url: "/todos",
+    start_url: "/",
     display: "standalone",
     background_color: "#0f172a",
     theme_color: "#0f172a",
