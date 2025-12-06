@@ -52,7 +52,7 @@ export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemPr
   return (
     <button
       type="button"
-      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm text-theme-text transition hover:bg-theme-surface/80"
+      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm text-theme-text transition hover:bg-theme-surface/80"
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}

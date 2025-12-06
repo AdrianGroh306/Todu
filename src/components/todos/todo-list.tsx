@@ -191,7 +191,7 @@ export function TodoList() {
             <ListPicker />
           </div>
           <button
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
+            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${completedButtonDisabled
               ? "cursor-not-allowed border-theme-border/50 text-theme-text-muted/50"
               : "border-theme-border text-theme-text hover:border-theme-primary"
               }`}
@@ -253,7 +253,7 @@ export function TodoList() {
           />
           <button
             type="submit"
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover"
+            className="flex cursor-pointer h-12 w-12 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover"
             aria-label="Todo hinzufügen"
             disabled={!hasActiveList || !text.trim() || createTodo.isPending}
           >
@@ -268,7 +268,7 @@ export function TodoList() {
         title="Erledigte Todos"
         footer={
           <button
-            className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-rose-500 cursor-pointer px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleClearCompleted}
             disabled={completedButtonDisabled || clearCompleted.isPending}
           >
@@ -279,11 +279,11 @@ export function TodoList() {
         {completedTodos.length === 0 ? (
           <EmptyState dashed>Keine erledigten Todos vorhanden.</EmptyState>
         ) : (
-          <ul className="max-h-72 space-y-2 overflow-y-auto pr-1">
+          <ul className="max-h-72 divide-y divide-theme-border/50 overflow-y-auto pr-1">
             {completedTodos.map((todo) => (
               <li
                 key={todo.id}
-                className="flex items-center justify-between rounded-xl border border-theme-border/70 bg-theme-surface/80 px-4 py-3 text-sm text-theme-text-muted line-through"
+                className="flex items-center justify-between px-4 py-3 text-sm text-theme-text-muted line-through"
               >
                 <span>{todo.text}</span>
                 <Checkbox visualSize="sm" checked onChange={() => handleReopenTodo(todo)} />
@@ -306,7 +306,7 @@ export function TodoList() {
               <button
                 type="button"
                 aria-label="Änderungen speichern"
-                className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
+                className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-border transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
                 onClick={handleEditSubmit}
                 disabled={!editValue.trim() || updateTodo.isPending}
               >

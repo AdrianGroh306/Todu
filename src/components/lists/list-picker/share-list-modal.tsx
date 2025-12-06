@@ -69,16 +69,13 @@ export function ShareListModal({ list, onClose }: ShareListModalProps) {
               />
               <button
                 type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-theme-border text-theme-text transition hover:border-theme-primary"
+                className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-xl border border-theme-border text-theme-text transition hover:border-theme-primary"
                 onClick={handleCopy}
               >
                 {hasCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </button>
             </div>
           </div>
-          <p className="text-xs text-theme-text-muted">
-            Hinweis: Wer den Link öffnet, erhält Zugriff entsprechend der Standardrolle deiner Liste.
-          </p>
         </div>
       )}
     </Modal>

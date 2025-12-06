@@ -38,7 +38,7 @@ export function UserAvatar({ size = "md" }: UserAvatarProps) {
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
-        className={`${sizeClasses[size]} flex items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
+        className={`${sizeClasses[size]} flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
       >
         {initial}
       </button>

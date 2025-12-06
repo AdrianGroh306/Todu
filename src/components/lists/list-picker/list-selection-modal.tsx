@@ -63,7 +63,7 @@ export function ListSelectionModal({
               Keine weiteren Listen – nutze unten den Button, um eine neue Liste anzulegen.
             </p>
           ) : (
-            <ul className="max-h-56 space-y-1 overflow-y-auto pr-1">
+            <ul className="max-h-56 divide-y divide-theme-border/50 overflow-y-auto pr-1">
               {selectableLists.map((list) => (
                 <li key={list.id}>
                   <ListPickerItem
@@ -100,7 +100,7 @@ export function ListSelectionModal({
               <div className="flex items-center justify-end gap-2 text-sm">
                 <button
                   type="button"
-                  className="rounded-xl border border-transparent px-3 py-1.5 text-theme-text-muted transition hover:text-theme-text"
+                  className="rounded-xl border border-transparent px-3 py-1.5 text-theme-text-muted transition hover:text-theme-text cursor-pointer"
                   onClick={() => {
                     setShowCreateForm(false);
                     setNewListName("");
@@ -110,7 +110,7 @@ export function ListSelectionModal({
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-white transition hover:bg-theme-primary-hover"
+                  className="flex items-center cursor-pointer gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-theme-border transition hover:bg-theme-primary-hover"
                   disabled={!newListName.trim() || isCreatingList}
                 >
                   {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}

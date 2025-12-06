@@ -85,7 +85,7 @@ export function ListActionsModal({
                 <button
                   type="button"
                   aria-label="Änderungen speichern"
-                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-theme-primary text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-theme-primary text-theme-border transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleRenameSubmit}
                   disabled={renameDisabled}
                 >
