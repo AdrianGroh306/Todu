@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorkerClient } from "@/components/service-worker-client";
 import { QueryClientProviderWrapper } from "@/components/query-client-provider";
-import { ClerkProviderWrapper } from "@/components/providers/clerk-provider-wrapper";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { ActiveListProvider } from "@/components/providers/active-list-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
@@ -47,7 +47,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-theme-bg text-theme-text antialiased`}
       >
-        <ClerkProviderWrapper>
+        <AuthProvider>
           <ThemeProvider>
             <QueryClientProviderWrapper>
               <ActiveListProvider>
@@ -56,7 +56,7 @@ export default function RootLayout({
               </ActiveListProvider>
             </QueryClientProviderWrapper>
           </ThemeProvider>
-        </ClerkProviderWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

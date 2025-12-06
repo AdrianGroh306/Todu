@@ -1,28 +1,13 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { type NextRequest } from "next/server";
+import { updateSession } from "@/lib/supabase/middleware";
 
-const isPublicRoute = createRouteMatcher([
-  "/api/todos(.*)",
-  "/manifest.webmanifest",
-  "/sw.js",
-  "/icons(.*)",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-]);
-
-export default clerkMiddleware(async (auth, req) => {
-  if (isPublicRoute(req)) {
-    return;
-  }
-
-  const session = await auth();
-  if (!session.userId) {
-    return session.redirectToSignIn();
-  }
-});
+export default async function proxy(request: NextRequest) {
+  return await updateSession(request);
+}
 
 export const config = {
+  // Exclude API routes and static assets from auth middleware
   matcher: [
-    "/((?!.+\\.[\\w]+$|_next).*)",
-    "/"
+    "/((?!api|_next/static|_next/image|favicon.ico).*)"
   ]
 };

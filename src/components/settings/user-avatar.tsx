@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/components/providers/auth-provider";
 import { SettingsModal } from "@/components/settings/settings-modal";
 
 type UserAvatarProps = {
@@ -9,16 +9,16 @@ type UserAvatarProps = {
 };
 
 const sizeClasses = {
-  sm: "h-7 w-7",
-  md: "h-9 w-9",
-  lg: "h-11 w-11",
+  sm: "h-7 w-7 text-xs",
+  md: "h-9 w-9 text-sm",
+  lg: "h-11 w-11 text-base",
 };
 
 export function UserAvatar({ size = "md" }: UserAvatarProps) {
-  const { user, isLoaded } = useUser();
+  const { user, isLoading } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <div
         className={`${sizeClasses[size]} animate-pulse rounded-full bg-theme-surface`}
@@ -30,18 +30,17 @@ export function UserAvatar({ size = "md" }: UserAvatarProps) {
     return null;
   }
 
+  const email = user.email ?? "";
+  const initial = email.charAt(0).toUpperCase();
+
   return (
     <>
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
-        className={`${sizeClasses[size]} overflow-hidden rounded-full ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
+        className={`${sizeClasses[size]} flex items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
       >
-        <img
-          src={user.imageUrl}
-          alt={user.fullName ?? "User"}
-          className="h-full w-full object-cover"
-        />
+        {initial}
       </button>
 
       <SettingsModal

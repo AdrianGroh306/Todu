@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/components/providers/auth-provider";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
@@ -16,15 +16,15 @@ type JoinState =
 export default function InvitePage({ params }: { params: Promise<{ listId: string }> }) {
   const { listId } = use(params);
   const router = useRouter();
-  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();
   const [state, setState] = useState<JoinState>({ status: "loading" });
   const [hasAttemptedJoin, setHasAttemptedJoin] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded || hasAttemptedJoin) return;
+    if (isLoading || hasAttemptedJoin) return;
 
-    if (!isSignedIn) {
+    if (!user) {
       // Store the invite URL and redirect to sign-in
       sessionStorage.setItem("pendingInvite", listId);
       router.push("/sign-in");
@@ -66,7 +66,7 @@ export default function InvitePage({ params }: { params: Promise<{ listId: strin
     }
 
     joinList();
-  }, [isLoaded, isSignedIn, listId, router, queryClient, hasAttemptedJoin, getToken]);
+  }, [isLoading, user, listId, router, queryClient, hasAttemptedJoin]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-theme-bg p-4">

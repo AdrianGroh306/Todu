@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useClerk } from "@clerk/nextjs";
+import { useAuth } from "@/components/providers/auth-provider";
 import { Modal } from "@/components/ui/modal";
 import { THEMES, useTheme, type ThemeId } from "@/components/providers/theme-provider";
 
@@ -12,7 +12,7 @@ type SettingsModalProps = {
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
-  const { signOut } = useClerk();
+  const { signOut } = useAuth();
 
   const handleThemeSelect = (themeId: ThemeId) => {
     setTheme(themeId);

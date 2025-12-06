@@ -1,14 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { TodoList } from "@/components/todos/todo-list";
 
 export default async function HomePage() {
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (clerkKey) {
-    const { userId } = await auth();
-    if (!userId) {
-      return null;
-    }
+  if (!user) {
+    redirect("/sign-in");
   }
 
   return <TodoList />;

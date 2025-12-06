@@ -2,26 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function POST(request: NextRequest, context: RouteContext) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const userId = await getUserId();
-    const { id: listId } = await context.params;
+    const { id: listId } = await params;
 
-    // Check if the list exists
+    console.log("Join list request:", { listId, userId });
+
+    // Check if the list exists (use admin client to bypass RLS)
+    console.log("Querying lists table with admin client for listId:", listId);
     const { data: list, error: listError } = await supabase
       .from("lists")
-      .select("id, name, owner_id")
+      .select("id, name, user_id")
       .eq("id", listId)
       .single();
+    
+    console.log("Admin client query result:", { list, listError });
+
+    console.log("List query result:", { list, listError });
 
     if (listError || !list) {
       return NextResponse.json({ error: "List not found" }, { status: 404 });
     }
 
     // Check if user is already the owner
-    if (list.owner_id === userId) {
+    if (list.user_id === userId) {
       return NextResponse.json(
         { error: "You are already the owner of this list", listId, listName: list.name },
         { status: 400 }

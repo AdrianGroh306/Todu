@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Modal } from "@/components/ui/modal";
 import { useActiveList } from "@/components/providers/active-list-provider";
 import { useTodos, type Todo } from "@/hooks/use-todos";
+import { useRealtimeTodos } from "@/hooks/use-realtime-todos";
 import { UserAvatar } from "@/components/settings/user-avatar";
 import { ListPicker } from "../lists/list-picker";
 
