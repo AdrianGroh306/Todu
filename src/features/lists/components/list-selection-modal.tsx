@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
-import { Modal } from "@/components/ui/modal";
-import type { ListSummary } from "@/hooks/use-lists";
+import { Modal } from "@/components/modal";
+import type { ListSummary } from "@/features/lists/hooks/use-lists";
 import { ListPickerItem } from "./list-picker-item";
 
 const MAX_LIST_NAME_LENGTH = 25;

@@ -1,21 +1,23 @@
 import { useRef } from "react";
 import type { PointerEvent } from "react";
-import { UserRound } from "lucide-react";
-import type { ListSummary } from "@/hooks/use-lists";
+import { Checkbox } from "@/components/checkbox";
+import type { Todo } from "@/features/todos/hooks/use-todos";
 
 const LONG_PRESS_MS = 500;
 
-type ListPickerItemProps = {
-  list: ListSummary;
-  onSelect: () => void;
+type TodoItemProps = {
+  todo: Todo;
+  isExiting: boolean;
+  onToggle: () => void;
   onLongPress: () => void;
 };
 
-export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemProps) {
+export function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
+  const disabled = isExiting;
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
 
-  const clearLongPress = (event?: PointerEvent<HTMLButtonElement>) => {
+  const clearLongPress = (event?: PointerEvent<HTMLLIElement>) => {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current);
       pressTimerRef.current = null;
@@ -39,21 +41,19 @@ export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemPr
     }, LONG_PRESS_MS);
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCheckboxChange = () => {
     if (longPressTriggeredRef.current) {
-      event.preventDefault();
-      event.stopPropagation();
       longPressTriggeredRef.current = false;
       return;
     }
-    onSelect();
+    onToggle();
   };
 
   return (
-    <button
-      type="button"
-      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm text-theme-text transition hover:bg-theme-surface/80"
-      onClick={handleClick}
+    <li
+      className={`group flex items-center justify-between px-2 py-4 transition-all duration-200 ease-out ${
+        isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
+      } ${!isExiting ? "hover:bg-theme-surface/40" : ""}`}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}
       onPointerLeave={() => clearLongPress()}
@@ -64,18 +64,21 @@ export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemPr
         onLongPress();
       }}
     >
-      <span className="flex-1 text-left text-sm font-medium leading-tight text-theme-text line-clamp-2 wrap-break-word">
-        {list.name}
-      </span>
-      {list.role !== "owner" && (
+      <label className="flex w-full cursor-pointer items-center gap-3">
         <span
-          className="text-theme-text-muted"
-          title={list.role === "editor" ? "Editor" : "Viewer"}
-          aria-label={`Rolle: ${list.role}`}
+          className={`flex-1 text-base transition-all duration-200 ${
+            todo.done ? "text-theme-text-muted line-through" : "text-theme-text"
+          }`}
         >
-          <UserRound className="h-4 w-4" aria-hidden="true" />
+          {todo.text}
         </span>
-      )}
-    </button>
+        <Checkbox
+          checked={todo.done}
+          onChange={handleCheckboxChange}
+          disabled={disabled}
+          aria-disabled={disabled}
+        />
+      </label>
+    </li>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuth } from "@/features/auth/providers/auth-provider";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 

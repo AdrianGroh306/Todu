@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronsUpDown } from "lucide-react";
-import { useActiveList } from "@/components/providers/active-list-provider";
-import type { ListSummary } from "@/hooks/use-lists";
+import { useActiveList } from "@/features/shared/providers/active-list-provider";
+import type { ListSummary } from "@/features/lists/hooks/use-lists";
 import { ListSelectionModal } from "./list-selection-modal";
 import { ListActionsModal } from "./list-actions-modal";
 import { ShareListModal } from "./share-list-modal";

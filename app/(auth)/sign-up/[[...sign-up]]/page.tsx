@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuth } from "@/features/auth/providers/auth-provider";
 
 export default function SignUpPage() {
   const router = useRouter();

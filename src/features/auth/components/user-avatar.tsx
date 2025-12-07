@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/providers/auth-provider";
-import { SettingsModal } from "@/components/settings/settings-modal";
+import { useAuth } from "@/features/auth/providers/auth-provider";
+import { SettingsModal } from "@/features/auth/components/settings-modal";
 
 type UserAvatarProps = {
   size?: "sm" | "md" | "lg";

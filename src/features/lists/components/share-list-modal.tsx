@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
-import { Modal } from "@/components/ui/modal";
-import type { ListSummary } from "@/hooks/use-lists";
+import { Modal } from "@/components/modal";
+import type { ListSummary } from "@/features/lists/hooks/use-lists";
 
 type ShareListModalProps = {
   list: ListSummary | null;

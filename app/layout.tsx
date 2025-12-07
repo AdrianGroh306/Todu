@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ServiceWorkerClient } from "@/components/service-worker-client";
-import { QueryClientProviderWrapper } from "@/components/query-client-provider";
-import { AuthProvider } from "@/components/providers/auth-provider";
-import { ActiveListProvider } from "@/components/providers/active-list-provider";
-import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ServiceWorkerClient } from "@/features/shared/service-worker-client";
+import { QueryClientProviderWrapper } from "@/features/shared/providers/query-client-provider";
+import { AuthProvider } from "@/features/auth/providers/auth-provider";
+import { ActiveListProvider } from "@/features/shared/providers/active-list-provider";
+import { ThemeProvider } from "@/features/shared/providers/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({

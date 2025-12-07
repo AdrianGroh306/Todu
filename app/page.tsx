@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { TodoList } from "@/components/todos/todo-list";
+import { TodoList } from "@/features/todos/components/todo-list";
 
 export default async function HomePage() {
   const supabase = await createClient();

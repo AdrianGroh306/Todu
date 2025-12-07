@@ -1,9 +1,9 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useAuth } from "@/components/providers/auth-provider";
-import { Modal } from "@/components/ui/modal";
-import { THEMES, useTheme, type ThemeId } from "@/components/providers/theme-provider";
+import { useAuth } from "@/features/auth/providers/auth-provider";
+import { Modal } from "@/components/modal";
+import { THEMES, useTheme, type ThemeId } from "@/features/shared/providers/theme-provider";
 
 type SettingsModalProps = {
   open: boolean;

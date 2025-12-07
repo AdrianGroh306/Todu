@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { useLists, type ListSummary } from "@/hooks/use-lists";
+import { useLists, type ListSummary } from "@/features/lists/hooks/use-lists";
 
 type ActiveListContextValue = {
   lists: ListSummary[];

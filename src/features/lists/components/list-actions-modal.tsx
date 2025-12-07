@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LogOut, Save, Share2, Trash2 } from "lucide-react";
-import { Modal } from "@/components/ui/modal";
-import type { ListSummary } from "@/hooks/use-lists";
+import { Modal } from "@/components/modal";
+import type { ListSummary } from "@/features/lists/hooks/use-lists";
 
 const MAX_LIST_NAME_LENGTH = 40;
 
