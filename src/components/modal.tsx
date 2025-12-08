@@ -10,7 +10,7 @@ type ModalProps = {
   titleActions?: ReactNode;
 };
 
-export function Modal({ open, onClose, title, children, footer, titleActions }: ModalProps) {
+export const Modal = ({ open, onClose, title, children, footer, titleActions }: ModalProps) => {
   if (!open) return null;
 
   return (
@@ -21,7 +21,7 @@ export function Modal({ open, onClose, title, children, footer, titleActions }: 
       onClick={onClose}
     >
       <section
-        className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-theme-border bg-theme-surface p-6 shadow-2xl"
+        className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-theme-border bg-theme-surface px-6 py-8 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">

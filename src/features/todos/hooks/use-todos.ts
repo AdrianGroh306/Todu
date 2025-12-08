@@ -12,7 +12,7 @@ export type Todo = {
 
 const todosQueryKey = (listId: string | null) => ["todos", listId ?? "none"] as const;
 
-export function useTodos(listId: string | null) {
+export const useTodos = (listId: string | null) => {
   const queryClient = useQueryClient();
   const hasActiveList = Boolean(listId);
   const queryKey = todosQueryKey(listId);
@@ -25,6 +25,8 @@ export function useTodos(listId: string | null) {
     queryKey,
     queryFn: () => jsonFetch<Todo[]>(`/api/todos?listId=${encodeURIComponent(listId ?? "")}`),
     enabled: hasActiveList,
+    staleTime: 30 * 1000, // Cache for 30 seconds - fast load, realtime keeps it fresh
+    gcTime: 10 * 60 * 1000, // Cache in memory for 10 minutes
   });
 
   const invalidateTodos = () => {

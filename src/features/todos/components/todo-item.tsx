@@ -12,7 +12,7 @@ type TodoItemProps = {
   onLongPress: () => void;
 };
 
-export function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
+export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) => {
   const disabled = isExiting;
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);

@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 import { Modal } from "@/components/modal";
 import { THEMES, useTheme, type ThemeId } from "@/features/shared/providers/theme-provider";
@@ -52,11 +53,20 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         <hr className="border-theme-border" />
 
-        <div className="flex justify-center">
+        <div className="space-y-2">
+          <Link
+            href="/profile"
+            onClick={onClose}
+            className="flex cursor-pointer items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-theme-text transition hover:bg-theme-surface"
+          >
+            <Settings className="h-4 w-4" />
+            Vollständiges Profil
+          </Link>
+          
           <button
             type="button"
             onClick={handleLogout}
-            className="flex cursor-pointer items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-rose-400 transition hover:bg-rose-500/10"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-rose-400 transition hover:bg-rose-500/10"
           >
             <LogOut className="h-4 w-4" />
             Abmelden

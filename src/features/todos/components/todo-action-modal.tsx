@@ -14,7 +14,7 @@ type TodoActionModalProps = {
   isDeleting: boolean;
 };
 
-export function TodoActionModal({
+export const TodoActionModal = ({
   open,
   onClose,
   todo,
@@ -24,7 +24,7 @@ export function TodoActionModal({
   onDelete,
   isSaving,
   isDeleting,
-}: TodoActionModalProps) {
+}: TodoActionModalProps) => {
   if (!todo) return null;
 
   return (

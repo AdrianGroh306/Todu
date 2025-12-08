@@ -13,7 +13,7 @@ export type ListSummary = {
 
 const listsQueryKey = ["lists"] as const;
 
-export function useLists() {
+export const useLists = () => {
   const queryClient = useQueryClient();
 
   const {

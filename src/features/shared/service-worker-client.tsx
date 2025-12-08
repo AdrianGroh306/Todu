@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 const SERVICE_WORKER_PATH = "/sw.js";
 
-export function ServiceWorkerClient() {
+export const ServiceWorkerClient = () => {
   useEffect(() => {
     if (process.env.NODE_ENV === "development") return;
     if (!("serviceWorker" in navigator)) return;

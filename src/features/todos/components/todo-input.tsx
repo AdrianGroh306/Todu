@@ -9,14 +9,14 @@ type TodoInputProps = {
   inputRef: React.RefObject<HTMLInputElement | null>;
 };
 
-export function TodoInput({
+export const TodoInput = ({
   value,
   onChange,
   onSubmit,
   disabled,
   isCreating,
   inputRef,
-}: TodoInputProps) {
+}: TodoInputProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit();

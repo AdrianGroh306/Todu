@@ -14,7 +14,7 @@ const EXIT_ANIMATION_MS = 280;
 
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
-export function TodoList() {
+export const TodoList = () => {
   const [text, setText] = useState("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [showCompleted, setShowCompleted] = useState(false);
@@ -253,14 +253,14 @@ export function TodoList() {
       />
     </main>
   );
-}
+};
 
 type EmptyStateProps = {
   children: React.ReactNode;
   dashed?: boolean;
 };
 
-function EmptyState({ children, dashed }: EmptyStateProps) {
+const EmptyState = ({ children, dashed }: EmptyStateProps) => {
   return (
     <p
       className={`rounded-xl px-4 py-8 text-center text-sm text-theme-text-muted ${
@@ -270,12 +270,12 @@ function EmptyState({ children, dashed }: EmptyStateProps) {
       {children}
     </p>
   );
-}
+};
 
-function ErrorState({ children }: { children: React.ReactNode }) {
+const ErrorState = ({ children }: { children: React.ReactNode }) => {
   return (
     <p className="rounded-xl border border-rose-500/50 bg-rose-950/60 px-4 py-3 text-center text-sm text-rose-200">
       {children}
     </p>
   );
-}
+};

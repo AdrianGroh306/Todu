@@ -19,7 +19,7 @@ const ActiveListContext = createContext<ActiveListContextValue | undefined>(unde
 
 const ACTIVE_LIST_STORAGE_KEY = "clarydo-active-list-id";
 
-export function ActiveListProvider({ children }: { children: ReactNode }) {
+export const ActiveListProvider = ({ children }: { children: ReactNode }) => {
   const {
     lists,
     isPending: isLoadingLists,
@@ -83,7 +83,7 @@ export function ActiveListProvider({ children }: { children: ReactNode }) {
   return <ActiveListContext.Provider value={value}>{children}</ActiveListContext.Provider>;
 }
 
-export function useActiveList() {
+export const useActiveList = () => {
   const context = useContext(ActiveListContext);
   if (!context) {
     throw new Error("useActiveList must be used within an ActiveListProvider");

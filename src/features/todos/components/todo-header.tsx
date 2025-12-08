@@ -11,13 +11,13 @@ type TodoHeaderProps = {
   showCompletedDisabled: boolean;
 };
 
-export function TodoHeader({
+export const TodoHeader = ({
   listName,
   completedCount,
   totalCount,
   onShowCompleted,
   showCompletedDisabled,
-}: TodoHeaderProps) {
+}: TodoHeaderProps) => {
   return (
     <header className="space-y-3">
       <div className="flex items-center justify-between gap-3">

@@ -4,7 +4,7 @@ type ProgressBarProps = {
   label?: string;
 };
 
-export function ProgressBar({ value, max, label = "Fortschritt" }: ProgressBarProps) {
+export const ProgressBar = ({ value, max, label = "Fortschritt" }: ProgressBarProps) => {
   const ratio = max === 0 ? 0 : value / max;
   const percent = Math.round(ratio * 100);
 

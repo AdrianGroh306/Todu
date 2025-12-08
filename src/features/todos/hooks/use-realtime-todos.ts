@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import type { Todo } from "./use-todos";
 
-export function useRealtimeTodos(listId: string | null) {
+export const useRealtimeTodos = (listId: string | null) => {
   const queryClient = useQueryClient();
   const supabase = createClient();
 
   useEffect(() => {
     if (!listId) return;
-
-    console.log("Setting up realtime subscription for listId:", listId);
 
     // Subscribe to changes on todos table for this specific list
     const subscription = supabase
@@ -17,22 +16,35 @@ export function useRealtimeTodos(listId: string | null) {
       .on(
         "postgres_changes",
         {
-          event: "*", // Listen to all events (INSERT, UPDATE, DELETE)
+          event: "*",
           schema: "public",
           table: "todos",
           filter: `list_id=eq.${listId}`,
         },
         (payload) => {
-          console.log("Realtime update received:", payload);
-          // Invalidate the todos query to trigger a refetch
-          queryClient.invalidateQueries({ queryKey: ["todos", listId] });
+          const queryKey = ["todos", listId] as const;
+          const currentTodos = queryClient.getQueryData<Todo[]>(queryKey) ?? [];
+
+          if (payload.eventType === "INSERT") {
+            const newTodo = payload.new as Todo;
+            queryClient.setQueryData<Todo[]>(queryKey, [newTodo, ...currentTodos]);
+          } else if (payload.eventType === "UPDATE") {
+            const updatedTodo = payload.new as Todo;
+            queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
+              current.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+            );
+          } else if (payload.eventType === "DELETE") {
+            const deletedTodo = payload.old as Todo;
+            queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
+              current.filter((todo) => todo.id !== deletedTodo.id)
+            );
+          }
         }
       )
       .subscribe();
 
     return () => {
-      console.log("Cleaning up realtime subscription for listId:", listId);
       subscription.unsubscribe();
     };
   }, [listId, queryClient, supabase]);
-}
+};

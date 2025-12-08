@@ -6,7 +6,7 @@ import { useAuth } from "@/features/auth/providers/auth-provider";
 
 export default function SignInPage() {
 	const router = useRouter();
-	const { user, isLoading } = useAuth();
+	const { user, isLoading, refreshUser } = useAuth();
 	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -48,6 +48,8 @@ export default function SignInPage() {
 				setIsSubmitting(false);
 				return;
 			}
+			// Refresh user data to get latest metadata (including avatar)
+			await refreshUser();
 			router.push("/");
 		} catch (err) {
 			console.error("Sign-in: login failed", err);

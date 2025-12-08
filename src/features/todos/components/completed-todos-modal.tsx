@@ -11,14 +11,14 @@ type CompletedTodosModalProps = {
   isClearing: boolean;
 };
 
-export function CompletedTodosModal({
+export const CompletedTodosModal = ({
   open,
   onClose,
   completedTodos,
   onReopenTodo,
   onClearCompleted,
   isClearing,
-}: CompletedTodosModalProps) {
+}: CompletedTodosModalProps) => {
   return (
     <Modal
       open={open}
@@ -39,18 +39,23 @@ export function CompletedTodosModal({
           Keine erledigten Todos vorhanden.
         </p>
       ) : (
-        <ul className="max-h-72 divide-y divide-theme-border/50 overflow-y-auto pr-1">
+        <ul className="min-h-[300px] max-h-[60vh] overflow-y-auto divide-y divide-theme-border/50 pr-1">
           {completedTodos.map((todo) => (
             <li
               key={todo.id}
               className="flex items-center justify-between px-4 py-3 text-sm text-theme-text-muted line-through"
             >
               <span>{todo.text}</span>
-              <Checkbox visualSize="sm" checked onChange={() => onReopenTodo(todo)} />
+              <Checkbox
+                visualSize="sm"
+                className="accent-theme-primary"
+                checked
+                onChange={() => onReopenTodo(todo)}
+              />
             </li>
           ))}
         </ul>
       )}
     </Modal>
   );
-}
+};

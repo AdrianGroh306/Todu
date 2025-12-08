@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { User } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
-import { SettingsModal } from "@/features/auth/components/settings-modal";
 
 type UserAvatarProps = {
   size?: "sm" | "md" | "lg";
@@ -14,9 +14,8 @@ const sizeClasses = {
   lg: "h-11 w-11 text-base",
 };
 
-export function UserAvatar({ size = "md" }: UserAvatarProps) {
+export const UserAvatar = ({ size = "md" }: UserAvatarProps) => {
   const { user, isLoading } = useAuth();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -32,21 +31,26 @@ export function UserAvatar({ size = "md" }: UserAvatarProps) {
 
   const email = user.email ?? "";
   const initial = email.charAt(0).toUpperCase();
+  const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setIsSettingsOpen(true)}
-        className={`${sizeClasses[size]} flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
-      >
-        {initial}
-      </button>
-
-      <SettingsModal
-        open={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-    </>
+    <Link
+      href="/profile"
+      className={`${sizeClasses[size]} flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
+      aria-label="Profil öffnen"
+    >
+      {avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={avatarUrl}
+          alt="Profilbild"
+          className="h-full w-full object-cover"
+        />
+      ) : initial ? (
+        initial
+      ) : (
+        <User className="h-4 w-4" />
+      )}
+    </Link>
   );
-}
+};
