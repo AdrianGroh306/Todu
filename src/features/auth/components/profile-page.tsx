@@ -18,17 +18,22 @@ export const ProfilePage = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data: username } = useQuery({
+  const { data: username, isLoading: usernameLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
+      console.log("Fetching username for user:", user.id);
       const { data, error } = await supabase
         .from("profiles")
         .select("username")
         .eq("id", user.id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error loading username:", error);
+        return null;
+      }
+      console.log("Username loaded:", data);
       return data?.username ?? null;
     },
     enabled: !!user?.id,
@@ -176,7 +181,7 @@ export const ProfilePage = () => {
                 type="button"
                 onClick={triggerAvatarUpload}
                 disabled={uploading}
-                className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-theme-border bg-theme-primary text-white shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
+                className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center cursor-pointer justify-center rounded-full border-2 border-theme-border bg-theme-primary text-theme-border shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
                 aria-label="Profilbild ändern"
               >
                 <Edit className="h-4 w-4" />
@@ -205,7 +210,7 @@ export const ProfilePage = () => {
             <div className="flex-1">
               <p className="text-sm text-theme-text-muted">Benutzername</p>
               <p className="text-lg font-medium text-theme-text">
-                {username || "Lädt..."}
+                {usernameLoading ? "Lädt..." : username || "Nicht gesetzt"}
               </p>
             </div>
           </div>

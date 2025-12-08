@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LogOut, Save, Share2, Trash2 } from "lucide-react";
 import { Modal } from "@/components/modal";
+import { Spinner } from "@/components/spinner";
 import type { ListSummary } from "@/features/lists/hooks/use-lists";
 
 const MAX_LIST_NAME_LENGTH = 40;
@@ -89,7 +90,7 @@ export function ListActionsModal({
                   onClick={handleRenameSubmit}
                   disabled={renameDisabled}
                 >
-                  {isRenaming ? <span className="text-sm font-semibold">…</span> : <Save className="h-5 w-5" aria-hidden="true" />}
+                  {isRenaming ? <Spinner size="sm" className="border-white" /> : <Save className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
               <p className="flex justify-center text-xs text-theme-text-muted">oder</p>
@@ -101,7 +102,7 @@ export function ListActionsModal({
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
-                    "Lösche…"
+                    <Spinner size="sm" className="border-white mx-auto" />
                   ) : (
                     <>
                       <Trash2 className="h-4 w-4" />
@@ -124,7 +125,7 @@ export function ListActionsModal({
                   disabled={isLeaving}
                 >
                   {isLeaving ? (
-                    "Verlasse…"
+                    <Spinner size="sm" className="border-white mx-auto" />
                   ) : (
                     <>
                       <LogOut className="h-4 w-4" />

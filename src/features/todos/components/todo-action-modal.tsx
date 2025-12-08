@@ -1,5 +1,6 @@
 import { Save } from "lucide-react";
 import { Modal } from "@/components/modal";
+import { Spinner } from "@/components/spinner";
 import type { Todo } from "@/features/todos/hooks/use-todos";
 
 type TodoActionModalProps = {
@@ -27,6 +28,9 @@ export const TodoActionModal = ({
 }: TodoActionModalProps) => {
   if (!todo) return null;
 
+  const isSaveDisabled =
+    !editValue.trim() || editValue.trim() === todo.text.trim() || isSaving;
+
   return (
     <Modal open={open} onClose={onClose} title="Todo-Aktionen">
       <div className="space-y-4">
@@ -40,12 +44,12 @@ export const TodoActionModal = ({
           <button
             type="button"
             aria-label="Änderungen speichern"
-            className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
+            className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-border transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
             onClick={onSave}
-            disabled={!editValue.trim() || isSaving}
+            disabled={isSaveDisabled}
           >
             {isSaving ? (
-              <span className="text-sm font-semibold">…</span>
+              <Spinner size="sm" className="border-white" />
             ) : (
               <Save className="h-5 w-5" aria-hidden="true" />
             )}
@@ -60,7 +64,7 @@ export const TodoActionModal = ({
             onClick={onDelete}
             disabled={isDeleting}
           >
-            {isDeleting ? "Lösche…" : "Todo löschen"}
+            {isDeleting ? <Spinner size="sm" className="border-white mx-auto" /> : "Todo löschen"}
           </button>
         </div>
       </div>

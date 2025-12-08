@@ -7,7 +7,7 @@
   --theme-surface: var(--color-slate-900);
   --theme-text: var(--color-slate-100);
   --theme-text-muted: var(--color-slate-400);
-  --theme-border: var(--color-slate-700);
+  --theme-border: var(--color-slate-900);
   --theme-primary: var(--color-white);
   --theme-primary-hover: var(--color-slate-100);
 }
