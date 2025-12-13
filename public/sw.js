@@ -37,7 +37,23 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Only cache navigation requests and static assets
+  // Never cache API responses – always hit the network for dynamic data
+  if (url.pathname.startsWith("/api/")) {
+    return;
+  }
+
+  // Always go to network for navigations so we don't show stale HTML on refresh
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(async () => {
+        const cached = await caches.match(request);
+        return cached ?? caches.match("/");
+      }),
+    );
+    return;
+  }
+
+  // Cache-first for static assets only
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)

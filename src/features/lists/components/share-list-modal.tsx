@@ -8,7 +8,7 @@ type ShareListModalProps = {
   onClose: () => void;
 };
 
-export function ShareListModal({ list, onClose }: ShareListModalProps) {
+export const ShareListModal = ({ list, onClose }: ShareListModalProps) => {
   const [hasCopied, setHasCopied] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

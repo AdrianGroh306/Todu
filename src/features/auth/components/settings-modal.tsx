@@ -11,7 +11,7 @@ type SettingsModalProps = {
   onClose: () => void;
 };
 
-export function SettingsModal({ open, onClose }: SettingsModalProps) {
+export const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();
 

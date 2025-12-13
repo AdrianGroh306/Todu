@@ -11,7 +11,7 @@ type ListPickerItemProps = {
   onLongPress: () => void;
 };
 
-export function ListPickerItem({ list, onSelect, onLongPress }: ListPickerItemProps) {
+export const ListPickerItem = ({ list, onSelect, onLongPress }: ListPickerItemProps) => {
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
 

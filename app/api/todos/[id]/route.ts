@@ -41,6 +41,8 @@ export async function PATCH(
     if (typeof text !== "undefined") update.text = text.trim();
     if (typeof done !== "undefined") update.done = done;
 
+    console.log("[PATCH /api/todos] Updating todo", todoId.slice(0,8), "with:", update);
+
     const { data, error } = await supabase
       .from("todos")
       .update(update)
@@ -52,6 +54,7 @@ export async function PATCH(
       throw error;
     }
 
+    console.log("[PATCH /api/todos] Updated result:", { id: data.id.slice(0,8), done: data.done });
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof UnauthorizedError) {

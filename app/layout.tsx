@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorkerClient } from "@/features/shared/service-worker-client";
 import { QueryClientProviderWrapper } from "@/features/shared/providers/query-client-provider";
 import { AuthProvider } from "@/features/auth/providers/auth-provider";
-import { ActiveListProvider } from "@/features/shared/providers/active-list-provider";
 import { ThemeProvider } from "@/features/shared/providers/theme-provider";
 import "./globals.css";
 
@@ -50,10 +49,8 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <QueryClientProviderWrapper>
-              <ActiveListProvider>
-                {children}
-                <ServiceWorkerClient />
-              </ActiveListProvider>
+              {children}
+              <ServiceWorkerClient />
             </QueryClientProviderWrapper>
           </ThemeProvider>
         </AuthProvider>

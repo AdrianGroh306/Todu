@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useLists, type ListSummary } from "@/features/lists/hooks/use-lists";
+import { ACTIVE_LIST_STORAGE_KEY } from "@/features/shared/constants/storage";
 
 type ActiveListContextValue = {
   lists: ListSummary[];
@@ -17,9 +18,15 @@ type ActiveListContextValue = {
 
 const ActiveListContext = createContext<ActiveListContextValue | undefined>(undefined);
 
-const ACTIVE_LIST_STORAGE_KEY = "clarydo-active-list-id";
+type ActiveListProviderProps = {
+  children: ReactNode;
+  initialActiveListId?: string | null;
+};
 
-export const ActiveListProvider = ({ children }: { children: ReactNode }) => {
+export const ActiveListProvider = ({ 
+  children, 
+  initialActiveListId 
+}: ActiveListProviderProps) => {
   const {
     lists,
     isPending: isLoadingLists,
@@ -28,7 +35,7 @@ export const ActiveListProvider = ({ children }: { children: ReactNode }) => {
     deleteList,
     leaveList,
   } = useLists();
-  const [activeListId, setActiveListId] = useState<string | null>(null);
+  const [activeListId, setActiveListId] = useState<string | null>(initialActiveListId || null);
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -44,8 +51,10 @@ export const ActiveListProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window === "undefined") return;
     if (activeListId) {
       window.localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
+      document.cookie = `${ACTIVE_LIST_STORAGE_KEY}=${activeListId}; path=/; max-age=31536000; SameSite=Lax`;
     } else {
       window.localStorage.removeItem(ACTIVE_LIST_STORAGE_KEY);
+      document.cookie = `${ACTIVE_LIST_STORAGE_KEY}=; path=/; max-age=0; SameSite=Lax`;
     }
   }, [activeListId]);
 

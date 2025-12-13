@@ -18,7 +18,7 @@ type ListActionsModalProps = {
   onShare: () => void;
 };
 
-export function ListActionsModal({
+export const ListActionsModal = ({
   list,
   onClose,
   onRename,
@@ -28,7 +28,7 @@ export function ListActionsModal({
   onLeave,
   isLeaving,
   onShare,
-}: ListActionsModalProps) {
+}: ListActionsModalProps) => {
   const [renameValue, setRenameValue] = useState("");
 
   useEffect(() => {

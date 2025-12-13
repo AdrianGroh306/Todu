@@ -23,6 +23,9 @@ export const useLists = () => {
   } = useQuery<ListSummary[]>({
     queryKey: listsQueryKey,
     queryFn: () => jsonFetch<ListSummary[]>("/api/lists"),
+    staleTime: 60 * 1000, // Consider fresh for 1 minute
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
+    refetchOnMount: true, // Always check on mount (uses staleTime to decide if fetch needed)
   });
 
   const createList = useMutation({

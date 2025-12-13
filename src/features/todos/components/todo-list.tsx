@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
 import { useTodos, type Todo } from "@/features/todos/hooks/use-todos";
-import { useRealtimeTodos } from "@/features/todos/hooks/use-realtime-todos";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
 import { TodoItem } from "./todo-item";
@@ -35,10 +35,11 @@ export const TodoList = () => {
     invalidateTodos,
   } = useTodos(activeList?.id ?? null);
 
-  // Set up real-time subscription for todos
-  useRealtimeTodos(activeList?.id ?? null);
-
   const hasActiveList = Boolean(activeList);
+
+  const handleRefresh = async () => {
+    await invalidateTodos();
+  };
 
   const completedTodos = useMemo(() => todos.filter((t) => t.done), [todos]);
   const totalTodos = todos.length;
@@ -76,7 +77,7 @@ export const TodoList = () => {
         return next;
       });
       delete animationTimers.current[todo.id];
-      invalidateTodos();
+      // Don't invalidate here - the mutation's onSuccess already updates the cache
     }, EXIT_ANIMATION_MS);
   };
 
@@ -188,7 +189,7 @@ export const TodoList = () => {
       />
 
       <section className="flex flex-1 flex-col gap-4 overflow-hidden rounded-2xl p-6 backdrop-blur">
-        <div className="flex-1 overflow-y-auto pr-1">
+        <PullToRefresh onRefresh={handleRefresh} disabled={!hasActiveList || isPending}>
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
           ) : !hasActiveList ? (
@@ -220,7 +221,7 @@ export const TodoList = () => {
               ))}
             </ul>
           )}
-        </div>
+        </PullToRefresh>
         <TodoInput
           value={text}
           onChange={setText}

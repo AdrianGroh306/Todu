@@ -17,7 +17,7 @@ type ListSelectionModalProps = {
   isCreatingList: boolean;
 };
 
-export function ListSelectionModal({
+export const ListSelectionModal = ({
   open,
   onClose,
   selectableLists,
@@ -26,7 +26,7 @@ export function ListSelectionModal({
   onListLongPress,
   onCreateList,
   isCreatingList,
-}: ListSelectionModalProps) {
+}: ListSelectionModalProps) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState("");
 

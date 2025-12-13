@@ -3,6 +3,9 @@ import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess } from "@/lib/list-access";
 
+// Disable caching for this route
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const userId = await getUserId();
@@ -23,7 +26,13 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    return NextResponse.json(data ?? []);
+    console.log("[GET /api/todos] Returning", data?.length, "todos:", data?.map(t => ({ id: t.id.slice(0,8), done: t.done })));
+    
+    return NextResponse.json(data ?? [], {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
