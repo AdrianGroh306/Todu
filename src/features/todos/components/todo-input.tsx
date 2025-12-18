@@ -24,7 +24,7 @@ export const TodoInput = ({
 
   return (
     <form
-      className="sticky bottom-0 flex items-center gap-1 pt-3 backdrop-blur"
+      className="sticky bottom-0 flex items-center gap-1 pt-3 pb-3 backdrop-blur-xs"
       onSubmit={handleSubmit}
     >
       <input
@@ -38,11 +38,11 @@ export const TodoInput = ({
       />
       <button
         type="submit"
-        className="flex h-12 w-12 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover"
+        className="flex h-13 w-13 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover"
         aria-label="Todo hinzufügen"
         disabled={disabled || !value.trim() || isCreating}
       >
-        <Plus className=" h-5 w-5" />
+        <Plus className=" h-6 w-6" />
       </button>
     </form>
   );

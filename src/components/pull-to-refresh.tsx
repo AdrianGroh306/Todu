@@ -7,12 +7,13 @@ type PullToRefreshProps = {
   children: ReactNode;
   onRefresh: () => Promise<void>;
   disabled?: boolean;
+  className?: string;
 };
 
 const PULL_THRESHOLD = 80; // Pixels to pull before triggering refresh
 const RESISTANCE = 2.5; // How hard to pull (higher = more resistance)
 
-export const PullToRefresh = ({ children, onRefresh, disabled }: PullToRefreshProps) => {
+export const PullToRefresh = ({ children, onRefresh, disabled, className = "" }: PullToRefreshProps) => {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const startY = useRef(0);
@@ -70,7 +71,7 @@ export const PullToRefresh = ({ children, onRefresh, disabled }: PullToRefreshPr
   return (
     <div 
       ref={containerRef}
-      className="relative flex-1 overflow-y-auto"
+      className={`relative flex-1 min-h-0 overflow-y-auto ${className}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

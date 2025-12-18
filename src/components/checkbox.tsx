@@ -5,7 +5,7 @@ type CheckboxProps = Omit<ComponentPropsWithoutRef<"input">, "type" | "size"> & 
 };
 
 export const Checkbox = ({ visualSize = "sm", className = "", onChange, ...props }: CheckboxProps) => {
-  const sizeClasses = "h-6 w-6";
+  const sizeClasses = "h-7 w-7";
   
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (typeof navigator !== "undefined" && navigator.vibrate) {

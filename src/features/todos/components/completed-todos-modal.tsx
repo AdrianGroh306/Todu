@@ -28,14 +28,17 @@ export const CompletedTodosModal = ({
   isClearing,
 }: CompletedTodosModalProps) => {
   const [exitingIds, setExitingIds] = useState<Set<string>>(new Set());
-  const exitingSnapshots = useRef<Record<string, ExitingSnapshot>>({});
+  const [exitingSnapshots, setExitingSnapshots] = useState<Record<string, ExitingSnapshot>>({});
   const animationTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const startExitAnimation = (todo: Todo, index: number) => {
     if (exitingIds.has(todo.id)) {
       return;
     }
-    exitingSnapshots.current[todo.id] = { todo, index };
+    setExitingSnapshots((prev) => ({
+      ...prev,
+      [todo.id]: { todo, index },
+    }));
     setExitingIds((prev) => {
       if (prev.has(todo.id)) return prev;
       const next = new Set(prev);
@@ -53,7 +56,11 @@ export const CompletedTodosModal = ({
         next.delete(todo.id);
         return next;
       });
-      delete exitingSnapshots.current[todo.id];
+      setExitingSnapshots((prev) => {
+        const next = { ...prev };
+        delete next[todo.id];
+        return next;
+      });
       delete animationTimers.current[todo.id];
     }, EXIT_ANIMATION_MS);
   };
@@ -65,14 +72,14 @@ export const CompletedTodosModal = ({
 
   const visibleTodos = useMemo(() => {
     const completedEntries = completedTodos.map((todo, index) => ({
-      todo: exitingSnapshots.current[todo.id]?.todo ?? todo,
+      todo: exitingSnapshots[todo.id]?.todo ?? todo,
       isExiting: exitingIds.has(todo.id),
       sourceIndex: index,
     }));
 
     const exitingOnly = Array.from(exitingIds)
       .filter((id) => !completedTodos.some((todo) => todo.id === id))
-      .map((id) => exitingSnapshots.current[id])
+      .map((id) => exitingSnapshots[id])
       .filter((snapshot): snapshot is ExitingSnapshot => Boolean(snapshot))
       .sort((a, b) => a.index - b.index)
       .map(({ todo, index }) => ({
@@ -87,20 +94,12 @@ export const CompletedTodosModal = ({
     });
 
     return merged;
-  }, [completedTodos, exitingIds]);
+  }, [completedTodos, exitingIds, exitingSnapshots]);
 
   useEffect(() => {
-    if (!open) {
-      Object.values(animationTimers.current).forEach(clearTimeout);
-      animationTimers.current = {};
-      exitingSnapshots.current = {};
-      setExitingIds(new Set());
-    }
-  }, [open]);
-
-  useEffect(() => {
+    const timersAtMount = animationTimers.current;
     return () => {
-      Object.values(animationTimers.current).forEach(clearTimeout);
+      Object.values(timersAtMount).forEach(clearTimeout);
     };
   }, []);
 

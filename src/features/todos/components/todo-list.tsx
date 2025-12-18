@@ -4,13 +4,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
 import { useTodos, type Todo } from "@/features/todos/hooks/use-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
+import { useNotifications } from "@/features/shared/hooks/use-notifications";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
 import { TodoItem } from "./todo-item";
 import { CompletedTodosModal } from "./completed-todos-modal";
 import { TodoActionModal } from "./todo-action-modal";
+import { NotificationBanner } from "./notification-banner";
 
 const EXIT_ANIMATION_MS = 280;
+const REMINDER_INTERVAL_MS = 15 * 60 * 1000;
 
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
@@ -20,9 +23,20 @@ export const TodoList = () => {
   const [showCompleted, setShowCompleted] = useState(false);
   const [actionTodo, setActionTodo] = useState<Todo | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [isRequestingNotifications, setIsRequestingNotifications] = useState(false);
+  const [isSendingTestNotification, setIsSendingTestNotification] = useState(false);
   const animationTimers = useRef<TimerMap>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastReminderTimestampRef = useRef(0);
+  const hasShownWelcomeNotificationRef = useRef(false);
   const { activeList, isLoadingLists } = useActiveList();
+  const {
+    isSupported: notificationsSupported,
+    permission: notificationPermission,
+    canNotify,
+    requestPermission,
+    sendNotification,
+  } = useNotifications();
 
   const {
     todos,
@@ -44,6 +58,7 @@ export const TodoList = () => {
   const completedTodos = useMemo(() => todos.filter((t) => t.done), [todos]);
   const totalTodos = todos.length;
   const completedCount = completedTodos.length;
+  const openTodosCount = totalTodos - completedCount;
 
   const visibleTodos = useMemo(
     () => todos.filter((t) => !t.done || animatingIds.has(t.id)),
@@ -79,6 +94,43 @@ export const TodoList = () => {
       delete animationTimers.current[todo.id];
       // Don't invalidate here - the mutation's onSuccess already updates the cache
     }, EXIT_ANIMATION_MS);
+  };
+
+  const handleEnableNotifications = async () => {
+    if (isRequestingNotifications || notificationPermission === "granted") {
+      return;
+    }
+    setIsRequestingNotifications(true);
+    try {
+      await requestPermission();
+    } finally {
+      setIsRequestingNotifications(false);
+    }
+  };
+
+  const reminderBody = (count: number) => {
+    if (count <= 0) {
+      return "Alles erledigt – gönn dir eine Pause!";
+    }
+    return count === 1 ? "Du hast noch eine offene Aufgabe." : `Du hast noch ${count} offene Aufgaben.`;
+  };
+
+  const handleSendTestNotification = async () => {
+    if (!canNotify || isSendingTestNotification) {
+      return;
+    }
+    setIsSendingTestNotification(true);
+    try {
+      await sendNotification("Clarydo Erinnerungen", {
+        body: reminderBody(openTodosCount),
+        tag: "clarydo-test",
+        renotify: true,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+      });
+    } finally {
+      setIsSendingTestNotification(false);
+    }
   };
 
   const clearExitAnimation = (id: string) => {
@@ -178,6 +230,49 @@ export const TodoList = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!canNotify) {
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "hidden") return;
+      if (openTodosCount <= 0) return;
+
+      const now = Date.now();
+      if (now - lastReminderTimestampRef.current < REMINDER_INTERVAL_MS) {
+        return;
+      }
+      lastReminderTimestampRef.current = now;
+      void sendNotification("Clarydo – offenes Todo", {
+        body: reminderBody(openTodosCount),
+        tag: "clarydo-reminder",
+        renotify: false,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+      });
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [canNotify, openTodosCount, sendNotification]);
+
+  useEffect(() => {
+    if (!canNotify || hasShownWelcomeNotificationRef.current) {
+      return;
+    }
+    hasShownWelcomeNotificationRef.current = true;
+    void sendNotification("Clarydo Benachrichtigungen aktiv", {
+      body: reminderBody(openTodosCount),
+      tag: "clarydo-welcome",
+      renotify: false,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+    });
+  }, [canNotify, openTodosCount, sendNotification]);
+
   return (
     <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
       <TodoHeader
@@ -188,8 +283,28 @@ export const TodoList = () => {
         showCompletedDisabled={completedButtonDisabled}
       />
 
-      <section className="flex flex-1 flex-col gap-4 overflow-hidden rounded-2xl p-6 backdrop-blur">
-        <PullToRefresh onRefresh={handleRefresh} disabled={!hasActiveList || isPending}>
+      <section className="flex flex-1 min-h-0 flex-col gap-4">
+        {notificationsSupported ? (
+          <NotificationBanner
+            variant={
+              notificationPermission === "granted"
+                ? "enabled"
+                : notificationPermission === "denied"
+                  ? "blocked"
+                  : "prompt"
+            }
+            onEnable={notificationPermission === "default" ? handleEnableNotifications : undefined}
+            onTest={notificationPermission === "granted" ? handleSendTestNotification : undefined}
+            isRequesting={isRequestingNotifications}
+            isTesting={isSendingTestNotification}
+            pendingTodos={openTodosCount}
+          />
+        ) : null}
+        <PullToRefresh
+          onRefresh={handleRefresh}
+          disabled={!hasActiveList || isPending}
+          className="rounded-2xl bg-theme-surface/80 p-6 backdrop-blur"
+        >
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
           ) : !hasActiveList ? (
@@ -232,14 +347,16 @@ export const TodoList = () => {
         />
       </section>
 
-      <CompletedTodosModal
-        open={showCompleted && hasActiveList}
-        onClose={() => setShowCompleted(false)}
-        completedTodos={completedTodos}
-        onReopenTodo={handleReopenTodo}
-        onClearCompleted={handleClearCompleted}
-        isClearing={clearCompleted.isPending}
-      />
+      {showCompleted && hasActiveList ? (
+        <CompletedTodosModal
+          open
+          onClose={() => setShowCompleted(false)}
+          completedTodos={completedTodos}
+          onReopenTodo={handleReopenTodo}
+          onClearCompleted={handleClearCompleted}
+          isClearing={clearCompleted.isPending}
+        />
+      ) : null}
 
       <TodoActionModal
         open={Boolean(actionTodo && hasActiveList)}
