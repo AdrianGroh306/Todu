@@ -26,7 +26,7 @@ export const TodoHeader = ({
           <ListPicker />
         </div>
         <button
-          className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${
+          className={`flex items-center cursor-pointer gap-2 rounded-xl border-3 px-3 py-2 text-sm font-medium transition ${
             showCompletedDisabled
               ? "cursor-not-allowed border-theme-border/50 text-theme-text-muted/50"
               : "border-theme-border text-theme-text hover:border-theme-primary"

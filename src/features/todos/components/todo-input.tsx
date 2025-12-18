@@ -24,7 +24,7 @@ export const TodoInput = ({
 
   return (
     <form
-      className="sticky bottom-0 flex items-center gap-3 pt-3 backdrop-blur"
+      className="sticky bottom-0 flex items-center gap-1 pt-3 backdrop-blur"
       onSubmit={handleSubmit}
     >
       <input

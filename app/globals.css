@@ -1,81 +1,92 @@
 @import "tailwindcss";
 
-/* Dark Theme (Default) */
+/* Dark Theme (default) */
 :root,
 [data-theme="dark"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-slate-900);
-  --theme-text: var(--color-slate-100);
-  --theme-text-muted: var(--color-slate-400);
-  --theme-border: var(--color-slate-900);
-  --theme-primary: var(--color-white);
-  --theme-primary-hover: var(--color-slate-100);
+  --theme-bg: #0c111d;
+  --theme-surface: #161b26;
+  --theme-text: #e2e8f0;
+  --theme-text-muted: #94a3b8;
+  --theme-border: #1f2733;
+  --theme-primary: #cbd5f5;
+  --theme-primary-hover: #e2e8ff;
 }
 
-/* Light Theme - neutral grays */
+/* Light Theme - powder rose */
 [data-theme="light"] {
-  --theme-bg: var(--color-gray-100);
-  --theme-surface: var(--color-white);
-  --theme-text: var(--color-gray-900);
-  --theme-text-muted: var(--color-gray-500);
-  --theme-border: var(--color-gray-300);
-  --theme-primary: var(--color-gray-900);
-  --theme-primary-hover: var(--color-black);
+  --theme-bg: #f5f5f4;
+  --theme-surface: #ffffff;
+  --theme-text: #111827;
+  --theme-text-muted: #6b7280;
+  --theme-border: #e5e7eb;
+  --theme-primary: #1f2937;
+  --theme-primary-hover: #0f172a;
 }
 
-/* Ocean Theme - sky/cyan-based */
+/* Ocean Theme - icy turquoise */
 [data-theme="ocean"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-sky-950);
-  --theme-text: var(--color-sky-100);
-  --theme-text-muted: var(--color-sky-300);
-  --theme-border: var(--color-sky-800);
-  --theme-primary: var(--color-sky-500);
-  --theme-primary-hover: var(--color-sky-600);
+  --theme-bg: #0c1526;
+  --theme-surface: #142842;
+  --theme-text: #ecf7ff;
+  --theme-text-muted: #a2dbff;
+  --theme-border: #223a56;
+  --theme-primary: #38bdf8;
+  --theme-primary-hover: #0ea5e9;
 }
 
-/* Forest Theme - green-based */
+/* Forest Theme - mint tones */
 [data-theme="forest"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-emerald-950);
-  --theme-text: var(--color-emerald-100);
-  --theme-text-muted: var(--color-emerald-300);
-  --theme-border: var(--color-emerald-800);
-  --theme-primary: var(--color-emerald-500);
-  --theme-primary-hover: var(--color-emerald-600);
+  --theme-bg: #0d1b13;
+  --theme-surface: #153424;
+  --theme-text: #e3fff2;
+  --theme-text-muted: #8fe8c0;
+  --theme-border: #214836;
+  --theme-primary: #34d399;
+  --theme-primary-hover: #10b981;
 }
 
-/* Sunset Theme - orange-based */
+/* Sunset Theme - peachy coral */
 [data-theme="sunset"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-orange-950);
-  --theme-text: var(--color-orange-100);
-  --theme-text-muted: var(--color-orange-300);
-  --theme-border: var(--color-orange-800);
-  --theme-primary: var(--color-orange-500);
-  --theme-primary-hover: var(--color-orange-600);
+  --theme-bg: #ffe8d0;
+  --theme-surface: #ffd3b1;
+  --theme-text: #7c2d12;
+  --theme-text-muted: #ea580c;
+  --theme-border: #ffc49c;
+  --theme-primary: #f97316;
+  --theme-primary-hover: #ea580c;
 }
 
-/* Lavender Theme - purple-based */
+/* Lavender Theme - dreamy violets */
 [data-theme="lavender"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-purple-950);
-  --theme-text: var(--color-purple-100);
-  --theme-text-muted: var(--color-purple-300);
-  --theme-border: var(--color-purple-800);
-  --theme-primary: var(--color-purple-500);
-  --theme-primary-hover: var(--color-purple-600);
+  --theme-bg: #f0e6ff;
+  --theme-surface: #e0d0ff;
+  --theme-text: #4c1d95;
+  --theme-text-muted: #7c3aed;
+  --theme-border: #cab6ff;
+  --theme-primary: #a855f7;
+  --theme-primary-hover: #9333ea;
 }
 
-/* Rose Theme - rose/pink-based */
+/* Rose Theme - blush pink */
 [data-theme="rose"] {
-  --theme-bg: var(--color-slate-950);
-  --theme-surface: var(--color-rose-950);
-  --theme-text: var(--color-rose-100);
-  --theme-text-muted: var(--color-rose-300);
-  --theme-border: var(--color-rose-800);
-  --theme-primary: var(--color-rose-500);
-  --theme-primary-hover: var(--color-rose-600);
+  --theme-bg: #ffd7df;
+  --theme-surface: #ffbfcd;
+  --theme-text: #831843;
+  --theme-text-muted: #db2777;
+  --theme-border: #ffacc2;
+  --theme-primary: #f43f5e;
+  --theme-primary-hover: #e11d48;
+}
+
+/* Berry Theme - vibrant magenta */
+[data-theme="berry"] {
+  --theme-bg: #fbe7ff;
+  --theme-surface: #f2cffc;
+  --theme-text: #4a154b;
+  --theme-text-muted: #d946ef;
+  --theme-border: #ebb3f8;
+  --theme-primary: #c026d3;
+  --theme-primary-hover: #a21caf;
 }
 
 /* ===== THEME UTILITY CLASSES ===== */
