@@ -124,7 +124,6 @@ export const TodoList = () => {
       await sendNotification("Clarydo Erinnerungen", {
         body: reminderBody(openTodosCount),
         tag: "clarydo-test",
-        renotify: true,
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-192.png",
       });
@@ -247,7 +246,6 @@ export const TodoList = () => {
       void sendNotification("Clarydo – offenes Todo", {
         body: reminderBody(openTodosCount),
         tag: "clarydo-reminder",
-        renotify: false,
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-192.png",
       });
@@ -267,7 +265,6 @@ export const TodoList = () => {
     void sendNotification("Clarydo Benachrichtigungen aktiv", {
       body: reminderBody(openTodosCount),
       tag: "clarydo-welcome",
-      renotify: false,
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
     });
