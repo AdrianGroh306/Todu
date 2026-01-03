@@ -33,7 +33,8 @@ export const useTodos = (listId: string | null) => {
     gcTime: 10 * 60 * 1000, // Cache in memory for 10 minutes
     refetchOnMount: true, // Refetch on mount if stale
     refetchOnWindowFocus: true, // Refetch when user returns to app
-    refetchInterval: false, // No polling - use pull-to-refresh instead
+    refetchInterval: hasActiveList ? 15 * 1000 : false,
+    refetchIntervalInBackground: true,
   });
 
   const invalidateTodos = async () => {

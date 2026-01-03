@@ -5,6 +5,7 @@ import { useActiveList } from "@/features/shared/providers/active-list-provider"
 import { useTodos, type Todo } from "@/features/todos/hooks/use-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { useNotifications } from "@/features/shared/hooks/use-notifications";
+import { useTodoChangeNotifications } from "@/features/todos/hooks/use-todo-change-notifications";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
 import { TodoItem } from "./todo-item";
@@ -64,6 +65,14 @@ export const TodoList = () => {
     () => todos.filter((t) => !t.done || animatingIds.has(t.id)),
     [todos, animatingIds],
   );
+
+  useTodoChangeNotifications({
+    todos,
+    listId: activeList?.id ?? null,
+    listName: activeList?.name ?? "",
+    canNotify,
+    sendNotification,
+  });
 
   useEffect(() => {
     if (hasActiveList) return;
