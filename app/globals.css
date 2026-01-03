@@ -9,7 +9,7 @@
   --theme-text-muted: #94a3b8;
   --theme-border: #1f2733;
   --theme-primary: #cbd5f5;
-  --theme-primary-hover: #e2e8ff;
+  --theme-delete: #F43F5E
 }
 
 /* Light Theme - powder rose */
@@ -21,6 +21,7 @@
   --theme-border: #e5e7eb;
   --theme-primary: #1f2937;
   --theme-primary-hover: #0f172a;
+   --theme-delete: #F43F5E
 }
 
 /* Ocean Theme - icy turquoise */
@@ -32,6 +33,7 @@
   --theme-border: #223a56;
   --theme-primary: #38bdf8;
   --theme-primary-hover: #0ea5e9;
+   --theme-delete: #F43F5E
 }
 
 /* Forest Theme - mint tones */
@@ -43,6 +45,7 @@
   --theme-border: #214836;
   --theme-primary: #34d399;
   --theme-primary-hover: #10b981;
+   --theme-delete: #F43F5E
 }
 
 /* Sunset Theme - peachy coral */
@@ -54,6 +57,7 @@
   --theme-border: #ffc49c;
   --theme-primary: #f97316;
   --theme-primary-hover: #ea580c;
+   --theme-delete: #F43F5E
 }
 
 /* Lavender Theme - dreamy violets */
@@ -65,6 +69,7 @@
   --theme-border: #cab6ff;
   --theme-primary: #a855f7;
   --theme-primary-hover: #9333ea;
+   --theme-delete: #F43F5E
 }
 
 /* Rose Theme - blush pink */
@@ -76,6 +81,7 @@
   --theme-border: #ffacc2;
   --theme-primary: #f43f5e;
   --theme-primary-hover: #e11d48;
+   --theme-delete: #F43F5E
 }
 
 /* Berry Theme - vibrant magenta */
@@ -87,6 +93,7 @@
   --theme-border: #ebb3f8;
   --theme-primary: #c026d3;
   --theme-primary-hover: #a21caf;
+   --theme-delete: #F43F5E
 }
 
 /* ===== THEME UTILITY CLASSES ===== */
@@ -98,6 +105,7 @@
   --color-theme-border: var(--theme-border);
   --color-theme-primary: var(--theme-primary);
   --color-theme-primary-hover: var(--theme-primary-hover);
+  --color-theme-delete: var(--theme-delete);
 }
 
 /* ===== BASE STYLES ===== */

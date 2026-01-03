@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Modal } from "@/components/modal";
 import { Checkbox } from "@/components/checkbox";
 import type { Todo } from "@/features/todos/hooks/use-todos";
@@ -110,39 +111,50 @@ export const CompletedTodosModal = ({
       title="Erledigte Todos"
       footer={
         <button
-          className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mx-auto flex items-center gap-2 rounded-full border border-theme-border px-5 py-3 text-sm font-semibold text-theme-text transition hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
           onClick={onClearCompleted}
           disabled={completedTodos.length === 0 || isClearing}
         >
-          {isClearing ? "Lösche erledigte…" : "Alle erledigten löschen"}
+          {isClearing ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-rose-300 border-t-transparent" />
+              Lösche…
+            </>
+          ) : (
+            <div className="text-theme-delete flex gap-1.5">
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              Alle löschen
+            </div>
+          )}
         </button>
       }
     >
-      {visibleTodos.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-theme-border/80 px-4 py-8 text-center text-sm text-theme-text-muted">
-          Keine erledigten Todos vorhanden.
-        </p>
-      ) : (
-        <ul className="min-h-[300px] max-h-[60vh] overflow-y-auto divide-y divide-theme-border/50 pr-1">
-          {visibleTodos.map(({ todo, isExiting, sourceIndex }) => (
-            <li
-              key={todo.id}
-              className={`flex items-center justify-between px-4 py-3 text-sm text-theme-text-muted line-through transition-all duration-200 ease-out ${
-                isExiting ? "-translate-x-4 opacity-0" : "opacity-100"
-              }`}
-            >
-              <span>{todo.text}</span>
-              <Checkbox
-                visualSize="sm"
-                className="accent-theme-primary"
-                checked
-                onChange={() => handleReopenClick(todo, sourceIndex)}
-                disabled={isExiting}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="flex flex-1 min-h-0 flex-col">
+        {visibleTodos.length === 0 ? (
+          <p className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-theme-border/80 px-4 py-8 text-center text-sm text-theme-text-muted">
+            Keine erledigten Todos vorhanden.
+          </p>
+        ) : (
+          <ul className="flex-1 overflow-y-auto divide-y divide-theme-border/50 pr-1">
+            {visibleTodos.map(({ todo, isExiting, sourceIndex }) => (
+              <li
+                key={todo.id}
+                className={`flex items-center justify-between px-4 py-3 text-sm text-theme-text-muted line-through transition-all duration-200 ease-out ${isExiting ? "-translate-x-4 opacity-0" : "opacity-100"
+                  }`}
+              >
+                <span>{todo.text}</span>
+                <Checkbox
+                  visualSize="sm"
+                  className="accent-theme-primary"
+                  checked
+                  onChange={() => handleReopenClick(todo, sourceIndex)}
+                  disabled={isExiting}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </Modal>
   );
 };
