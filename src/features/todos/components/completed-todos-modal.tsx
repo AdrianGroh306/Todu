@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, ListChecks } from "lucide-react";
 import { Modal } from "@/components/modal";
 import { Checkbox } from "@/components/checkbox";
 import type { Todo } from "@/features/todos/hooks/use-todos";
@@ -108,7 +108,7 @@ export const CompletedTodosModal = ({
     <Modal
       open={open}
       onClose={onClose}
-      title="Erledigte Todos"
+      title={<div className="flex items-center gap-2"><ListChecks className="h-6 w-6" aria-hidden="true" />Erledigte Todos</div>}
       footer={
         <button
           className="mx-auto flex items-center gap-2 rounded-full border border-theme-border px-5 py-3 text-sm font-semibold text-theme-text transition hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
