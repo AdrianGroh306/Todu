@@ -9,9 +9,10 @@ type ListPickerItemProps = {
   list: ListSummary;
   onSelect: () => void;
   onLongPress: () => void;
+  isActive?: boolean;
 };
 
-export const ListPickerItem = ({ list, onSelect, onLongPress }: ListPickerItemProps) => {
+export const ListPickerItem = ({ list, onSelect, onLongPress, isActive }: ListPickerItemProps) => {
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
 
@@ -52,7 +53,9 @@ export const ListPickerItem = ({ list, onSelect, onLongPress }: ListPickerItemPr
   return (
     <button
       type="button"
-      className="flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm text-theme-text transition hover:bg-theme-surface/80"
+      className={`flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm text-theme-text transition ${
+        isActive ? "bg-theme-primary/10 hover:bg-theme-primary/15" : "hover:bg-theme-surface/80"
+      }`}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}
@@ -64,7 +67,9 @@ export const ListPickerItem = ({ list, onSelect, onLongPress }: ListPickerItemPr
         onLongPress();
       }}
     >
-      <span className="flex-1 text-left text-sm font-medium leading-tight text-theme-text line-clamp-2 wrap-break-word">
+      <span className={`flex-1 text-left text-sm font-medium leading-tight line-clamp-2 wrap-break-word ${
+        isActive ? "text-theme-primary" : "text-theme-text"
+      }`}>
         {list.name}
       </span>
       {list.role !== "owner" && (

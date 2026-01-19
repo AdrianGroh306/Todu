@@ -25,7 +25,7 @@ export const ListPicker = () => {
   const [shareList, setShareList] = useState<ListSummary | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectableLists = lists.filter((list) => list.id !== activeList?.id);
+  const selectableLists = lists;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -139,6 +139,7 @@ export const ListPicker = () => {
         open={isSelectionOpen}
         onClose={() => setIsSelectionOpen(false)}
         selectableLists={selectableLists}
+        activeList={activeList}
         isLoading={isLoadingLists}
         onSelectList={(listId) => {
           setActiveListId(listId);

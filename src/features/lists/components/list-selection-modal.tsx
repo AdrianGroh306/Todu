@@ -10,6 +10,7 @@ type ListSelectionModalProps = {
   open: boolean;
   onClose: () => void;
   selectableLists: ListSummary[];
+  activeList: ListSummary | null;
   isLoading: boolean;
   onSelectList: (listId: string) => void;
   onListLongPress: (list: ListSummary) => void;
@@ -21,6 +22,7 @@ export const ListSelectionModal = ({
   open,
   onClose,
   selectableLists,
+  activeList,
   isLoading,
   onSelectList,
   onListLongPress,
@@ -50,36 +52,61 @@ export const ListSelectionModal = ({
   };
 
   return (
-    <Modal open={open} onClose={handleClose} title="Weitere Listen">
+    <Modal open={open} onClose={handleClose} title="Meine Listen">
       <div className="space-y-4">
-        <div className="rounded-2xl bg-theme-surface/50 p-2">
+        {activeList && (
+          <div className="rounded-2xl bg-theme-primary/10 border border-theme-primary/20 p-3">
+            <p className="px-1 pb-2 text-xs font-semibold text-theme-primary/80 uppercase tracking-wider">
+              Aktiv
+            </p>
+            <ListPickerItem
+              list={activeList}
+              onSelect={() => {
+                handleClose();
+              }}
+              onLongPress={() => {
+                handleClose();
+                onListLongPress(activeList);
+              }}
+              isActive
+            />
+          </div>
+        )}
+        <div className="rounded-2xl bg-theme-surface/50 p-3">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 py-4 text-sm text-theme-text-muted">
               <Loader2 className="h-4 w-4 animate-spin" />
               Listen werden geladen…
             </div>
-          ) : selectableLists.length === 0 ? (
+          ) : selectableLists.filter((list) => list.id !== activeList?.id).length === 0 ? (
             <p className="py-2 text-sm text-theme-text-muted">
-              Keine weiteren Listen – nutze unten den Button, um eine neue Liste anzulegen.
+              Keine anderen Listen verfügbar.
             </p>
           ) : (
-            <ul className="max-h-56 divide-y divide-theme-border/50 overflow-y-auto pr-1">
-              {selectableLists.map((list) => (
-                <li key={list.id}>
-                  <ListPickerItem
-                    list={list}
-                    onSelect={() => {
-                      onSelectList(list.id);
-                      handleClose();
-                    }}
-                    onLongPress={() => {
-                      handleClose();
-                      onListLongPress(list);
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="px-1 pb-2 text-xs font-semibold text-theme-text-muted/70 uppercase tracking-wider">
+                Alle Listen
+              </p>
+              <ul className="max-h-56 divide-y divide-theme-border/50 overflow-y-auto pr-1">
+                {selectableLists
+                  .filter((list) => list.id !== activeList?.id)
+                  .map((list) => (
+                    <li key={list.id}>
+                      <ListPickerItem
+                        list={list}
+                        onSelect={() => {
+                          onSelectList(list.id);
+                          handleClose();
+                        }}
+                        onLongPress={() => {
+                          handleClose();
+                          onListLongPress(list);
+                        }}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            </>
           )}
         </div>
         <div className="rounded-2xl bg-theme-surface/40 p-4">
@@ -91,7 +118,7 @@ export const ListSelectionModal = ({
                 onChange={(event) => setNewListName(event.target.value)}
                 className="w-full rounded-xl border border-theme-border bg-theme-bg px-4 py-3 text-sm text-theme-text outline-none focus:border-theme-primary"
                 maxLength={MAX_LIST_NAME_LENGTH}
-                placeholder="Neue Liste"
+                placeholder="Name der neuen Liste"
                 autoFocus
               />
               <div className="text-right text-xs text-theme-text-muted">

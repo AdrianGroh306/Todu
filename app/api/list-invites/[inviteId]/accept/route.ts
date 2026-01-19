@@ -12,7 +12,7 @@ export async function POST(
 
     const { data: invite, error: inviteError } = await supabase
       .from("list_invites")
-      .select("id, list_id, invited_user_id, status, lists(name)")
+      .select("id, list_id, invited_user_id, status, lists!inner(name)")
       .eq("id", inviteId)
       .single();
 
@@ -57,7 +57,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       listId: invite.list_id,
-      listName: invite.lists?.name ?? "",
+      listName: (invite.lists as any)?.name ?? "",
     });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
