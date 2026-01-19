@@ -1,6 +1,8 @@
 import { CheckCircle } from "lucide-react";
 import { ProgressBar } from "@/components/progress-bar";
 import { UserAvatar } from "@/features/auth/components/user-avatar";
+import { PresenceAvatars } from "./presence-avatars";
+import type { PresenceUser } from "@/features/todos/hooks/use-polling-todos";
 import { ListPicker } from "@/features/lists/components/list-picker";
 
 type TodoHeaderProps = {
@@ -9,6 +11,7 @@ type TodoHeaderProps = {
   totalCount: number;
   onShowCompleted: () => void;
   showCompletedDisabled: boolean;
+  activeUsers?: PresenceUser[];
 };
 
 export const TodoHeader = ({
@@ -17,12 +20,23 @@ export const TodoHeader = ({
   totalCount,
   onShowCompleted,
   showCompletedDisabled,
+  activeUsers = [],
 }: TodoHeaderProps) => {
   return (
     <header className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <UserAvatar size="md" />
+          <UserAvatar size="md">
+            {activeUsers.length > 0 ? (
+              <PresenceAvatars
+                users={activeUsers}
+                maxVisible={2}
+                variant="inline"
+                size="md"
+                className="pointer-events-none"
+              />
+            ) : null}
+          </UserAvatar>
           <ListPicker />
         </div>
         <button

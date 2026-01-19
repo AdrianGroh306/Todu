@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
-import { useTodos, type Todo } from "@/features/todos/hooks/use-todos";
+import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { useNotifications } from "@/features/shared/hooks/use-notifications";
 import { useTodoChangeNotifications } from "@/features/todos/hooks/use-todo-change-notifications";
@@ -12,6 +12,7 @@ import { TodoItem } from "./todo-item";
 import { CompletedTodosModal } from "./completed-todos-modal";
 import { TodoActionModal } from "./todo-action-modal";
 import { NotificationBanner } from "./notification-banner";
+import { PendingInviteModal } from "@/features/lists/components/pending-invite-modal";
 
 const EXIT_ANIMATION_MS = 280;
 const REMINDER_INTERVAL_MS = 15 * 60 * 1000;
@@ -48,7 +49,8 @@ export const TodoList = () => {
     clearCompleted,
     deleteTodo,
     invalidateTodos,
-  } = useTodos(activeList?.id ?? null);
+    activeUsers,
+  } = usePollingTodos(activeList?.id ?? null);
 
   const hasActiveList = Boolean(activeList);
 
@@ -281,12 +283,14 @@ export const TodoList = () => {
 
   return (
     <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
+      <PendingInviteModal />
       <TodoHeader
         listName={activeList?.name ?? ""}
         completedCount={completedCount}
         totalCount={totalTodos}
         onShowCompleted={() => setShowCompleted(true)}
         showCompletedDisabled={completedButtonDisabled}
+        activeUsers={activeUsers}
       />
 
       <section className="flex flex-1 min-h-0 flex-col gap-4">

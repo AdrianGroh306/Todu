@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { User } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
+import type { ReactNode } from "react";
 
 type UserAvatarProps = {
   size?: "sm" | "md" | "lg";
+  children?: ReactNode;
 };
 
 const sizeClasses = {
@@ -14,7 +16,7 @@ const sizeClasses = {
   lg: "h-11 w-11 text-base",
 };
 
-export const UserAvatar = ({ size = "md" }: UserAvatarProps) => {
+export const UserAvatar = ({ size = "md", children }: UserAvatarProps) => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -36,21 +38,26 @@ export const UserAvatar = ({ size = "md" }: UserAvatarProps) => {
   return (
     <Link
       href="/profile"
-      className={`${sizeClasses[size]} flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium ring-2 ring-transparent transition hover:ring-theme-primary focus:outline-none focus:ring-theme-primary`}
+      className="group inline-flex items-center -space-x-3 rounded-full p-1 transition hover:ring-2 hover:ring-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary"
       aria-label="Profil öffnen"
     >
-      {avatarUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={avatarUrl}
-          alt="Profilbild"
-          className="h-full w-full object-cover"
-        />
-      ) : initial ? (
-        initial
-      ) : (
-        <User className="h-4 w-4" />
-      )}
+      <span
+        className={`${sizeClasses[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-theme-accent text-white font-medium`}
+      >
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatarUrl}
+            alt="Profilbild"
+            className="h-full w-full object-cover"
+          />
+        ) : initial ? (
+          initial
+        ) : (
+          <User className="h-4 w-4" />
+        )}
+      </span>
+      {children}
     </Link>
   );
 };

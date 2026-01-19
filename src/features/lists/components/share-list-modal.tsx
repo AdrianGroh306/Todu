@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Share2 } from "lucide-react";
 import { Modal } from "@/components/modal";
 import type { ListSummary } from "@/features/lists/hooks/use-lists";
 
@@ -10,6 +10,11 @@ type ShareListModalProps = {
 
 export const ShareListModal = ({ list, onClose }: ShareListModalProps) => {
   const [hasCopied, setHasCopied] = useState(false);
+  const [inviteUsername, setInviteUsername] = useState("");
+  const [inviteStatus, setInviteStatus] = useState<{
+    type: "idle" | "sending" | "success" | "error";
+    message?: string;
+  }>({ type: "idle" });
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const shareUrl = useMemo(() => {
@@ -30,6 +35,8 @@ export const ShareListModal = ({ list, onClose }: ShareListModalProps) => {
   useEffect(() => {
     if (!list) {
       setHasCopied(false);
+      setInviteUsername("");
+      setInviteStatus({ type: "idle" });
       if (resetTimerRef.current) {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = null;
@@ -51,14 +58,81 @@ export const ShareListModal = ({ list, onClose }: ShareListModalProps) => {
     }
   };
 
+  const handleInvite = async () => {
+    if (!list || !inviteUsername.trim()) return;
+    setInviteStatus({ type: "sending" });
+
+    try {
+      const response = await fetch("/api/list-invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listId: list.id, username: inviteUsername.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setInviteStatus({
+          type: "error",
+          message: data.error || "Einladung konnte nicht gesendet werden.",
+        });
+        return;
+      }
+
+      setInviteStatus({
+        type: "success",
+        message: `Einladung an @${data.invitedUsername ?? inviteUsername.trim()} gesendet.`,
+      });
+      setInviteUsername("");
+    } catch (error) {
+      console.error("Failed to send invite", error);
+      setInviteStatus({ type: "error", message: "Netzwerkfehler beim Einladen." });
+    }
+  };
+
   return (
     <Modal open={Boolean(list)} onClose={onClose} title="Liste teilen">
       {list && (
-        <div className="space-y-4">
-          <p className="text-sm text-theme-text-muted">
-            Teile diesen Link, damit andere deiner Liste <strong>{list.name}</strong> beitreten können.
-          </p>
-          <div className="flex flex-col gap-2">
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-theme-border bg-theme-surface">
+              <Share2 className="h-5 w-5 text-theme-text" />
+            </div>
+            <p className="text-base font-semibold text-theme-text">{list.name}</p>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-xs uppercase tracking-wide text-theme-text-muted">Per Benutzername</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={inviteUsername}
+                onChange={(event) => {
+                  setInviteUsername(event.target.value);
+                  if (inviteStatus.type !== "idle") {
+                    setInviteStatus({ type: "idle" });
+                  }
+                }}
+                placeholder="@username"
+                className="flex-1 rounded-xl border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text outline-none"
+              />
+              <button
+                type="button"
+                className="rounded-xl bg-theme-primary px-4 py-3 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={handleInvite}
+                disabled={inviteStatus.type === "sending" || inviteUsername.trim().length === 0}
+              >
+                {inviteStatus.type === "sending" ? "Sende…" : "Einladen"}
+              </button>
+            </div>
+            {inviteStatus.type === "success" ? (
+              <p className="text-xs text-emerald-400">{inviteStatus.message}</p>
+            ) : inviteStatus.type === "error" ? (
+              <p className="text-xs text-rose-400">{inviteStatus.message}</p>
+            ) : null}
+          </div>
+
+          <div className="space-y-3">
             <label className="text-xs uppercase tracking-wide text-theme-text-muted">Einladungslink</label>
             <div className="flex items-center gap-2">
               <input
