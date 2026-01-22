@@ -53,8 +53,8 @@ export const ListPickerItem = ({ list, onSelect, onLongPress, isActive }: ListPi
   return (
     <button
       type="button"
-      className={`flex w-full items-start cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm text-theme-text transition ${
-        isActive ? "bg-theme-primary/10 hover:bg-theme-primary/15" : "hover:bg-theme-surface/80"
+      className={`flex w-full items-center cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
+        isActive ? "hover:bg-theme-surface/60" : "hover:bg-theme-surface/80"
       }`}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
@@ -67,8 +67,13 @@ export const ListPickerItem = ({ list, onSelect, onLongPress, isActive }: ListPi
         onLongPress();
       }}
     >
+      <span
+        className={`h-2 w-2 rounded-full shrink-0 ${
+          isActive ? "bg-theme-text" : "bg-theme-text-transparent"
+        }`}
+      />
       <span className={`flex-1 text-left text-sm font-medium leading-tight line-clamp-2 wrap-break-word ${
-        isActive ? "text-theme-primary" : "text-theme-text"
+        isActive ? "text-theme-text" : "text-theme-text-muted"
       }`}>
         {list.name}
       </span>

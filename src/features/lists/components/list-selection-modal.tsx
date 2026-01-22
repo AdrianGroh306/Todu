@@ -51,62 +51,45 @@ export const ListSelectionModal = ({
     }
   };
 
+  const sortedLists = [
+    ...(activeList ? [activeList] : []),
+    ...selectableLists.filter((list) => list.id !== activeList?.id),
+  ];
+
   return (
     <Modal open={open} onClose={handleClose} title="Meine Listen">
       <div className="space-y-4">
-        {activeList && (
-          <div className="rounded-2xl bg-theme-primary/10 border border-theme-primary/20 p-3">
-            <p className="px-1 pb-2 text-xs font-semibold text-theme-primary/80 uppercase tracking-wider">
-              Aktiv
-            </p>
-            <ListPickerItem
-              list={activeList}
-              onSelect={() => {
-                handleClose();
-              }}
-              onLongPress={() => {
-                handleClose();
-                onListLongPress(activeList);
-              }}
-              isActive
-            />
-          </div>
-        )}
         <div className="rounded-2xl bg-theme-surface/50 p-3">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 py-4 text-sm text-theme-text-muted">
               <Loader2 className="h-4 w-4 animate-spin" />
               Listen werden geladen…
             </div>
-          ) : selectableLists.filter((list) => list.id !== activeList?.id).length === 0 ? (
+          ) : sortedLists.length === 0 ? (
             <p className="py-2 text-sm text-theme-text-muted">
-              Keine anderen Listen verfügbar.
+              Keine Listen verfügbar.
             </p>
           ) : (
-            <>
-              <p className="px-1 pb-2 text-xs font-semibold text-theme-text-muted/70 uppercase tracking-wider">
-                Alle Listen
-              </p>
-              <ul className="max-h-56 divide-y divide-theme-border/50 overflow-y-auto pr-1">
-                {selectableLists
-                  .filter((list) => list.id !== activeList?.id)
-                  .map((list) => (
-                    <li key={list.id}>
-                      <ListPickerItem
-                        list={list}
-                        onSelect={() => {
-                          onSelectList(list.id);
-                          handleClose();
-                        }}
-                        onLongPress={() => {
-                          handleClose();
-                          onListLongPress(list);
-                        }}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            </>
+            <ul className="max-h-64 divide-y divide-theme-border/50 overflow-y-auto pr-1">
+              {sortedLists.map((list) => (
+                <li key={list.id}>
+                  <ListPickerItem
+                    list={list}
+                    isActive={list.id === activeList?.id}
+                    onSelect={() => {
+                      if (list.id !== activeList?.id) {
+                        onSelectList(list.id);
+                      }
+                      handleClose();
+                    }}
+                    onLongPress={() => {
+                      handleClose();
+                      onListLongPress(list);
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
           )}
         </div>
         <div className="rounded-2xl bg-theme-surface/40 p-4">
