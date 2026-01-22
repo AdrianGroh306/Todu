@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess } from "@/lib/list-access";
+import { notifyListMembers } from "@/lib/notify-list-members";
 
 // Disable caching for this route
 export const dynamic = "force-dynamic";
@@ -26,8 +27,6 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    console.log("[GET /api/todos] Returning", data?.length, "todos:", data?.map(t => ({ id: t.id.slice(0,8), done: t.done })));
-    
     return NextResponse.json(data ?? [], {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -65,6 +64,19 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       throw error;
+    }
+
+    // Send push notification to other list members (non-blocking)
+    const { data: listData } = await supabase
+      .from("lists")
+      .select("name")
+      .eq("id", listId)
+      .single();
+
+    if (listData?.name) {
+      notifyListMembers(listId, userId, listData.name).catch(() => {
+        // Ignore notification errors - don't break the main flow
+      });
     }
 
     return NextResponse.json(data, { status: 201 });

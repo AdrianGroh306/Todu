@@ -6,7 +6,6 @@ const SERVICE_WORKER_PATH = "/sw.js";
 
 export const ServiceWorkerClient = () => {
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") return;
     if (!("serviceWorker" in navigator)) return;
 
     const register = async () => {

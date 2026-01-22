@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListOwnership } from "@/lib/list-access";
+import { sendPushToUser } from "@/lib/push-sender";
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,6 +68,32 @@ export async function POST(request: NextRequest) {
 
     if (inviteError) {
       throw inviteError;
+    }
+
+    // Get list name and inviter name for notification
+    const { data: listData } = await supabase
+      .from("lists")
+      .select("name")
+      .eq("id", listId)
+      .single();
+
+    const { data: inviterProfile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", requestingUserId)
+      .single();
+
+    // Send push notification to invited user (non-blocking)
+    if (listData?.name) {
+      const inviterName = inviterProfile?.username || "Jemand";
+      sendPushToUser(profile.id, {
+        title: "Neue Einladung",
+        body: `${inviterName} hat dich zu "${listData.name}" eingeladen`,
+        tag: "invite",
+        url: "/",
+      }).catch(() => {
+        // Ignore notification errors
+      });
     }
 
     return NextResponse.json(

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess } from "@/lib/list-access";
+import { notifyListMembers } from "@/lib/notify-list-members";
 
 async function getTodoListId(todoId: string) {
   const { data, error } = await supabase
@@ -41,7 +42,6 @@ export async function PATCH(
     if (typeof text !== "undefined") update.text = text.trim();
     if (typeof done !== "undefined") update.done = done;
 
-    console.log("[PATCH /api/todos] Updating todo", todoId.slice(0,8), "with:", update);
 
     const { data, error } = await supabase
       .from("todos")
@@ -54,7 +54,19 @@ export async function PATCH(
       throw error;
     }
 
-    console.log("[PATCH /api/todos] Updated result:", { id: data.id.slice(0,8), done: data.done });
+    // Send push notification to other list members (non-blocking)
+    const { data: listData } = await supabase
+      .from("lists")
+      .select("name")
+      .eq("id", listId)
+      .single();
+
+    if (listData?.name) {
+      notifyListMembers(listId, userUuid, listData.name).catch(() => {
+        // Ignore notification errors
+      });
+    }
+
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof UnauthorizedError) {
@@ -83,6 +95,19 @@ export async function DELETE(
 
     if (error) {
       throw error;
+    }
+
+    // Send push notification to other list members (non-blocking)
+    const { data: listData } = await supabase
+      .from("lists")
+      .select("name")
+      .eq("id", listId)
+      .single();
+
+    if (listData?.name) {
+      notifyListMembers(listId, userUuid, listData.name).catch(() => {
+        // Ignore notification errors
+      });
     }
 
     return NextResponse.json({ success: true });

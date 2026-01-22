@@ -5,6 +5,7 @@ import { useActiveList } from "@/features/shared/providers/active-list-provider"
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { useNotifications } from "@/features/shared/hooks/use-notifications";
+import { useWebPush } from "@/features/shared/hooks/use-web-push";
 import { useTodoChangeNotifications } from "@/features/todos/hooks/use-todo-change-notifications";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
@@ -36,9 +37,14 @@ export const TodoList = () => {
     isSupported: notificationsSupported,
     permission: notificationPermission,
     canNotify,
-    requestPermission,
     sendNotification,
   } = useNotifications();
+
+  const {
+    isSupported: pushSupported,
+    isSubscribed: isPushSubscribed,
+    subscribe: subscribeToPush,
+  } = useWebPush();
 
   const {
     todos,
@@ -113,7 +119,10 @@ export const TodoList = () => {
     }
     setIsRequestingNotifications(true);
     try {
-      await requestPermission();
+      // Subscribe to push notifications (this also requests notification permission)
+      if (pushSupported) {
+        await subscribeToPush();
+      }
     } finally {
       setIsRequestingNotifications(false);
     }
@@ -127,17 +136,18 @@ export const TodoList = () => {
   };
 
   const handleSendTestNotification = async () => {
-    if (!canNotify || isSendingTestNotification) {
+    if (isSendingTestNotification) {
       return;
     }
     setIsSendingTestNotification(true);
     try {
-      await sendNotification("Clarydo Erinnerungen", {
-        body: reminderBody(openTodosCount),
-        tag: "clarydo-test",
-        icon: "/icons/icon-192.png",
-        badge: "/icons/icon-192.png",
-      });
+      // Send a real push notification via the server
+      const response = await fetch("/api/test-push", { method: "POST" });
+      if (!response.ok) {
+        console.error("Test push failed:", await response.text());
+      }
+    } catch (error) {
+      console.error("Test push error:", error);
     } finally {
       setIsSendingTestNotification(false);
     }

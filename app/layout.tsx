@@ -25,15 +25,23 @@ export const metadata: Metadata = {
     "Clarydo ist deine minimalistische Todo-App, die sich Schritt für Schritt zur persönlichen Produktivitätszentrale ausbauen lässt.",
   applicationName: "Clarydo",
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Clarydo",
+  },
   icons: {
     icon: "/icons/icon-192.png",
     shortcut: "/icons/icon-192.png",
-    apple: "/icons/icon-192.png",
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
   },
 };
 
 export const viewport: Viewport = {
   themeColor: "#0f172a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
