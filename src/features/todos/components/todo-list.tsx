@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { useNotifications } from "@/features/shared/hooks/use-notifications";
-import { useWebPush } from "@/features/shared/hooks/use-web-push";
+import { useVisualViewport } from "@/features/shared/hooks/use-visual-viewport";
 import { useTodoChangeNotifications } from "@/features/todos/hooks/use-todo-change-notifications";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
 import { TodoItem } from "./todo-item";
-import { CompletedTodosModal } from "./completed-todos-modal";
 import { TodoActionModal } from "./todo-action-modal";
-import { NotificationBanner } from "./notification-banner";
 import { PendingInviteModal } from "@/features/lists/components/pending-invite-modal";
 
 const EXIT_ANIMATION_MS = 280;
@@ -21,30 +20,18 @@ const REMINDER_INTERVAL_MS = 15 * 60 * 1000;
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
 export const TodoList = () => {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
-  const [showCompleted, setShowCompleted] = useState(false);
   const [actionTodo, setActionTodo] = useState<Todo | null>(null);
   const [editValue, setEditValue] = useState("");
-  const [isRequestingNotifications, setIsRequestingNotifications] = useState(false);
-  const [isSendingTestNotification, setIsSendingTestNotification] = useState(false);
   const animationTimers = useRef<TimerMap>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const lastReminderTimestampRef = useRef(0);
   const hasShownWelcomeNotificationRef = useRef(false);
   const { activeList, isLoadingLists } = useActiveList();
-  const {
-    isSupported: notificationsSupported,
-    permission: notificationPermission,
-    canNotify,
-    sendNotification,
-  } = useNotifications();
-
-  const {
-    isSupported: pushSupported,
-    isSubscribed: isPushSubscribed,
-    subscribe: subscribeToPush,
-  } = useWebPush();
+  const { canNotify, sendNotification } = useNotifications();
+  useVisualViewport();
 
   const {
     todos,
@@ -52,7 +39,6 @@ export const TodoList = () => {
     isError,
     createTodo,
     updateTodo,
-    clearCompleted,
     deleteTodo,
     invalidateTodos,
     activeUsers,
@@ -84,12 +70,16 @@ export const TodoList = () => {
 
   useEffect(() => {
     if (hasActiveList) return;
-    setShowCompleted(false);
     setActionTodo(null);
     setEditValue("");
   }, [hasActiveList]);
 
   const completedButtonDisabled = !hasActiveList || completedTodos.length === 0;
+
+  const navigateToCompleted = () => {
+    if (!hasActiveList) return;
+    router.push("/completed");
+  };
 
   const startExitAnimation = (todo: Todo) => {
     setAnimatingIds((prev) => {
@@ -113,44 +103,11 @@ export const TodoList = () => {
     }, EXIT_ANIMATION_MS);
   };
 
-  const handleEnableNotifications = async () => {
-    if (isRequestingNotifications || notificationPermission === "granted") {
-      return;
-    }
-    setIsRequestingNotifications(true);
-    try {
-      // Subscribe to push notifications (this also requests notification permission)
-      if (pushSupported) {
-        await subscribeToPush();
-      }
-    } finally {
-      setIsRequestingNotifications(false);
-    }
-  };
-
   const reminderBody = (count: number) => {
     if (count <= 0) {
       return "Alles erledigt – gönn dir eine Pause!";
     }
     return count === 1 ? "Du hast noch eine offene Aufgabe." : `Du hast noch ${count} offene Aufgaben.`;
-  };
-
-  const handleSendTestNotification = async () => {
-    if (isSendingTestNotification) {
-      return;
-    }
-    setIsSendingTestNotification(true);
-    try {
-      // Send a real push notification via the server
-      const response = await fetch("/api/test-push", { method: "POST" });
-      if (!response.ok) {
-        console.error("Test push failed:", await response.text());
-      }
-    } catch (error) {
-      console.error("Test push error:", error);
-    } finally {
-      setIsSendingTestNotification(false);
-    }
   };
 
   const clearExitAnimation = (id: string) => {
@@ -183,11 +140,6 @@ export const TodoList = () => {
     );
   };
 
-  const handleReopenTodo = (todo: Todo) => {
-    clearExitAnimation(todo.id);
-    updateTodo.mutate({ id: todo.id, done: false });
-  };
-
   const handleSubmit = () => {
     const trimmedText = text.trim();
     if (!trimmedText || !hasActiveList) return;
@@ -203,11 +155,6 @@ export const TodoList = () => {
         },
       },
     );
-  };
-
-  const handleClearCompleted = () => {
-    if (!hasActiveList || completedTodos.length === 0) return;
-    clearCompleted.mutate(completedTodos.map((t) => t.id));
   };
 
   const openActionMenu = (todo: Todo) => {
@@ -292,38 +239,24 @@ export const TodoList = () => {
   }, [canNotify, openTodosCount, sendNotification]);
 
   return (
-    <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
+    <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
       <PendingInviteModal />
+      {/* Header */}
       <TodoHeader
         listName={activeList?.name ?? ""}
         completedCount={completedCount}
         totalCount={totalTodos}
-        onShowCompleted={() => setShowCompleted(true)}
+        onShowCompleted={navigateToCompleted}
         showCompletedDisabled={completedButtonDisabled}
         activeUsers={activeUsers}
       />
 
-      <section className="flex flex-1 min-h-0 flex-col gap-4">
-        {notificationsSupported ? (
-          <NotificationBanner
-            variant={
-              notificationPermission === "granted"
-                ? "enabled"
-                : notificationPermission === "denied"
-                  ? "blocked"
-                  : "prompt"
-            }
-            onEnable={notificationPermission === "default" ? handleEnableNotifications : undefined}
-            onTest={notificationPermission === "granted" ? handleSendTestNotification : undefined}
-            isRequesting={isRequestingNotifications}
-            isTesting={isSendingTestNotification}
-            pendingTodos={openTodosCount}
-          />
-        ) : null}
+      {/* Scrollable Content Area */}
+      <section className="flex flex-1 min-h-0 flex-col gap-4 pt-4">
         <PullToRefresh
           onRefresh={handleRefresh}
           disabled={!hasActiveList || isPending}
-          className="rounded-2xl bg-theme-surface/80 p-6 backdrop-blur"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 p-6 backdrop-blur"
         >
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
@@ -357,26 +290,16 @@ export const TodoList = () => {
             </ul>
           )}
         </PullToRefresh>
-        <TodoInput
-          value={text}
-          onChange={setText}
-          onSubmit={handleSubmit}
-          disabled={!hasActiveList}
-          isCreating={createTodo.isPending}
-          inputRef={inputRef}
-        />
       </section>
 
-      {showCompleted && hasActiveList ? (
-        <CompletedTodosModal
-          open
-          onClose={() => setShowCompleted(false)}
-          completedTodos={completedTodos}
-          onReopenTodo={handleReopenTodo}
-          onClearCompleted={handleClearCompleted}
-          isClearing={clearCompleted.isPending}
-        />
-      ) : null}
+      <TodoInput
+        value={text}
+        onChange={setText}
+        onSubmit={handleSubmit}
+        disabled={!hasActiveList}
+        isCreating={createTodo.isPending}
+        inputRef={inputRef}
+      />
 
       <TodoActionModal
         open={Boolean(actionTodo && hasActiveList)}

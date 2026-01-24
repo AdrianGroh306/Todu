@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Trash2, ListChecks } from "lucide-react";
 import { Modal } from "@/components/modal";
 import { Checkbox } from "@/components/checkbox";
-import type { Todo } from "@/features/todos/hooks/use-todos";
+import type { Todo } from "@/features/todos/hooks/use-polling-todos";
 
 const EXIT_ANIMATION_MS = 280;
 

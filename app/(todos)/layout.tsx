@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { TodoList } from "@/features/todos/components/todo-list";
 import { ActiveListProviderWithData } from "@/features/shared/providers/active-list-provider-with-data";
 import { getLists } from "@/lib/data/lists";
 import { getTodosForList } from "@/lib/data/todos";
 import { ACTIVE_LIST_STORAGE_KEY } from "@/features/shared/constants/storage";
 
-export default async function HomePage() {
+export default async function TodosLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -30,7 +29,7 @@ export default async function HomePage() {
       initialActiveListId={initialActiveListId}
       initialTodos={initialTodos}
     >
-      <TodoList />
+      {children}
     </ActiveListProviderWithData>
   );
 }

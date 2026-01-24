@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import type { PointerEvent } from "react";
 import { Checkbox } from "@/components/checkbox";
-import type { Todo } from "@/features/todos/hooks/use-todos";
+import type { Todo } from "@/features/todos/hooks/use-polling-todos";
 
 const LONG_PRESS_MS = 500;
 

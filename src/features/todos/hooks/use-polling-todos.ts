@@ -43,11 +43,11 @@ export const usePollingTodos = (listId: string | null) => {
       return data;
     },
     enabled: hasActiveList,
-    staleTime: 2 * 1000,
+    staleTime: 5 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-    refetchInterval: 4 * 1000,
+    refetchInterval: 8 * 1000,
     refetchIntervalInBackground: true,
   });
 
@@ -245,8 +245,8 @@ export const usePollingTodos = (listId: string | null) => {
       return data ?? [];
     },
     enabled: Boolean(listId),
-    refetchInterval: 5 * 1000,
-    staleTime: 2 * 1000,
+    refetchInterval: 10 * 1000,
+    staleTime: 5 * 1000,
   });
 
   useEffect(() => {
@@ -271,7 +271,7 @@ export const usePollingTodos = (listId: string | null) => {
     };
 
     void updatePresence();
-    const interval = setInterval(updatePresence, 10_000);
+    const interval = setInterval(updatePresence, 15_000);
 
     return () => clearInterval(interval);
   }, [listId, user, userId]);

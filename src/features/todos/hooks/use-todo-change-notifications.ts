@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Todo } from "./use-todos";
+import type { Todo } from "./use-polling-todos";
 
 type Change =
   | { type: "created"; todo: Todo }

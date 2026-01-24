@@ -27,8 +27,9 @@ Clarydo is a collaborative todo app built with Next.js 16 (App Router), Supabase
 app/                    # Next.js App Router pages
 ├── (auth)/            # Auth route group (sign-in, sign-up)
 ├── api/               # API routes
+├── completed/         # Erledigte Todos Seite
 ├── invite/[listId]/   # List invite acceptance
-├── profile/           # User profile
+├── profile/           # User profile (mit loading.tsx Skeleton)
 └── page.tsx           # Main todo list view
 
 src/
@@ -51,7 +52,7 @@ src/
 **Data Flow**:
 1. Server Components fetch initial data via functions in `src/lib/data/`
 2. Data is passed to `ActiveListProviderWithData` which hydrates React Query cache
-3. Client components use hooks (`useLists`, `useTodos`) that read from React Query
+3. Client components use hooks (`useLists`, `usePollingTodos`) that read from React Query
 
 **Provider Hierarchy** (in `app/layout.tsx`):
 ```
@@ -63,7 +64,7 @@ AuthProvider → ThemeProvider → QueryClientProvider → ActiveListProviderWit
 **React Query Conventions**:
 - Query keys: `["lists"]`, `["todos", listId]`
 - Mutations use optimistic updates with rollback on error
-- Polling: todos refetch every 15s, presence every 5s
+- Polling: todos refetch every 8s, presence every 10s
 
 ### Database Tables (Supabase)
 - `lists` - Todo lists
@@ -75,3 +76,31 @@ AuthProvider → ThemeProvider → QueryClientProvider → ActiveListProviderWit
 
 ### Path Alias
 `@/*` maps to `./src/*` (configured in tsconfig.json)
+
+---
+
+## PWA / Mobile Hinweise
+
+### Safe Areas (iOS)
+- `safe-top` Klasse für Padding unter Notch/Dynamic Island
+- `safe-bottom` Klasse für Home Indicator Bereich
+- Definiert in `app/globals.css`
+- **WICHTIG:** Hauptseite (`todo-list.tsx`) muss `h-full safe-top` haben
+
+### Viewport Settings (`app/layout.tsx`)
+- `interactiveWidget: "resizes-content"` - Tastatur verkleinert Viewport
+- `viewportFit: "cover"` - Content geht bis zu den Rändern
+- `100dvh` in CSS für dynamische Viewport-Höhe
+
+### Navigation
+- `/` - Hauptseite mit Todo-Liste
+- `/completed` - Erledigte Todos (Swipe-back vom linken Rand)
+- `/profile` - Benutzereinstellungen
+
+---
+
+## Aktuelle Bugs (zu beheben)
+
+1. **Safe Area Bug**: Nach Navigation von /completed oder /profile zurück zur Hauptseite fehlt das Top-Padding
+2. **Keyboard Gap**: Abstand zwischen Input-Feld und Tastatur nach Keyboard-Nutzung
+3. **useVisualViewport Hook**: Verursacht Layout-Probleme, sollte entfernt werden

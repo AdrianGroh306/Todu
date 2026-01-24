@@ -9,6 +9,7 @@
   --theme-text-muted: #94a3b8;
   --theme-border: #1f2733;
   --theme-primary: #cbd5f5;
+  --theme-primary-hover: #dbe1f3;
   --theme-delete: #F43F5E
 }
 
@@ -21,7 +22,7 @@
   --theme-border: #e5e7eb;
   --theme-primary: #1f2937;
   --theme-primary-hover: #0f172a;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Ocean Theme - icy turquoise */
@@ -33,7 +34,7 @@
   --theme-border: #223a56;
   --theme-primary: #38bdf8;
   --theme-primary-hover: #0ea5e9;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Forest Theme - mint tones */
@@ -45,7 +46,7 @@
   --theme-border: #214836;
   --theme-primary: #34d399;
   --theme-primary-hover: #10b981;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Sunset Theme - peachy coral */
@@ -57,7 +58,7 @@
   --theme-border: #ffc49c;
   --theme-primary: #f97316;
   --theme-primary-hover: #ea580c;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Lavender Theme - dreamy violets */
@@ -69,7 +70,7 @@
   --theme-border: #cab6ff;
   --theme-primary: #a855f7;
   --theme-primary-hover: #9333ea;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Rose Theme - blush pink */
@@ -81,7 +82,7 @@
   --theme-border: #ffacc2;
   --theme-primary: #f43f5e;
   --theme-primary-hover: #e11d48;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* Berry Theme - vibrant magenta */
@@ -93,7 +94,7 @@
   --theme-border: #ebb3f8;
   --theme-primary: #c026d3;
   --theme-primary-hover: #a21caf;
-   --theme-delete: #F43F5E
+  --theme-delete: #F43F5E
 }
 
 /* ===== THEME UTILITY CLASSES ===== */
@@ -111,7 +112,16 @@
 /* ===== BASE STYLES ===== */
 html,
 body {
-  height: 100%;
+  /* iOS keyboard fix: position fixed prevents keyboard from pushing content */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Use visual viewport height (set by JS) - shrinks when keyboard opens */
+  height: var(--vvh, 100dvh);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -119,5 +129,35 @@ body {
   color: var(--theme-text);
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
-  overflow: hidden;
+  /* Safe areas */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Safe top padding utility */
+.safe-top {
+  padding-top: 1rem;
+}
+
+@media (display-mode: standalone) {
+  .safe-top {
+    padding-top: 0.5rem;
+  }
+}
+
+/* Safe bottom padding utility */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+@media (display-mode: standalone) {
+  .safe-bottom {
+    padding-bottom: 0.25rem;
+  }
+}
+
+/* Safe top padding for fixed overlays that ignore body padding */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
 }

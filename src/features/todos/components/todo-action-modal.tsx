@@ -1,7 +1,7 @@
 import { Save } from "lucide-react";
 import { Modal } from "@/components/modal";
 import { Spinner } from "@/components/spinner";
-import type { Todo } from "@/features/todos/hooks/use-todos";
+import type { Todo } from "@/features/todos/hooks/use-polling-todos";
 
 type TodoActionModalProps = {
   open: boolean;

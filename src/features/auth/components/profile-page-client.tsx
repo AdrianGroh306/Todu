@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Mail, User, X, Edit } from "lucide-react";
+import { LogOut, Mail, User, X, Edit, Bell, BellOff, BellRing } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 import { useTheme, THEMES, type ThemeId } from "@/features/shared/providers/theme-provider";
+import { useWebPush } from "@/features/shared/hooks/use-web-push";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfileData } from "@/lib/data/profile";
 
@@ -17,11 +18,14 @@ export const ProfilePageClient = ({ initialProfile }: ProfilePageClientProps) =>
   const supabase = createClient();
   const { user, signOut, refreshUser } = useAuth();
   const { theme, setTheme } = useTheme();
-  
+  const { isSupported: pushSupported, isSubscribed, permission, subscribe, unsubscribe } = useWebPush();
+
   // Use server-fetched data as initial state - no loading needed!
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initialProfile?.avatarUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isTogglingPush, setIsTogglingPush] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Username comes from server - no useQuery needed
@@ -115,6 +119,30 @@ export const ProfilePageClient = ({ initialProfile }: ProfilePageClientProps) =>
     fileInputRef.current?.click();
   };
 
+  const handleTogglePush = async () => {
+    if (isTogglingPush) return;
+    setIsTogglingPush(true);
+    try {
+      if (isSubscribed) {
+        await unsubscribe();
+      } else {
+        await subscribe();
+      }
+    } finally {
+      setIsTogglingPush(false);
+    }
+  };
+
+  const handleSendTestNotification = async () => {
+    if (isSendingTest) return;
+    setIsSendingTest(true);
+    try {
+      await fetch("/api/test-push", { method: "POST" });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   const avatarFallback = useMemo(
     () => (initialProfile?.email?.charAt(0) ?? user?.email?.charAt(0) ?? "").toUpperCase(),
     [initialProfile?.email, user?.email]
@@ -124,7 +152,7 @@ export const ProfilePageClient = ({ initialProfile }: ProfilePageClientProps) =>
   const displayCreatedAt = initialProfile?.createdAt ?? user?.created_at ?? "";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-8 text-theme-text">
+    <main className="mx-auto flex h-full max-w-2xl flex-col overflow-y-auto px-4 pt-4 pb-8 safe-top text-theme-text">
       <div className="mb-8 flex items-center justify-between gap-3">
         <h1 className="text-3xl font-bold">Profil</h1>
         <button
@@ -209,7 +237,7 @@ export const ProfilePageClient = ({ initialProfile }: ProfilePageClientProps) =>
         </div>
       </section>
 
-      {/* Einstellungen */}
+      {/* Design */}
       <section className="mb-8 rounded-2xl border border-theme-border bg-theme-surface p-6">
         <h2 className="mb-6 text-xl font-semibold">Design</h2>
         <div className="space-y-4">
@@ -230,6 +258,68 @@ export const ProfilePageClient = ({ initialProfile }: ProfilePageClientProps) =>
           </div>
         </div>
       </section>
+
+      {/* Benachrichtigungen */}
+      {pushSupported ? (
+        <section className="mb-8 rounded-2xl border border-theme-border bg-theme-surface p-6">
+          <h2 className="mb-6 text-xl font-semibold">Benachrichtigungen</h2>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              {permission === "granted" ? (
+                <Bell className="h-5 w-5 text-emerald-400" />
+              ) : permission === "denied" ? (
+                <BellOff className="h-5 w-5 text-rose-400" />
+              ) : (
+                <BellRing className="h-5 w-5 text-theme-text-muted" />
+              )}
+              <div className="flex-1">
+                <p className="text-sm text-theme-text-muted">Status</p>
+                <p className="text-lg font-medium text-theme-text">
+                  {permission === "granted"
+                    ? "Aktiv"
+                    : permission === "denied"
+                      ? "Blockiert"
+                      : "Nicht aktiviert"}
+                </p>
+              </div>
+            </div>
+
+            {permission === "denied" ? (
+              <p className="text-sm text-theme-text-muted">
+                Benachrichtigungen wurden blockiert. Erlaube sie in den Einstellungen deines Geräts.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={handleTogglePush}
+                  disabled={isTogglingPush}
+                  className={`cursor-pointer rounded-xl px-4 py-2 font-medium transition disabled:opacity-60 ${
+                    isSubscribed
+                      ? "border border-theme-border text-theme-text hover:border-rose-500 hover:text-rose-500"
+                      : "bg-theme-primary text-theme-bg hover:bg-theme-primary-hover"
+                  }`}
+                >
+                  {isTogglingPush
+                    ? "..."
+                    : isSubscribed
+                      ? "Deaktivieren"
+                      : "Aktivieren"}
+                </button>
+
+                {isSubscribed ? (
+                  <button
+                    onClick={handleSendTestNotification}
+                    disabled={isSendingTest}
+                    className="cursor-pointer rounded-xl border border-theme-border px-4 py-2 font-medium text-theme-text transition hover:border-theme-primary disabled:opacity-60"
+                  >
+                    {isSendingTest ? "Sende..." : "Test senden"}
+                  </button>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       {/* Abmelden */}
       <section className="flex justify-center rounded-2xl border border-rose-500/20 bg-rose-950/10 p-6">
