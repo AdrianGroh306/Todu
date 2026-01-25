@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/data/profile";
-import { ProfilePageClient } from "@/features/auth/components/profile-page-client";
+import { ProfilePage } from "@/features/auth/components/profile-page";
 
 export const metadata = {
   title: "Profil - Clarydo",
@@ -18,5 +18,5 @@ export default async function Page() {
 
   const initialProfile = await getProfile();
 
-  return <ProfilePageClient initialProfile={initialProfile} />;
+  return <ProfilePage initialProfile={initialProfile} />;
 }

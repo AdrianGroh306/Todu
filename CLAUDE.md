@@ -99,8 +99,14 @@ AuthProvider → ThemeProvider → QueryClientProvider → ActiveListProviderWit
 
 ---
 
-## Aktuelle Bugs (zu beheben)
+## Styling-Regeln
 
-1. **Safe Area Bug**: Nach Navigation von /completed oder /profile zurück zur Hauptseite fehlt das Top-Padding
-2. **Keyboard Gap**: Abstand zwischen Input-Feld und Tastatur nach Keyboard-Nutzung
-3. **useVisualViewport Hook**: Verursacht Layout-Probleme, sollte entfernt werden
+1. **Tailwind First**: Immer Tailwind-Klassen verwenden
+2. **CSS nur wenn nötig**: Nur `globals.css` nutzen wenn Tailwind nicht ausreicht
+3. **Keine Inline-Styles**: Außer für dynamische Werte (z.B. CSS-Variablen)
+
+---
+
+## Aktuelle Todos
+
+*Keine offenen Todos*

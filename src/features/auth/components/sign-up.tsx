@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 
-export default function SignUpClient() {
+export default function SignUp() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const [email, setEmail] = useState("");

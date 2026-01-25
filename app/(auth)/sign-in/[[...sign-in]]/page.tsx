@@ -1,6 +1,5 @@
-import SignInClient from "@/features/auth/components/sign-in-client";
-
+import SignIn from "@/features/auth/components/sign-in";
 
 export default function SignInPage() {
-  return <SignInClient />;
+  return <SignIn />;
 }

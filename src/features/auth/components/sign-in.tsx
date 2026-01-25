@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 
-export default function SignInClient() {
+export default function SignIn() {
   const router = useRouter();
   const { user, isLoading, refreshUser } = useAuth();
   const [identifier, setIdentifier] = useState("");

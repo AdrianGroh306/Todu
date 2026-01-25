@@ -13,7 +13,7 @@ type JoinState =
   | { status: "already-member"; listName: string }
   | { status: "error"; message: string };
 
-export default function InviteClient({ listId }: { listId: string }) {
+export default function Invite({ listId }: { listId: string }) {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();

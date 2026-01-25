@@ -51,7 +51,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
 
   return (
     <li
-      className={`group flex items-center justify-between px-2 py-4 transition-all duration-200 ease-out ${
+      className={`group flex items-center justify-between px-4 py-3 transition-all duration-200 ease-out ${
         isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
       } ${!isExiting ? "hover:bg-theme-surface/40" : ""}`}
       onPointerDown={handlePointerDown}
@@ -66,7 +66,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
     >
       <label className="flex w-full cursor-pointer items-center gap-3">
         <span
-          className={`flex-1 text-base transition-all duration-200 ${
+          className={`flex-1 text-sm transition-all duration-200 ${
             todo.done ? "text-theme-text-muted line-through" : "text-theme-text"
           }`}
         >

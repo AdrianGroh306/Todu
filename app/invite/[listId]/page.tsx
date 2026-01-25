@@ -1,5 +1,5 @@
-import InviteClient from "@/features/lists/components/invite-client";
+import Invite from "@/features/lists/components/invite";
 
 export default function InvitePage({ params }: { params: { listId: string } }) {
-  return <InviteClient listId={params.listId} />;
+  return <Invite listId={params.listId} />;
 }

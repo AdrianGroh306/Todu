@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ServiceWorkerClient } from "@/features/shared/service-worker-client";
+import { ServiceWorker } from "@/features/shared/service-worker";
 import { QueryClientProviderWrapper } from "@/features/shared/providers/query-client-provider";
 import { AuthProvider } from "@/features/auth/providers/auth-provider";
 import { ThemeProvider } from "@/features/shared/providers/theme-provider";
@@ -61,7 +61,7 @@ export default function RootLayout({
           <ThemeProvider>
             <QueryClientProviderWrapper>
               {children}
-              <ServiceWorkerClient />
+              <ServiceWorker />
             </QueryClientProviderWrapper>
           </ThemeProvider>
         </AuthProvider>

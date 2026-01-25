@@ -241,7 +241,6 @@ export const TodoList = () => {
   return (
     <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
       <PendingInviteModal />
-      {/* Header */}
       <TodoHeader
         listName={activeList?.name ?? ""}
         completedCount={completedCount}
@@ -251,12 +250,11 @@ export const TodoList = () => {
         activeUsers={activeUsers}
       />
 
-      {/* Scrollable Content Area */}
       <section className="flex flex-1 min-h-0 flex-col gap-4 pt-4">
         <PullToRefresh
           onRefresh={handleRefresh}
           disabled={!hasActiveList || isPending}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 p-6 backdrop-blur"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 p-4 backdrop-blur"
         >
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
