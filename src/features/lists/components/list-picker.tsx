@@ -129,10 +129,10 @@ export const ListPicker = () => {
         aria-expanded={isSelectionOpen}
         aria-haspopup="listbox"
       >
-        <span className="max-w-56 text-left text-base leading-tight text-theme-text line-clamp-2 wrap-break-word sm:text-lg">
+        <ChevronsUpDown className="h-4 w-4 shrink-0" />
+        <span className="max-w-56 text-left text-base font-semibold leading-tight text-theme-text line-clamp-2 wrap-break-word sm:text-lg">
           {triggerLabel}
         </span>
-        <ChevronsUpDown className="h-4 w-4 shrink-0" />
       </button>
 
       <ListSelectionModal

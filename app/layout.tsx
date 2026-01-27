@@ -18,17 +18,17 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Clarydo",
-    template: "%s · Clarydo",
+    default: "Todu",
+    template: "%s · Todu",
   },
   description:
-    "Clarydo ist deine minimalistische Todo-App, die sich Schritt für Schritt zur persönlichen Produktivitätszentrale ausbauen lässt.",
-  applicationName: "Clarydo",
+    "Todu ist deine minimalistische Todo-App, die sich Schritt für Schritt zur persönlichen Produktivitätszentrale ausbauen lässt.",
+  applicationName: "Todu",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Clarydo",
+    title: "Todu",
   },
   icons: {
     icon: "/icons/icon-192.png",

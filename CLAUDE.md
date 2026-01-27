@@ -12,7 +12,7 @@ npm run lint     # Run ESLint
 
 ## Architecture Overview
 
-Clarydo is a collaborative todo app built with Next.js 16 (App Router), Supabase, and React Query.
+Todu is a collaborative todo app built with Next.js 16 (App Router), Supabase, and React Query.
 
 ### Tech Stack
 - **Framework**: Next.js 16 with App Router (React 19)

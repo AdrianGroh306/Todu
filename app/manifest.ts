@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Clarydo",
-    short_name: "Clarydo",
+    name: "Todu",
+    short_name: "Todu",
     description:
       "Minimalistische Todo-App, die später zur vollständigen Produktivitätsplattform wächst.",
     start_url: "/",

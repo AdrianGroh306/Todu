@@ -69,7 +69,7 @@ export default function SignIn() {
       <div className="w-full max-w-sm">
         <div className="bg-theme-surface border border-theme-border rounded-2xl p-8 shadow-xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-theme-text">Clarydo</h1>
+            <h1 className="text-3xl font-bold text-theme-text">Todu</h1>
             <p className="text-theme-muted text-sm mt-1">Willkommen zurück</p>
           </div>
 

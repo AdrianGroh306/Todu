@@ -211,9 +211,9 @@ export const TodoList = () => {
         return;
       }
       lastReminderTimestampRef.current = now;
-      void sendNotification("Clarydo – offenes Todo", {
+      void sendNotification("Todu – offenes Todo", {
         body: reminderBody(openTodosCount),
-        tag: "clarydo-reminder",
+        tag: "todu-reminder",
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-192.png",
       });
@@ -230,9 +230,9 @@ export const TodoList = () => {
       return;
     }
     hasShownWelcomeNotificationRef.current = true;
-    void sendNotification("Clarydo Benachrichtigungen aktiv", {
+    void sendNotification("Todu Benachrichtigungen aktiv", {
       body: reminderBody(openTodosCount),
-      tag: "clarydo-welcome",
+      tag: "todu-welcome",
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
     });

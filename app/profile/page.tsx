@@ -4,7 +4,7 @@ import { getProfile } from "@/lib/data/profile";
 import { ProfilePage } from "@/features/auth/components/profile-page";
 
 export const metadata = {
-  title: "Profil - Clarydo",
+  title: "Profil - Todu",
   description: "Benutzerprofil und Einstellungen",
 };
 

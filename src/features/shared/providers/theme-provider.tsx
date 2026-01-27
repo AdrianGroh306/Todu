@@ -35,7 +35,7 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const THEME_STORAGE_KEY = "clarydo-theme";
+const THEME_STORAGE_KEY = "todu-theme";
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeId>("dark");

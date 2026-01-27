@@ -29,13 +29,14 @@ export const Modal = ({ open, onClose, title, children, footer, titleActions }: 
             <h2 className="text-lg font-semibold text-theme-text">{title}</h2>
             {titleActions}
           </div>
-          <button
-            className="rounded-full border cursor-pointer border-theme-border p-1 text-theme-text-muted hover:text-theme-text"
-            onClick={onClose}
-            aria-label="Schließen"
-          >
-            <X className="h-4 w-4" />
-          </button>
+           <button
+          type="button"
+          onClick={onClose}
+          aria-label="Profil schließen"
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-theme-border bg-theme-surface text-theme-text transition hover:border-theme-primary hover:text-theme-primary"
+        >
+          <X className="h-5 w-5" />
+        </button>
         </div>
 
         {children}

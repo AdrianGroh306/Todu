@@ -1,4 +1,4 @@
-const CACHE_NAME = "clarydo-cache-v2";
+const CACHE_NAME = "todu-cache-v2";
 const OFFLINE_URLS = ["/", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
@@ -31,12 +31,12 @@ self.addEventListener("push", (event) => {
     body: data.body,
     icon: "/icons/icon-192.png",
     badge: "/icons/icon-192.png",
-    tag: data.tag || "clarydo",
+    tag: data.tag || "todu",
     data: { url: data.url || "/" },
     vibrate: [100, 50, 100],
   };
 
-  event.waitUntil(self.registration.showNotification(data.title || "Clarydo", options));
+  event.waitUntil(self.registration.showNotification(data.title || "Todu", options));
 });
 
 // Notification click handler
