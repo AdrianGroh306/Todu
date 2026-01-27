@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/providers/auth-provider";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -83,15 +85,24 @@ export default function SignIn() {
             placeholder="E-Mail oder Benutzername"
           />
 
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
-            placeholder="Passwort"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="w-full px-4 py-3.5 pr-12 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+              placeholder="Passwort"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-text transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5 cursor-pointer text-theme-primary" /> : <Eye className="w-5 h-5 cursor-pointer text-theme-primary" />}
+            </button>
+          </div>
 
           {error && (
             <p className="text-red-400 text-sm text-center">{error}</p>

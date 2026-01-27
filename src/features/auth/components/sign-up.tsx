@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/features/auth/providers/auth-provider";
-import { Check } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 
 export default function SignUp() {
   const router = useRouter();
@@ -18,6 +18,8 @@ export default function SignUp() {
   const [emailSent, setEmailSent] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const supabase = createClient();
 
@@ -194,25 +196,43 @@ export default function SignUp() {
             </p>
           )}
 
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="new-password"
-            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
-            placeholder="Passwort"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+              className="w-full px-4 py-3.5 pr-12 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+              placeholder="Passwort"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-text transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5 cursor-pointer text-theme-primary" /> : <Eye className="w-5 h-5 cursor-pointer text-theme-primary" />}
+            </button>
+          </div>
 
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            autoComplete="new-password"
-            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
-            placeholder="Passwort bestätigen"
-          />
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+              className="w-full px-4 py-3.5 pr-12 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+              placeholder="Passwort bestätigen"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-text transition-colors"
+            >
+              {showConfirmPassword ? <EyeOff className="w-5 h-5 cursor-pointer text-theme-primary" /> : <Eye className="w-5 h-5 cursor-pointer text-theme-primary" />}
+            </button>
+          </div>
 
           {error && (
             <p className="text-red-400 text-sm text-center">{error}</p>
