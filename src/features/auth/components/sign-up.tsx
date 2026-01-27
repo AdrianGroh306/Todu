@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/features/auth/providers/auth-provider";
+import { Check } from "lucide-react";
 
 export default function SignUp() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function SignUp() {
     }
 
     if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-      setUsernameError("Nur Buchstaben, Zahlen und Unterstriche");
+      setUsernameError("Nur Buchstaben, Zahlen und _");
       setUsernameAvailable(null);
       return;
     }
@@ -69,22 +70,22 @@ export default function SignUp() {
     setError(null);
 
     if (!username || usernameError) {
-      setError("Bitte geben Sie einen gültigen Benutzernamen ein");
+      setError("Bitte gültigen Benutzernamen eingeben");
       return;
     }
 
     if (usernameAvailable === false) {
-      setError("Dieser Benutzername ist bereits vergeben");
+      setError("Benutzername bereits vergeben");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Die Passwörter stimmen nicht überein");
+      setError("Passwörter stimmen nicht überein");
       return;
     }
 
     if (password.length < 6) {
-      setError("Das Passwort muss mindestens 6 Zeichen lang sein");
+      setError("Passwort muss mind. 6 Zeichen haben");
       return;
     }
 
@@ -110,7 +111,7 @@ export default function SignUp() {
         .insert([{ id: authData.user.id, username: username.toLowerCase() }]);
 
       if (profileError) {
-        setError("Fehler beim Speichern des Benutzernamens");
+        setError("Fehler beim Speichern");
         setIsSubmitting(false);
         return;
       }
@@ -122,118 +123,116 @@ export default function SignUp() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-theme-bg">
-        <div className="text-theme-muted">Laden...</div>
+        <span className="loading loading-spinner loading-md text-theme-muted" />
       </div>
     );
   }
 
   if (emailSent) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
-        <div className="w-full max-w-sm">
-          <div className="bg-theme-surface border border-theme-border rounded-2xl p-8 shadow-xl text-center">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-theme-text mb-2">E-Mail bestätigen</h1>
-            <p className="text-theme-muted mb-6">
-              Wir haben eine E-Mail an <strong className="text-theme-text">{email}</strong> gesendet.
-              Klicke auf den Link, um dein Konto zu aktivieren.
-            </p>
-            <a href="/sign-in" className="text-theme-accent font-medium hover:underline cursor-pointer">Zurück zur Anmeldung</a>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-theme-bg px-6">
+        <div className="w-full max-w-xs text-center">
+          <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-7 h-7 text-green-500" />
           </div>
+          <h1 className="text-2xl font-bold text-theme-text mb-3">E-Mail bestätigen</h1>
+          <p className="text-theme-muted text-sm mb-8">
+            Wir haben eine E-Mail an <span className="text-theme-text">{email}</span> gesendet.
+          </p>
+          <a href="/sign-in" className="text-theme-accent text-sm hover:underline">
+            Zurück zur Anmeldung
+          </a>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
-      <div className="w-full max-w-sm">
-        <div className="bg-theme-surface border border-theme-border rounded-2xl p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-theme-text">Todu</h1>
-            <p className="text-theme-muted text-sm mt-1">Erstelle dein Konto</p>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-theme-bg px-6">
+      <div className="w-full max-w-xs">
+        {/* Logo / App Name */}
+        <h1 className="text-4xl font-bold text-theme-text text-center mb-12 tracking-tight">
+          TODU
+        </h1>
+
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+            placeholder="E-Mail"
+          />
+
+          <div className="relative">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => handleCheckUsername(e.target.value)}
+              required
+              autoComplete="username"
+              className={`w-full px-4 py-3.5 bg-theme-surface border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none transition-colors ${
+                usernameError
+                  ? "border-red-500/70 focus:border-red-500"
+                  : usernameAvailable === true
+                  ? "border-green-500/70 focus:border-green-500"
+                  : usernameAvailable === false
+                  ? "border-red-500/70 focus:border-red-500"
+                  : "border-theme-border focus:border-theme-accent"
+              }`}
+              placeholder="Benutzername"
+            />
+            {usernameAvailable === true && (
+              <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+            )}
           </div>
+          {(usernameError || usernameAvailable === false) && (
+            <p className="text-red-400 text-xs -mt-2 ml-1">
+              {usernameError || "Bereits vergeben"}
+            </p>
+          )}
 
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-theme-muted mb-1.5">E-Mail</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-theme-bg border border-theme-border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
-                placeholder="deine@email.de"
-              />
-            </div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+            placeholder="Passwort"
+          />
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-theme-muted mb-1.5">Benutzername</label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => handleCheckUsername(e.target.value)}
-                required
-                className={`w-full px-4 py-3 bg-theme-bg border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent ${
-                  usernameError ? "border-red-500" : usernameAvailable === true ? "border-green-500" : "border-theme-border"
-                }`}
-                placeholder="dein_benutzername"
-              />
-              {usernameError && <p className="text-red-500 text-sm mt-1">{usernameError}</p>}
-              {usernameAvailable === true && <p className="text-green-500 text-sm mt-1">Verfügbar ✓</p>}
-              {usernameAvailable === false && !usernameError && <p className="text-red-500 text-sm mt-1">Bereits vergeben</p>}
-            </div>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+            placeholder="Passwort bestätigen"
+          />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-theme-muted mb-1.5">Passwort</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-theme-bg border border-theme-border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
+          {error && (
+            <p className="text-red-400 text-sm text-center">{error}</p>
+          )}
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-theme-muted mb-1.5">Passwort bestätigen</label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-theme-bg border border-theme-border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3.5 mt-5 bg-theme-primary text-theme-bg font-medium rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {isSubmitting ? "Registrieren..." : "Registrieren"}
+          </button>
+        </form>
 
-            {error && <div className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-3 rounded-lg">{error}</div>}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-theme-accent text-white font-semibold rounded-xl border-2 border-theme-accent hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-theme-accent/25 cursor-pointer"
-            >
-              {isSubmitting ? "Wird registriert..." : "Registrieren"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <span className="text-theme-muted text-sm">
-              Bereits ein Konto?{" "}
-              <a href="/sign-in" className="text-theme-accent font-medium hover:underline cursor-pointer">Anmelden</a>
-            </span>
-          </div>
-        </div>
+        <p className="text-center text-theme-muted text-sm mt-8">
+          Bereits ein Konto?{" "}
+          <a href="/sign-in" className="text-theme-primary hover:underline">
+            Anmelden
+          </a>
+        </p>
       </div>
     </main>
   );

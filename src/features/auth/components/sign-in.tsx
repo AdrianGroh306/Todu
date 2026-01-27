@@ -59,71 +59,59 @@ export default function SignIn() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-theme-bg">
-        <div className="text-theme-muted">Laden...</div>
+        <span className="loading loading-spinner loading-md text-theme-muted" />
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-theme-bg px-4 py-16">
-      <div className="w-full max-w-sm">
-        <div className="bg-theme-surface border border-theme-border rounded-2xl p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-theme-text">Todu</h1>
-            <p className="text-theme-muted text-sm mt-1">Willkommen zurück</p>
-          </div>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-theme-bg px-6">
+      <div className="w-full max-w-xs">
+        {/* Logo / App Name */}
+        <h1 className="text-4xl font-bold text-theme-text text-center mb-12 tracking-tight">
+          TODU
+        </h1>
 
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div>
-              <label htmlFor="identifier" className="block text-sm font-medium text-theme-muted mb-1.5">
-                E-Mail oder Benutzername
-              </label>
-              <input
-                id="identifier"
-                type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-theme-bg border border-theme-border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
-                placeholder="dein_benutzername oder email"
-              />
-            </div>
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <input
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required
+            autoComplete="username"
+            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+            placeholder="E-Mail oder Benutzername"
+          />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-theme-muted mb-1.5">
-                Passwort
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-theme-bg border border-theme-border rounded-xl text-theme-text placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            className="w-full px-4 py-3.5 bg-theme-surface border border-theme-border rounded-xl text-theme-text placeholder-theme-muted/60 focus:outline-none focus:border-theme-accent transition-colors"
+            placeholder="Passwort"
+          />
 
-            {error && (
-              <div className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-3 rounded-lg">{error}</div>
-            )}
+          {error && (
+            <p className="text-red-400 text-sm text-center">{error}</p>
+          )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-theme-accent text-white font-semibold rounded-xl border-2 border-theme-accent hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-theme-accent/25"
-            >
-              {isSubmitting ? "Wird angemeldet..." : "Anmelden"}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3.5 mt-3.5 bg-theme-primary text-theme-bg font-medium rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {isSubmitting ? "Anmelden..." : "Anmelden"}
+          </button>
+        </form>
 
-          <div className="mt-6 text-center">
-            <span className="text-theme-muted text-sm">
-              Noch kein Konto?{" "}
-              <a href="/sign-up" className="text-theme-accent font-medium hover:underline">Registrieren</a>
-            </span>
-          </div>
-        </div>
+        <p className="text-center text-theme-muted text-sm mt-8">
+          Noch kein Konto?{" "}
+          <a href="/sign-up" className="text-theme-primary hover:underline">
+            Registrieren
+          </a>
+        </p>
       </div>
     </main>
   );
