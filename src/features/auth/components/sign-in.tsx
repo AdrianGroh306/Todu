@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 import { Eye, EyeOff } from "lucide-react";
+import Image from 'next/image';
 
 export default function SignIn() {
   const router = useRouter();
@@ -69,10 +70,13 @@ export default function SignIn() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-theme-bg px-6">
       <div className="w-full max-w-xs">
-        {/* Logo / App Name */}
-        <h1 className="text-4xl font-bold text-theme-text text-center mb-12 tracking-tight">
-          TODU
-        </h1>
+      <Image
+          src="/icons/Todu.png"
+          alt="Todu Logo"
+          width={120}
+          height={120}
+          className="mx-auto mb-12 rounded-2xl"
+        />
 
         <form onSubmit={handleSignIn} className="space-y-4">
           <input
