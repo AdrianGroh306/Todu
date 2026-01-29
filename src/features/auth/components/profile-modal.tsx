@@ -43,7 +43,7 @@ export const ProfileModal = ({ open, onClose }: ProfileModalProps) => {
       {isLoading || isPending ? (
         <ProfileSkeleton onClose={onClose} />
       ) : (
-        <ProfilePage initialProfile={data} onClose={onClose} />
+        <ProfilePage initialProfile={data ?? null} onClose={onClose} />
       )}
     </div>
   );
