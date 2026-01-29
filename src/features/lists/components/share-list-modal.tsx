@@ -91,7 +91,7 @@ export const ShareListModal = ({ list, onClose }: ShareListModalProps) => {
   };
 
   return (
-    <Modal open={Boolean(list)} onClose={onClose} title="Liste teilen">
+    <Modal open={Boolean(list)} onClose={onClose} title="Liste teilen" fullscreen>
       {list && (
         <div className="space-y-6">
           <div className="flex items-center gap-3">

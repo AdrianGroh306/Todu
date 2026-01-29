@@ -2,18 +2,20 @@
 
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Mail, User, X, Edit, Bell, BellOff, BellRing } from "lucide-react";
+import { LogOut, Mail, User, Edit, Bell, BellOff, BellRing } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
 import { useTheme, THEMES, type ThemeId } from "@/features/shared/providers/theme-provider";
 import { useWebPush } from "@/features/shared/hooks/use-web-push";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfileData } from "@/lib/data/profile";
+import { CloseButton } from "@/components/close-button";
 
 type ProfilePageProps = {
   initialProfile: ProfileData | null;
+  onClose?: () => void;
 };
 
-export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
+export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
   const router = useRouter();
   const supabase = createClient();
   const { user, signOut, refreshUser } = useAuth();
@@ -43,6 +45,10 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
   };
 
   const handleClose = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.back();
     } else {
@@ -78,7 +84,6 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
       return;
     }
 
-    // Delete old avatars with different extensions
     const extensions = ["png", "jpg", "jpeg", "webp", "gif"];
     for (const ext of extensions) {
       if (ext !== fileExt) {
@@ -96,7 +101,6 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
       return;
     }
 
-    // Add cache-busting timestamp
     publicUrl = `${publicUrl}?t=${Date.now()}`;
 
     const { error: updateErr } = await supabase.auth.updateUser({
@@ -153,25 +157,18 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
 
   return (
     <main className="mx-auto flex h-full max-w-2xl flex-col overflow-y-auto px-4 pt-4 pb-8 safe-top text-theme-text">
-      <div className="mb-8 flex items-center justify-between gap-3">
-        <h1 className="text-3xl font-bold">Profil</h1>
-        <button
-          type="button"
-          onClick={handleClose}
-          aria-label="Profil schließen"
-          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-theme-border bg-theme-surface text-theme-text transition hover:border-theme-primary hover:text-theme-primary"
-        >
-          <X className="h-5 w-5" />
-        </button>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="text-xl font-bold">Profil</h1>
+        <CloseButton onClick={handleClose} ariaLabel="Profil schließen" />
       </div>
 
       {/* Benutzerinformationen */}
-      <section className="mb-8 rounded-2xl border border-theme-border bg-theme-surface p-6">
+      <section className="mb-8 rounded-2xl bg-theme-surface p-6">
         <h2 className="mb-6 text-xl font-semibold">Benutzerinformationen</h2>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="relative h-16 w-16 shrink-0">
-              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-theme-border bg-theme-surface text-lg font-semibold text-theme-text">
+              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-theme-surface text-lg font-semibold text-theme-text">
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -187,7 +184,7 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
                 type="button"
                 onClick={triggerAvatarUpload}
                 disabled={uploading}
-                className="absolute -bottom-2 -right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-theme-border bg-theme-primary text-theme-border shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
+                className="absolute -bottom-2 -right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-theme-border shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
                 aria-label="Profilbild ändern"
               >
                 <Edit className="h-4 w-4" />
@@ -235,33 +232,39 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
             </div>
           )}
         </div>
-      </section>
-
-      {/* Design */}
-      <section className="mb-8 rounded-2xl border border-theme-border bg-theme-surface p-6">
-        <h2 className="mb-6 text-xl font-semibold">Design</h2>
+        <h2 className="mb-6 mt-8 text-xl font-semibold">Design</h2>
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3">
             {THEMES.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTheme(t.id as ThemeId)}
-                className={`cursor-pointer rounded-xl px-4 py-2 font-medium transition ${
-                  theme === t.id
+                className={`cursor-pointer rounded-xl px-4 py-2 font-medium transition ${theme === t.id
                     ? "bg-theme-primary text-theme-bg"
                     : "border border-theme-border text-theme-text hover:border-theme-primary"
-                }`}
+                  }`}
               >
                 {t.name}
               </button>
             ))}
           </div>
         </div>
+        <div className="flex justify-center pt-16">
+          <button
+            onClick={handleSignOut}
+            className="flex cursor-pointer items-center gap-2 rounded-xl bg-rose-500 px-6 py-3 font-semibold text-white transition hover:bg-rose-600 active:scale-95"
+          >
+            <LogOut className="h-5 w-5" />
+            Abmelden
+          </button>
+        </div>
+
       </section>
+
 
       {/* Benachrichtigungen */}
       {pushSupported ? (
-        <section className="mb-8 rounded-2xl border border-theme-border bg-theme-surface p-6">
+        <section className="rounded-2xl bg-theme-surface p-6">
           <h2 className="mb-6 text-xl font-semibold">Benachrichtigungen</h2>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -293,11 +296,10 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
                 <button
                   onClick={handleTogglePush}
                   disabled={isTogglingPush}
-                  className={`cursor-pointer rounded-xl px-4 py-2 font-medium transition disabled:opacity-60 ${
-                    isSubscribed
+                  className={`cursor-pointer rounded-xl px-4 py-2 font-medium transition disabled:opacity-60 ${isSubscribed
                       ? "border border-theme-border text-theme-text hover:border-rose-500 hover:text-rose-500"
                       : "bg-theme-primary text-theme-bg hover:bg-theme-primary-hover"
-                  }`}
+                    }`}
                 >
                   {isTogglingPush
                     ? "..."
@@ -321,16 +323,6 @@ export const ProfilePage = ({ initialProfile }: ProfilePageProps) => {
         </section>
       ) : null}
 
-      {/* Abmelden */}
-      <section className="flex justify-center rounded-2xl border border-rose-500/20 bg-rose-950/10 p-6">
-        <button
-          onClick={handleSignOut}
-          className="flex cursor-pointer items-center gap-2 rounded-xl bg-rose-500 px-6 py-3 font-semibold text-white transition hover:bg-rose-600 active:scale-95"
-        >
-          <LogOut className="h-5 w-5" />
-          Abmelden
-        </button>
-      </section>
     </main>
   );
 };

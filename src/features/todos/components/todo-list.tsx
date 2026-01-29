@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
+import { useModalManager } from "@/features/shared/providers/modal-manager-provider";
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { useNotifications } from "@/features/shared/hooks/use-notifications";
@@ -20,7 +20,6 @@ const REMINDER_INTERVAL_MS = 15 * 60 * 1000;
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
 export const TodoList = () => {
-  const router = useRouter();
   const [text, setText] = useState("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [actionTodo, setActionTodo] = useState<Todo | null>(null);
@@ -30,6 +29,7 @@ export const TodoList = () => {
   const lastReminderTimestampRef = useRef(0);
   const hasShownWelcomeNotificationRef = useRef(false);
   const { activeList, isLoadingLists } = useActiveList();
+  const { openModal } = useModalManager();
   const { canNotify, sendNotification } = useNotifications();
   useVisualViewport();
 
@@ -78,7 +78,7 @@ export const TodoList = () => {
 
   const navigateToCompleted = () => {
     if (!hasActiveList) return;
-    router.push("/completed");
+    openModal("completedTodos");
   };
 
   const startExitAnimation = (todo: Todo) => {

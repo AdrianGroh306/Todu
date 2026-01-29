@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { Checkbox } from "@/components/checkbox";
+import { CloseButton } from "@/components/close-button";
 
 const EXIT_ANIMATION_MS = 280;
 
@@ -14,16 +15,29 @@ type ExitingSnapshot = {
   index: number;
 };
 
-export const CompletedTodosPage = () => {
+type CompletedTodosPageProps = {
+  onClose?: () => void;
+};
+
+export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
   const router = useRouter();
   const { activeList } = useActiveList();
-  const { completedTodos, updateTodo, clearCompleted } = usePollingTodos(activeList?.id ?? null);
+  const {
+    completedTodos,
+    updateTodo,
+    clearCompleted,
+    isPending,
+  } = usePollingTodos(activeList?.id ?? null);
 
   const [exitingIds, setExitingIds] = useState<Set<string>>(new Set());
   const [exitingSnapshots, setExitingSnapshots] = useState<Record<string, ExitingSnapshot>>({});
   const animationTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const handleBack = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
     router.back();
   };
 
@@ -98,28 +112,44 @@ export const CompletedTodosPage = () => {
     };
   }, []);
 
+  const isLoading = isPending && completedTodos.length === 0;
+
   return (
     <div className="fixed inset-0 z-50 bg-theme-bg pt-safe">
       <main className="mx-auto flex h-full max-w-3xl flex-col px-4 safe-top text-theme-text">
         <header className="flex shrink-0 items-center justify-between py-4">
           <div className="w-8" />
           <div className="flex items-center gap-2 text-theme-text">
-            <div className="text-2xl font-semibold">{completedTodos.length}</div>
-            <h1 className="text-xl font-semibold">Erledigt</h1>
+            {isLoading ? (
+              <>
+                <div className="h-7 w-10 animate-pulse rounded bg-theme-surface/70" />
+                <div className="h-6 w-24 animate-pulse rounded bg-theme-surface/70" />
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">{completedTodos.length}</div>
+                <h1 className="text-xl font-bold">Erledigt</h1>
+              </>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={handleBack}
-            aria-label="Profil schließen"
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-theme-border bg-theme-surface text-theme-text transition hover:border-theme-primary hover:text-theme-primary"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <CloseButton onClick={handleBack} ariaLabel="Profil schließen" />
         </header>
 
         <section className="flex flex-1 min-h-0 flex-col gap-4">
           <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl bg-theme-surface/80 p-4 backdrop-blur">
-            {visibleTodos.length === 0 ? (
+            {isLoading ? (
+              <ul className="space-y-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <li
+                    key={`skeleton-${index}`}
+                    className="flex items-center justify-between rounded-xl border border-theme-border/50 px-4 py-3"
+                  >
+                    <div className="h-4 w-2/3 animate-pulse rounded bg-theme-surface/70" />
+                    <div className="h-4 w-4 animate-pulse rounded bg-theme-surface/70" />
+                  </li>
+                ))}
+              </ul>
+            ) : visibleTodos.length === 0 ? (
               <p className="flex h-full items-center justify-center rounded-xl border border-dashed border-theme-border/80 px-4 py-8 text-center text-sm text-theme-text-muted">
                 Keine erledigten Todos vorhanden.
               </p>
@@ -148,21 +178,14 @@ export const CompletedTodosPage = () => {
 
         <footer className="shrink-0 py-4 safe-bottom">
           <button
-            className="mx-auto flex items-center gap-2 rounded-full border border-theme-border px-5 py-3 text-sm font-semibold text-theme-text transition hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mx-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-theme-text bg-theme-delete transition hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleClearCompleted}
-            disabled={completedTodos.length === 0 || clearCompleted.isPending}
+            disabled={isLoading || completedTodos.length === 0 || clearCompleted.isPending}
           >
-            {clearCompleted.isPending ? (
-              <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-rose-300 border-t-transparent" />
-                Lösche...
-              </>
-            ) : (
-              <div className="text-theme-delete flex gap-1.5">
+              <div className="text-theme-surface flex gap-1.5">
                 <Trash2 className="h-4 w-4" aria-hidden="true" />
                 Alle löschen
               </div>
-            )}
           </button>
         </footer>
       </main>

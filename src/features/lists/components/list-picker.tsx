@@ -124,7 +124,7 @@ export const ListPicker = () => {
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-3 rounded-xl cursor-pointer bg-theme-surface/60 px-3 py-2 text-left text-sm font-medium text-theme-text transition hover:border-theme-border focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary/60 sm:w-auto"
+        className="flex w-full items-center justify-between gap-3 rounded-xl cursor-pointer bg-theme-surface px-3 py-2 text-left text-sm font-medium text-theme-text transition hover:border-theme-border focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary/60 sm:w-auto"
         onClick={toggleOpen}
         aria-expanded={isSelectionOpen}
         aria-haspopup="listbox"

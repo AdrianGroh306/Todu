@@ -67,6 +67,7 @@ export const PendingInviteModal = () => {
       open
       onClose={() => handleRespond("decline")}
       title="Liste beitreten?"
+      fullscreen
     >
       <div className="space-y-4 text-sm text-theme-text">
         <p>

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ActiveListProviderWithData } from "@/features/shared/providers/active-list-provider-with-data";
+import { ModalManagerProvider } from "@/features/shared/providers/modal-manager-provider";
 import { getLists } from "@/lib/data/lists";
 import { getTodosForList } from "@/lib/data/todos";
 import { ACTIVE_LIST_STORAGE_KEY } from "@/features/shared/constants/storage";
@@ -29,7 +30,7 @@ export default async function TodosLayout({ children }: { children: React.ReactN
       initialActiveListId={initialActiveListId}
       initialTodos={initialTodos}
     >
-      {children}
+      <ModalManagerProvider>{children}</ModalManagerProvider>
     </ActiveListProviderWithData>
   );
 }

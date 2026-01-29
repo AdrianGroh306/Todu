@@ -58,6 +58,7 @@ export const ListActionsModal = ({
       open={Boolean(list)}
       onClose={onClose}
       title="Listen-Aktionen"
+      fullscreen
       titleActions={
         isOwner ? (
           <button

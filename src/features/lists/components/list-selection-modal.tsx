@@ -57,9 +57,9 @@ export const ListSelectionModal = ({
   ];
 
   return (
-    <Modal open={open} onClose={handleClose} title="Meine Listen">
-      <div className="space-y-4">
-        <div className="rounded-2xl bg-theme-surface/50 p-3">
+    <Modal open={open} onClose={handleClose} title="Meine Listen" fullscreen>
+      <div className="flex h-full flex-col gap-4">
+        <div className="flex-1 min-h-0 rounded-2xl bg-theme-surface/50 p-3">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 py-4 text-sm text-theme-text-muted">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -70,7 +70,7 @@ export const ListSelectionModal = ({
               Keine Listen verfügbar.
             </p>
           ) : (
-            <ul className="max-h-64 divide-y divide-theme-border/50 overflow-y-auto pr-1">
+            <ul className="h-full divide-y divide-theme-border/50 overflow-y-auto pr-1">
               {sortedLists.map((list) => (
                 <li key={list.id}>
                   <ListPickerItem
@@ -92,14 +92,14 @@ export const ListSelectionModal = ({
             </ul>
           )}
         </div>
-        <div className="rounded-2xl bg-theme-surface/40 p-4">
+        <div className="rounded-2xl p-4">
           {showCreateForm ? (
-            <form className="space-y-3" onSubmit={handleCreateList}>
+            <form className="space-y-4" onSubmit={handleCreateList}>
               <input
                 type="text"
                 value={newListName}
                 onChange={(event) => setNewListName(event.target.value)}
-                className="w-full rounded-xl border border-theme-border bg-theme-bg px-4 py-3 text-sm text-theme-text outline-none focus:border-theme-primary"
+                className="w-full rounded-2xl border border-theme-border bg-theme-surface px-4 py-4 text-sm text-theme-text outline-none focus:border-theme-primary"
                 maxLength={MAX_LIST_NAME_LENGTH}
                 placeholder="Name der neuen Liste"
                 autoFocus
@@ -107,10 +107,10 @@ export const ListSelectionModal = ({
               <div className="text-right text-xs text-theme-text-muted">
                 {newListName.length}/{MAX_LIST_NAME_LENGTH}
               </div>
-              <div className="flex items-center justify-end gap-2 text-sm">
+              <div className="flex items-center justify-between gap-3 text-sm">
                 <button
                   type="button"
-                  className="rounded-xl border border-transparent px-3 py-1.5 text-theme-text-muted transition hover:text-theme-text cursor-pointer"
+                  className="rounded-full border border-theme-border px-5 py-2 text-sm font-semibold text-theme-text transition hover:border-theme-primary hover:text-theme-primary cursor-pointer"
                   onClick={() => {
                     setShowCreateForm(false);
                     setNewListName("");
@@ -120,7 +120,7 @@ export const ListSelectionModal = ({
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center cursor-pointer gap-1 rounded-xl bg-theme-primary px-4 py-2 font-semibold text-theme-border transition hover:bg-theme-primary-hover"
+                  className="flex items-center cursor-pointer gap-2 rounded-full bg-theme-primary px-5 py-2 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover disabled:opacity-60"
                   disabled={!newListName.trim() || isCreatingList}
                 >
                   {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -131,7 +131,7 @@ export const ListSelectionModal = ({
           ) : (
             <button
               type="button"
-              className="flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl border border-dashed border-theme-border/60 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-border"
+              className="mx-auto flex items-center gap-2 rounded-full bg-theme-primary px-5 py-3 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover"
               onClick={() => setShowCreateForm(true)}
             >
               <Plus className="h-4 w-4" />

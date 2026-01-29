@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { User } from "lucide-react";
 import { useAuth } from "@/features/auth/providers/auth-provider";
+import { useModalManager } from "@/features/shared/providers/modal-manager-provider";
 import type { ReactNode } from "react";
 
 type UserAvatarProps = {
@@ -18,6 +18,7 @@ const sizeClasses = {
 
 export const UserAvatar = ({ size = "md", children }: UserAvatarProps) => {
   const { user, isLoading } = useAuth();
+  const { openModal } = useModalManager();
 
   if (isLoading) {
     return (
@@ -36,8 +37,9 @@ export const UserAvatar = ({ size = "md", children }: UserAvatarProps) => {
   const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
 
   return (
-    <Link
-      href="/profile"
+    <button
+      type="button"
+      onClick={() => openModal("profile")}
       className="group inline-flex items-center -space-x-3 rounded-full p-1 transition hover:ring-2 hover:ring-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary"
       aria-label="Profil öffnen"
     >
@@ -58,6 +60,6 @@ export const UserAvatar = ({ size = "md", children }: UserAvatarProps) => {
         )}
       </span>
       {children}
-    </Link>
+    </button>
   );
 };
