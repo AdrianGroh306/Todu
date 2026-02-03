@@ -29,11 +29,9 @@ export const ListSelectionModal = ({
   onCreateList,
   isCreatingList,
 }: ListSelectionModalProps) => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState("");
 
   const handleClose = () => {
-    setShowCreateForm(false);
     setNewListName("");
     onClose();
   };
@@ -41,14 +39,20 @@ export const ListSelectionModal = ({
   const handleCreateList = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = newListName.trim();
-    if (!trimmed) return;
+    if (!trimmed || isCreatingList) return;
     try {
       await onCreateList(trimmed);
       setNewListName("");
-      setShowCreateForm(false);
     } catch (error) {
       console.error("Failed to create list", error);
     }
+  };
+
+  const handleInputFocus = () => {
+    // iOS keyboard fix: reset scroll when input is focused
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
   };
 
   const sortedLists = [
@@ -92,54 +96,33 @@ export const ListSelectionModal = ({
             </ul>
           )}
         </div>
-        <div className="rounded-2xl p-4">
-          {showCreateForm ? (
-            <form className="space-y-4" onSubmit={handleCreateList}>
-              <input
-                type="text"
-                value={newListName}
-                onChange={(event) => setNewListName(event.target.value)}
-                className="w-full rounded-2xl border border-theme-border bg-theme-surface px-4 py-4 text-sm text-theme-text outline-none focus:border-theme-primary"
-                maxLength={MAX_LIST_NAME_LENGTH}
-                placeholder="Name der neuen Liste"
-                autoFocus
-              />
-              <div className="text-right text-xs text-theme-text-muted">
-                {newListName.length}/{MAX_LIST_NAME_LENGTH}
-              </div>
-              <div className="flex items-center justify-between gap-3 text-sm">
-                <button
-                  type="button"
-                  className="rounded-full border border-theme-border px-5 py-2 text-sm font-semibold text-theme-text transition hover:border-theme-primary hover:text-theme-primary cursor-pointer"
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setNewListName("");
-                  }}
-                >
-                  Abbrechen
-                </button>
-                <button
-                  type="submit"
-                  className="flex items-center cursor-pointer gap-2 rounded-full bg-theme-primary px-5 py-2 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover disabled:opacity-60"
-                  disabled={!newListName.trim() || isCreatingList}
-                >
-                  {isCreatingList ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                  Speichern
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button
-              type="button"
-              className="mx-auto flex items-center gap-2 rounded-full bg-theme-primary px-5 py-3 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover"
-              onClick={() => setShowCreateForm(true)}
-            >
-              <Plus className="h-4 w-4" />
-              Neue Liste
-            </button>
-          )}
-        </div>
+        <form
+          className="flex shrink-0 items-center gap-2 pt-2 pb-15"
+          onSubmit={handleCreateList}
+        >
+          <input
+            type="text"
+            value={newListName}
+            onChange={(event) => setNewListName(event.target.value)}
+            onFocus={handleInputFocus}
+            className="flex-1 rounded-xl border border-theme-border bg-theme-surface/80 px-4 py-3 text-base text-theme-text outline-none transition focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/40"
+            maxLength={MAX_LIST_NAME_LENGTH}
+            placeholder="Neue Liste hinzufügen"
+          />
+          <button
+            type="submit"
+            className="flex h-13 w-13 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover cursor-pointer disabled:opacity-60"
+            aria-label="Liste hinzufügen"
+            disabled={!newListName.trim() || isCreatingList}
+          >
+            {isCreatingList ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              <Plus className="h-6 w-6" />
+            )}
+          </button>
+        </form>
       </div>
     </Modal>
   );
-}
+};

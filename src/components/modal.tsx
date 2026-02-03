@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { CloseButton } from "@/components/close-button";
+import { useVisualViewport } from "@/features/shared/hooks/use-visual-viewport";
 
 type ModalProps = {
   open: boolean;
@@ -20,15 +23,19 @@ export const Modal = ({
   titleActions,
   fullscreen = false,
 }: ModalProps) => {
+  // Sync visual viewport for keyboard handling
+  useVisualViewport();
+
   if (!open) return null;
 
   return (
     <div
       className={
         fullscreen
-          ? "fixed inset-0 z-50 bg-theme-bg pt-safe"
+          ? "fixed inset-x-0 top-0 z-50 bg-theme-bg pt-safe"
           : "fixed inset-0 z-50 flex items-center justify-center bg-theme-bg/80 p-4 backdrop-blur"
       }
+      style={fullscreen ? { height: "var(--vvh, 100dvh)" } : undefined}
       role="dialog"
       aria-modal
       onClick={fullscreen ? undefined : onClose}
@@ -36,7 +43,7 @@ export const Modal = ({
       <section
         className={
           fullscreen
-            ? "flex h-full w-full flex-col gap-4 px-4 pb-4 safe-top safe-bottom"
+            ? "flex h-full w-full flex-col gap-4 px-4 pb-8 safe-top safe-bottom"
             : "flex w-full max-w-xl flex-col gap-4 rounded-2xl bg-theme-surface px-6 py-8 shadow-2xl max-h-full"
         }
         onClick={(event) => event.stopPropagation()}

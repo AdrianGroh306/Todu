@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Todu",
     short_name: "Todu",
     description:
-      "Minimalistische Todo-App, die später zur vollständigen Produktivitätsplattform wächst.",
+      "Minimalistische Todo-App.",
     start_url: "/",
     display: "standalone",
     background_color: "#0f172a",

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Todu",
   },
   description:
-    "Todu ist deine minimalistische Todo-App, die sich Schritt für Schritt zur persönlichen Produktivitätszentrale ausbauen lässt.",
+    "Todu ist deine minimalistische Todo-App.",
   applicationName: "Todu",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
