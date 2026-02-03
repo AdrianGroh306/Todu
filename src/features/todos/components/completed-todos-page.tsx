@@ -162,13 +162,15 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
                       }`}
                   >
                     <span>{todo.text}</span>
-                    <Checkbox
-                      visualSize="sm"
-                      className="accent-theme-primary"
-                      checked
-                      onChange={() => handleReopenTodo(todo, sourceIndex)}
-                      disabled={isExiting}
-                    />
+                    <label className="p-1 -m-1 cursor-pointer">
+                      <Checkbox
+                        visualSize="sm"
+                        className="accent-theme-primary"
+                        checked
+                        onChange={() => handleReopenTodo(todo, sourceIndex)}
+                        disabled={isExiting}
+                      />
+                    </label>
                   </li>
                 ))}
               </ul>

@@ -30,6 +30,7 @@ export const ListSelectionModal = ({
   isCreatingList,
 }: ListSelectionModalProps) => {
   const [newListName, setNewListName] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const handleClose = () => {
     setNewListName("");
@@ -49,10 +50,15 @@ export const ListSelectionModal = ({
   };
 
   const handleInputFocus = () => {
+    setIsInputFocused(true);
     // iOS keyboard fix: reset scroll when input is focused
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
   };
 
   const sortedLists = [
@@ -97,7 +103,7 @@ export const ListSelectionModal = ({
           )}
         </div>
         <form
-          className="flex shrink-0 items-center gap-2 pt-2 pb-15"
+          className={`flex shrink-0 items-center gap-2 pt-2`}
           onSubmit={handleCreateList}
         >
           <input
@@ -105,6 +111,7 @@ export const ListSelectionModal = ({
             value={newListName}
             onChange={(event) => setNewListName(event.target.value)}
             onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             className="flex-1 rounded-xl border border-theme-border bg-theme-surface/80 px-4 py-3 text-base text-theme-text outline-none transition focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/40"
             maxLength={MAX_LIST_NAME_LENGTH}
             placeholder="Neue Liste hinzufügen"

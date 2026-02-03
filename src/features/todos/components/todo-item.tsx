@@ -64,21 +64,23 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
         onLongPress();
       }}
     >
-      <label className="flex w-full cursor-pointer items-center gap-3">
+      <div className="flex w-full font-semibold items-center gap-3">
         <span
-          className={`flex-1 text-sm transition-all duration-200 ${
+          className={`flex-1 text-base transition-all duration-200 ${
             todo.done ? "text-theme-text-muted line-through" : "text-theme-text"
           }`}
         >
           {todo.text}
         </span>
-        <Checkbox
-          checked={todo.done}
-          onChange={handleCheckboxChange}
-          disabled={disabled}
-          aria-disabled={disabled}
-        />
-      </label>
+        <label className="p-1 -m-1 cursor-pointer">
+          <Checkbox
+            checked={todo.done}
+            onChange={handleCheckboxChange}
+            disabled={disabled}
+            aria-disabled={disabled}
+          />
+        </label>
+      </div>
     </li>
   );
 }

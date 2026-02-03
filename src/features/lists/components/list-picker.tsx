@@ -130,7 +130,7 @@ export const ListPicker = () => {
         aria-haspopup="listbox"
       >
         <ChevronsUpDown className="h-4 w-4 shrink-0" />
-        <span className="max-w-56 text-left text-base font-semibold leading-tight text-theme-text line-clamp-2 wrap-break-word sm:text-lg">
+        <span className="max-w-56 text-left text-lg font-semibold leading-tight text-theme-text line-clamp-2 wrap-break-word sm:text-xl">
           {triggerLabel}
         </span>
       </button>
