@@ -102,14 +102,10 @@ export const ListActionsModal = ({
                   onClick={onDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? (
-                    <Spinner size="sm" className="border-white mx-auto" />
-                  ) : (
-                    <>
-                      <Trash2 className="h-4 w-4" />
-                      Liste löschen
-                    </>
-                  )}
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Liste löschen
+                  </>
                 </button>
               </div>
             </>
@@ -125,14 +121,10 @@ export const ListActionsModal = ({
                   onClick={onLeave}
                   disabled={isLeaving}
                 >
-                  {isLeaving ? (
-                    <Spinner size="sm" className="border-white mx-auto" />
-                  ) : (
                     <>
                       <LogOut className="h-4 w-4" />
                       Liste verlassen
                     </>
-                  )}
                 </button>
               </div>
             </>
