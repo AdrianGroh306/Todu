@@ -103,7 +103,7 @@ export const ListSelectionModal = ({
           )}
         </div>
         <form
-          className={`flex shrink-0 items-center gap-2 pt-2`}
+          className="flex shrink-0 items-center gap-2 py-4"
           onSubmit={handleCreateList}
         >
           <input

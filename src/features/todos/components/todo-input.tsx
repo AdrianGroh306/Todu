@@ -31,7 +31,7 @@ export const TodoInput = ({
 
   return (
     <form
-      className="flex shrink-0 items-center gap-2 pt-2 pb-4"
+      className="flex shrink-0 items-center gap-2 py-4"
       onSubmit={handleSubmit}
     >
       <input

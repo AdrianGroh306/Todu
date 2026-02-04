@@ -116,7 +116,7 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-theme-bg pt-safe">
-      <main className="mx-auto flex h-full max-w-3xl flex-col px-4 safe-top text-theme-text">
+      <main className="mx-auto flex h-full max-w-3xl flex-col px-4 pb-4 safe-top text-theme-text">
         <header className="flex shrink-0 items-center justify-between py-4">
           <div className="w-8" />
           <div className="flex items-center gap-2 text-theme-text">
@@ -158,7 +158,7 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
                 {visibleTodos.map(({ todo, isExiting, sourceIndex }) => (
                   <li
                     key={todo.id}
-                    className={`flex items-center justify-between px-4 py-3 text-sm text-theme-text-muted line-through transition-all duration-200 ease-out ${isExiting ? "-translate-x-4 opacity-0" : "opacity-100"
+                    className={`flex items-center justify-between px-4 py-3 font-semibold text-base text-theme-text-muted line-through transition-all duration-200 ease-out ${isExiting ? "-translate-x-4 opacity-0" : "opacity-100"
                       }`}
                   >
                     <span>{todo.text}</span>

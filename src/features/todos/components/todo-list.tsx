@@ -239,7 +239,7 @@ export const TodoList = () => {
   }, [canNotify, openTodosCount, sendNotification]);
 
   return (
-    <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 text-theme-text">
+    <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 pb-4 text-theme-text">
       <PendingInviteModal />
       <TodoHeader
         listName={activeList?.name ?? ""}
@@ -254,7 +254,7 @@ export const TodoList = () => {
         <PullToRefresh
           onRefresh={handleRefresh}
           disabled={!hasActiveList || isPending}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 p-4 backdrop-blur"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 px-4 py-2 backdrop-blur"
         >
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
@@ -275,7 +275,7 @@ export const TodoList = () => {
               Alle Todos sind erledigt – öffne die Erledigt-Ansicht oben rechts.
             </EmptyState>
           ) : (
-            <ul className="divide-y divide-theme-border/50">
+            <ul>
               {visibleTodos.map((todo) => (
                 <TodoItem
                   key={todo.id}
