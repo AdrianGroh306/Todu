@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess, ensureListOwnership } from "@/lib/list-access";
+import { sendPushToUser } from "@/lib/push-sender";
 
 export async function GET(
   _request: NextRequest,
@@ -62,6 +63,31 @@ export async function DELETE(
 
     if (error) {
       throw error;
+    }
+
+    // Notify owner when a member leaves (only if member left on their own, not kicked)
+    if (targetUserId === userId) {
+      const { data: listData } = await supabase
+        .from("lists")
+        .select("name, owner_id")
+        .eq("id", listId)
+        .single();
+
+      if (listData?.owner_id) {
+        const { data: leavingProfile } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", targetUserId)
+          .single();
+
+        const leavingName = leavingProfile?.username || "Jemand";
+        sendPushToUser(listData.owner_id, {
+          title: "Mitglied hat Liste verlassen",
+          body: `${leavingName} hat "${listData.name}" verlassen`,
+          tag: "member-left",
+          url: "/",
+        }).catch(() => {});
+      }
     }
 
     return NextResponse.json({ success: true });

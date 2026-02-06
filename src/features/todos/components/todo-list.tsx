@@ -5,9 +5,7 @@ import { useActiveList } from "@/features/shared/providers/active-list-provider"
 import { useModalManager } from "@/features/shared/providers/modal-manager-provider";
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
 import { PullToRefresh } from "@/components/pull-to-refresh";
-import { useNotifications } from "@/features/shared/hooks/use-notifications";
 import { useVisualViewport } from "@/features/shared/hooks/use-visual-viewport";
-import { useTodoChangeNotifications } from "@/features/todos/hooks/use-todo-change-notifications";
 import { TodoHeader } from "./todo-header";
 import { TodoInput } from "./todo-input";
 import { TodoItem } from "./todo-item";
@@ -15,7 +13,6 @@ import { TodoActionModal } from "./todo-action-modal";
 import { PendingInviteModal } from "@/features/lists/components/pending-invite-modal";
 
 const EXIT_ANIMATION_MS = 280;
-const REMINDER_INTERVAL_MS = 15 * 60 * 1000;
 
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
@@ -26,11 +23,8 @@ export const TodoList = () => {
   const [editValue, setEditValue] = useState("");
   const animationTimers = useRef<TimerMap>({});
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastReminderTimestampRef = useRef(0);
-  const hasShownWelcomeNotificationRef = useRef(false);
   const { activeList, isLoadingLists } = useActiveList();
   const { openModal } = useModalManager();
-  const { canNotify, sendNotification } = useNotifications();
   useVisualViewport();
 
   const {
@@ -53,20 +47,11 @@ export const TodoList = () => {
   const completedTodos = useMemo(() => todos.filter((t) => t.done), [todos]);
   const totalTodos = todos.length;
   const completedCount = completedTodos.length;
-  const openTodosCount = totalTodos - completedCount;
 
   const visibleTodos = useMemo(
     () => todos.filter((t) => !t.done || animatingIds.has(t.id)),
     [todos, animatingIds],
   );
-
-  useTodoChangeNotifications({
-    todos,
-    listId: activeList?.id ?? null,
-    listName: activeList?.name ?? "",
-    canNotify,
-    sendNotification,
-  });
 
   useEffect(() => {
     if (hasActiveList) return;
@@ -74,7 +59,7 @@ export const TodoList = () => {
     setEditValue("");
   }, [hasActiveList]);
 
-  const completedButtonDisabled = !hasActiveList || completedTodos.length === 0;
+  const completedButtonDisabled = !hasActiveList || completedCount === 0;
 
   const navigateToCompleted = () => {
     if (!hasActiveList) return;
@@ -101,13 +86,6 @@ export const TodoList = () => {
       delete animationTimers.current[todo.id];
       // Don't invalidate here - the mutation's onSuccess already updates the cache
     }, EXIT_ANIMATION_MS);
-  };
-
-  const reminderBody = (count: number) => {
-    if (count <= 0) {
-      return "Alles erledigt – gönn dir eine Pause!";
-    }
-    return count === 1 ? "Du hast noch eine offene Aufgabe." : `Du hast noch ${count} offene Aufgaben.`;
   };
 
   const clearExitAnimation = (id: string) => {
@@ -196,47 +174,6 @@ export const TodoList = () => {
       Object.values(timers).forEach(clearTimeout);
     };
   }, []);
-
-  useEffect(() => {
-    if (!canNotify) {
-      return;
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState !== "hidden") return;
-      if (openTodosCount <= 0) return;
-
-      const now = Date.now();
-      if (now - lastReminderTimestampRef.current < REMINDER_INTERVAL_MS) {
-        return;
-      }
-      lastReminderTimestampRef.current = now;
-      void sendNotification("Todu – offenes Todo", {
-        body: reminderBody(openTodosCount),
-        tag: "todu-reminder",
-        icon: "/icons/icon-192.png",
-        badge: "/icons/icon-192.png",
-      });
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [canNotify, openTodosCount, sendNotification]);
-
-  useEffect(() => {
-    if (!canNotify || hasShownWelcomeNotificationRef.current) {
-      return;
-    }
-    hasShownWelcomeNotificationRef.current = true;
-    void sendNotification("Todu Benachrichtigungen aktiv", {
-      body: reminderBody(openTodosCount),
-      tag: "todu-welcome",
-      icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
-    });
-  }, [canNotify, openTodosCount, sendNotification]);
 
   return (
     <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 pb-4 text-theme-text">

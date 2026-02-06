@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
+import { sendPushToUser } from "@/lib/push-sender";
 
 export async function POST(
   _request: Request,
@@ -54,10 +55,35 @@ export async function POST(
       throw updateError;
     }
 
+    const listName = (invite.lists as { name?: string })?.name ?? "";
+
+    // Get invite details to find inviter and notify them
+    const { data: inviteWithInviter } = await supabase
+      .from("list_invites")
+      .select("invited_by")
+      .eq("id", inviteId)
+      .single();
+
+    if (inviteWithInviter?.invited_by) {
+      const { data: accepterProfile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", userId)
+        .single();
+
+      const accepterName = accepterProfile?.username || "Jemand";
+      sendPushToUser(inviteWithInviter.invited_by, {
+        title: "Einladung angenommen",
+        body: `${accepterName} hat deine Einladung zu "${listName}" angenommen`,
+        tag: "invite-accepted",
+        url: "/",
+      }).catch(() => {});
+    }
+
     return NextResponse.json({
       success: true,
       listId: invite.list_id,
-      listName: (invite.lists as any)?.name ?? "",
+      listName,
     });
   } catch (error) {
     if (error instanceof UnauthorizedError) {

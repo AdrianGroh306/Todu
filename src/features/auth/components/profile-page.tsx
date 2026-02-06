@@ -301,11 +301,9 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
                       : "bg-theme-primary text-theme-bg hover:bg-theme-primary-hover"
                     }`}
                 >
-                  {isTogglingPush
-                    ? "..."
-                    : isSubscribed
-                      ? "Deaktivieren"
-                      : "Aktivieren"}
+                  {isSubscribed
+                    ? "Aktivieren"
+                      : "Deaktivieren"}
                 </button>
 
                 {isSubscribed ? (
@@ -314,7 +312,7 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
                     disabled={isSendingTest}
                     className="cursor-pointer rounded-xl border border-theme-border px-4 py-2 font-medium text-theme-text transition hover:border-theme-primary disabled:opacity-60"
                   >
-                    {isSendingTest ? "Sende..." : "Test senden"}
+                    Test senden
                   </button>
                 ) : null}
               </div>
