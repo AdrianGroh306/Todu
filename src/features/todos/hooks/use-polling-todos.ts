@@ -91,14 +91,12 @@ export const usePollingTodos = (listId: string | null) => {
       if (context?.previousTodos) {
         queryClient.setQueryData(queryKey, context.previousTodos);
       }
+      void queryClient.invalidateQueries({ queryKey });
     },
     onSuccess: (newTodo) => {
       queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
         current.map((todo) => (todo.id.startsWith("optimistic-") ? newTodo : todo))
       );
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -135,14 +133,12 @@ export const usePollingTodos = (listId: string | null) => {
       if (context?.previousTodos) {
         queryClient.setQueryData(queryKey, context.previousTodos);
       }
+      void queryClient.invalidateQueries({ queryKey });
     },
     onSuccess: (updatedTodo) => {
       queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
         current.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
       );
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -169,8 +165,6 @@ export const usePollingTodos = (listId: string | null) => {
       if (context?.previousTodos) {
         queryClient.setQueryData(queryKey, context.previousTodos);
       }
-    },
-    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey });
     },
   });
@@ -204,8 +198,6 @@ export const usePollingTodos = (listId: string | null) => {
       if (context?.previousTodos) {
         queryClient.setQueryData(queryKey, context.previousTodos);
       }
-    },
-    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey });
     },
   });

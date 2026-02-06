@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { CompletedTodosPage } from "@/features/todos/components/completed-todos-page";
 import { ProfileModal } from "@/features/auth/components/profile-modal";
+import { UpdateToast } from "@/components/update-toast";
 
 type ModalKey = "profile" | "completedTodos" | null;
 
@@ -37,6 +38,7 @@ export const ModalManagerProvider = ({ children }: { children: React.ReactNode }
         <CompletedTodosPage onClose={closeModal} />
       ) : null}
       <ProfileModal open={activeModal === "profile"} onClose={closeModal} />
+      <UpdateToast />
     </ModalManagerContext.Provider>
   );
 };

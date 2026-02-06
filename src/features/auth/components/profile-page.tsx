@@ -262,6 +262,16 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
       </section>
 
 
+      {/* App-Version */}
+      <section className="mb-8 rounded-2xl bg-theme-surface p-6">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-theme-text-muted">App-Version</p>
+          <p className="text-sm font-medium text-theme-text">
+            {process.env.NEXT_PUBLIC_APP_VERSION ?? "dev"}
+          </p>
+        </div>
+      </section>
+
       {/* Benachrichtigungen */}
       {pushSupported ? (
         <section className="rounded-2xl bg-theme-surface p-6">

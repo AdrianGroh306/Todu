@@ -32,8 +32,8 @@ export function useVisualViewport() {
     syncViewport();
 
     // Update on resize (keyboard open/close) and scroll
-    vv.addEventListener("resize", syncViewport);
-    vv.addEventListener("scroll", syncViewport);
+    vv.addEventListener("resize", syncViewport, { passive: true });
+    vv.addEventListener("scroll", syncViewport, { passive: true });
 
     return () => {
       vv.removeEventListener("resize", syncViewport);

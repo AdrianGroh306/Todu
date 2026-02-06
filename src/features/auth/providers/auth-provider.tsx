@@ -36,14 +36,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
+    }).catch(() => {
+      setSession(null);
+      setUser(null);
+      setIsLoading(false);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
+
+      // Redirect to sign-in if token refresh fails
+      if (event === "TOKEN_REFRESHED" && !session) {
+        window.location.href = "/sign-in";
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -54,9 +63,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshUser = async () => {
-    const { data: { user: freshUser } } = await supabase.auth.getUser();
-    if (freshUser) {
-      setUser(freshUser);
+    try {
+      const { data: { user: freshUser } } = await supabase.auth.getUser();
+      if (freshUser) {
+        setUser(freshUser);
+      }
+    } catch {
+      // Ignore refresh errors - session will be handled by onAuthStateChange
     }
   };
 

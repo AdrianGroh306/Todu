@@ -6,8 +6,15 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => cache.addAll(OFFLINE_URLS))
-      .then(() => self.skipWaiting()),
+      // Don't skipWaiting automatically - let the app control when to update
   );
+});
+
+// Listen for skip waiting message from the app
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
