@@ -97,6 +97,23 @@ onSuccess: (newList) => {
 - Navigations gehen immer zum Netzwerk (kein stale HTML)
 - Nur statische Assets werden cache-first geladen
 
+### iOS PWA Assets - Vor Release finalisieren! (2026-02-09)
+
+**Wichtig:** Folgende Assets werden von iOS **nur beim Installieren** der PWA gecached und können danach **nicht mehr aktualisiert** werden ohne die App neu zu installieren:
+
+- `apple-touch-startup-image` (Splash Screen Bild)
+- `apple-touch-icon` (App Icon)
+- App-Name im Manifest
+
+**Konsequenz:** Diese Assets müssen **vor dem offiziellen Release** finalisiert sein! Spätere Änderungen erfordern, dass Nutzer die PWA vom Home-Bildschirm löschen und neu hinzufügen.
+
+**Dateien:**
+- `/public/splash.png` - iOS Splash Screen (1170x2532px)
+- `/public/icons/apple-touch-icon.png` - iOS App Icon (180x180px)
+- `/public/manifest.webmanifest` - App-Name und Icons
+
+**Splash generieren:** `scripts/generate-splash.html` im Browser öffnen
+
 ---
 
 ## Architecture Overview

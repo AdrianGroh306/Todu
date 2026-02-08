@@ -100,7 +100,7 @@ export function SplashScreen({ onComplete }: Props) {
       {/* Logo */}
       <div
         className={`relative z-10 ${
-          phase === "bounce" ? "animate-[bounce-in_0.6s_cubic-bezier(0.34,1.56,0.64,1)]" : ""
+          phase === "bounce" ? "animate-[bounce-in_0.6s_cubic-bezier(0.34,1.56,0.64,1)_forwards]" : ""
         }`}
       >
         <Check className="h-24 w-24 text-white drop-shadow-lg" strokeWidth={3} />
