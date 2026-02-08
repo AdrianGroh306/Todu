@@ -1,4 +1,4 @@
-const CACHE_NAME = "todu-cache-v1.0.0";
+const CACHE_NAME = "todu-cache-v1.1.0";
 const OFFLINE_URLS = ["/", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
