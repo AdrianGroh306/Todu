@@ -8,15 +8,20 @@
 npm run dev      # Start development server (http://localhost:3000)
 npm run build    # Production build
 npm run lint     # Run ESLint
+
+# Release erstellen (bumpt Version, updated SW, erstellt Commit + Tag)
+npm run release patch   # Bugfixes: 1.0.0 → 1.0.1
+npm run release minor   # Features: 1.0.0 → 1.1.0
+npm run release major   # Breaking: 1.0.0 → 2.0.0
 ```
 
 ---
 
 ## Aktuelle Todos
 
-- [ ] **iOS Viewport Box testen** - Nach Cache-Leerung prüfen ob der leere Bereich unten weg ist
-- [ ] **Liste erstellen testen** - Prüfen ob neue Liste als aktive Liste gesetzt wird
-- [ ] **Listen-Input Keyboard testen** - Prüfen ob Input über Keyboard angezeigt wird wie bei Todos
+- [ ] **Benachrichtigungen-Bereich immer anzeigen** - Im Profil wird der Benachrichtigungen-Bereich manchmal am Anfang nicht angezeigt. Sollte immer sichtbar sein (ist eine Einstellung).
+- [ ] **Neue Liste als aktive Liste setzen** - Wenn eine Liste erstellt wird, sollte diese automatisch die aktive Liste werden.
+- [x] **Splash Screen mit Animation** - Natives Gefühl verbessern mit animiertem Splash Screen beim App-Start.
 
 ---
 

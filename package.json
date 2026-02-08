@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "splash": "node scripts/open-splash.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
