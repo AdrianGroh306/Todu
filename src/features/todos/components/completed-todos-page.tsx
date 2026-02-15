@@ -151,7 +151,7 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
               </ul>
             ) : visibleTodos.length === 0 ? (
               <p className="flex h-full items-center justify-center rounded-xl border border-dashed border-theme-border/80 px-4 py-8 text-center text-sm text-theme-text-muted">
-                Keine erledigten Todos vorhanden.
+                Nichts erledigt.
               </p>
             ) : (
               <ul className="divide-y divide-theme-border/50">
@@ -180,14 +180,12 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
 
         <footer className="shrink-0 py-4 safe-bottom">
           <button
-            className="mx-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-theme-text bg-theme-delete transition hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mx-auto flex items-center gap-2 rounded-full bg-theme-delete px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleClearCompleted}
             disabled={isLoading || completedTodos.length === 0 || clearCompleted.isPending}
           >
-              <div className="text-theme-surface flex gap-1.5">
-                <Trash2 className="h-4 w-4" aria-hidden="true" />
-                Alle löschen
-              </div>
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            Alle löschen
           </button>
         </footer>
       </main>

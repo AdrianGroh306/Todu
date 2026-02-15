@@ -176,7 +176,7 @@ export const TodoList = () => {
   }, []);
 
   return (
-    <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden px-4 pt-4 pb-4 text-theme-text">
+    <main className="mx-auto flex h-full max-w-3xl flex-col overflow-hidden bg-theme-bg px-4 pt-4 pb-4 text-theme-text">
       <PendingInviteModal />
       <TodoHeader
         listName={activeList?.name ?? ""}
@@ -196,21 +196,15 @@ export const TodoList = () => {
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>
           ) : !hasActiveList ? (
-            <EmptyState dashed>
-              Wähle oben eine Liste aus oder lege eine neue Liste an, um zu starten.
-            </EmptyState>
+            <EmptyState dashed>Wähle eine Liste.</EmptyState>
           ) : isPending ? (
             <EmptyState>Lade Aufgaben…</EmptyState>
           ) : isError ? (
             <ErrorState>Fehler beim Laden der Aufgaben.</ErrorState>
           ) : totalTodos === 0 ? (
-            <EmptyState dashed>
-              Noch keine Einträge – starte unten mit deiner ersten Aufgabe.
-            </EmptyState>
+            <EmptyState dashed>Leer.</EmptyState>
           ) : visibleTodos.length === 0 ? (
-            <EmptyState dashed>
-              Alle Todos sind erledigt – öffne die Erledigt-Ansicht oben rechts.
-            </EmptyState>
+            <EmptyState dashed>Alles erledigt.</EmptyState>
           ) : (
             <ul>
               {visibleTodos.map((todo) => (

@@ -20,7 +20,7 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
   const supabase = createClient();
   const { user, signOut, refreshUser } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { isSupported: pushSupported, isSubscribed, permission, subscribe, unsubscribe } = useWebPush();
+  const { isSupported: pushSupported, isSubscribed, isLoading: pushLoading, permission, subscribe, unsubscribe } = useWebPush();
 
   // Use server-fetched data as initial state - no loading needed!
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initialProfile?.avatarUrl ?? null);
@@ -184,7 +184,7 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
                 type="button"
                 onClick={triggerAvatarUpload}
                 disabled={uploading}
-                className="absolute -bottom-2 -right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-theme-border shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
+                className="absolute -bottom-2 -right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-theme-bg shadow-lg transition hover:bg-theme-primary-hover disabled:opacity-60"
                 aria-label="Profilbild ändern"
               >
                 <Edit className="h-4 w-4" />
@@ -272,10 +272,19 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
         </div>
       </section>
 
-      {/* Benachrichtigungen */}
-      {pushSupported ? (
-        <section className="rounded-2xl bg-theme-surface p-6">
-          <h2 className="mb-6 text-xl font-semibold">Benachrichtigungen</h2>
+      {/* Benachrichtigungen - immer anzeigen */}
+      <section className="rounded-2xl bg-theme-surface p-6">
+        <h2 className="mb-6 text-xl font-semibold">Benachrichtigungen</h2>
+        {pushLoading ? (
+          <p className="text-sm text-theme-text-muted">Laden...</p>
+        ) : !pushSupported ? (
+          <div className="flex items-center gap-4">
+            <BellOff className="h-5 w-5 text-theme-text-muted" />
+            <p className="text-sm text-theme-text-muted">
+              Push-Benachrichtigungen werden auf diesem Gerät nicht unterstützt.
+            </p>
+          </div>
+        ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               {permission === "granted" ? (
@@ -312,8 +321,8 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
                     }`}
                 >
                   {isSubscribed
-                    ? "Aktivieren"
-                      : "Deaktivieren"}
+                    ? "Deaktivieren"
+                    : "Aktivieren"}
                 </button>
 
                 {isSubscribed ? (
@@ -328,8 +337,8 @@ export const ProfilePage = ({ initialProfile, onClose }: ProfilePageProps) => {
               </div>
             )}
           </div>
-        </section>
-      ) : null}
+        )}
+      </section>
 
     </main>
   );

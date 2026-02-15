@@ -14,7 +14,8 @@ function urlBase64ToUint8Array(base64: string) {
 export function useWebPush() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported, setIsSupported] = useState<boolean | null>(null); // null = loading
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supported = "serviceWorker" in navigator && "PushManager" in window;
@@ -26,7 +27,10 @@ export function useWebPush() {
       navigator.serviceWorker.ready.then(async (reg) => {
         const sub = await reg.pushManager.getSubscription();
         setIsSubscribed(!!sub);
+        setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -72,5 +76,5 @@ export function useWebPush() {
     }
   }, []);
 
-  return { isSupported, isSubscribed, permission, subscribe, unsubscribe };
+  return { isSupported, isSubscribed, isLoading, permission, subscribe, unsubscribe };
 }

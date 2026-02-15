@@ -34,8 +34,11 @@ export const useLists = () => {
         method: "POST",
         body: JSON.stringify(payload),
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: listsQueryKey });
+    onSuccess: (newList) => {
+      // Sofort zum Cache hinzufügen damit setActiveListId funktioniert
+      queryClient.setQueryData<ListSummary[]>(listsQueryKey, (old) =>
+        old ? [...old, newList] : [newList]
+      );
     },
   });
 

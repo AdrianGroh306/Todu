@@ -76,9 +76,7 @@ export const ListSelectionModal = ({
               Listen werden geladen…
             </div>
           ) : sortedLists.length === 0 ? (
-            <p className="py-2 text-sm text-theme-text-muted">
-              Keine Listen verfügbar.
-            </p>
+            <p className="py-2 text-sm text-theme-text-muted">Keine Listen.</p>
           ) : (
             <ul className="h-full divide-y divide-theme-border/50 overflow-y-auto pr-1">
               {sortedLists.map((list) => (

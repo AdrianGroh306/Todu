@@ -10,7 +10,9 @@ export type ThemeId =
   | "forest"
   | "sunset"
   | "lavender"
-  | "rose";
+  | "rose"
+  | "rainbow"
+  | "mono";
 
 export type ThemeConfig = {
   id: ThemeId;
@@ -26,6 +28,8 @@ export const THEMES: ThemeConfig[] = [
   { id: "sunset", name: "Sunset", preview: "bg-orange-500" },
   { id: "lavender", name: "Lavender", preview: "bg-purple-500" },
   { id: "rose", name: "Rose", preview: "bg-rose-500" },
+  { id: "rainbow", name: "Rainbow", preview: "bg-gradient-to-br from-green-400 via-orange-500 to-purple-500" },
+  { id: "mono", name: "Mono", preview: "bg-gradient-to-br from-black via-gray-700 to-black" },
 ];
 
 type ThemeContextValue = {
@@ -36,6 +40,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const THEME_STORAGE_KEY = "todu-theme";
+
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeId>("dark");

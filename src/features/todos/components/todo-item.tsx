@@ -53,7 +53,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
     <li
       className={`group flex items-center justify-between px-4 py-3 transition-all duration-200 ease-out ${
         isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
-      } ${!isExiting ? "hover:bg-theme-surface/40" : ""}`}
+      }`}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}
       onPointerLeave={() => clearLongPress()}

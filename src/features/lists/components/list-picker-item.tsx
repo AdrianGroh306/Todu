@@ -53,9 +53,7 @@ export const ListPickerItem = ({ list, onSelect, onLongPress, isActive }: ListPi
   return (
     <button
       type="button"
-      className={`flex w-full items-center cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
-        isActive ? "hover:bg-theme-surface/60" : "hover:bg-theme-surface/80"
-      }`}
+      className="flex w-full items-center cursor-pointer justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm transition"
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={clearLongPress}

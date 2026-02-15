@@ -19,8 +19,8 @@ npm run release major   # Breaking: 1.0.0 → 2.0.0
 
 ## Aktuelle Todos
 
-- [ ] **Benachrichtigungen-Bereich immer anzeigen** - Im Profil wird der Benachrichtigungen-Bereich manchmal am Anfang nicht angezeigt. Sollte immer sichtbar sein (ist eine Einstellung).
-- [ ] **Neue Liste als aktive Liste setzen** - Wenn eine Liste erstellt wird, sollte diese automatisch die aktive Liste werden.
+- [x] **Benachrichtigungen-Bereich immer anzeigen** - Im Profil wird der Benachrichtigungen-Bereich manchmal am Anfang nicht angezeigt. Sollte immer sichtbar sein (ist eine Einstellung).
+- [x] **Neue Liste als aktive Liste setzen** - Wenn eine Liste erstellt wird, sollte diese automatisch die aktive Liste werden.
 - [x] **Splash Screen mit Animation** - Natives Gefühl verbessern mit animiertem Splash Screen beim App-Start.
 
 ---

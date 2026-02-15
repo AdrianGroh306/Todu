@@ -97,6 +97,30 @@
   --theme-delete: #F43F5E
 }
 
+/* Rainbow Theme - animierter bunter Gradient */
+[data-theme="rainbow"] {
+  --theme-bg: #000000;
+  --theme-surface: rgba(255, 255, 255, 0.15);
+  --theme-text: #ffffff;
+  --theme-text-muted: rgba(255, 255, 255, 0.75);
+  --theme-border: rgba(255, 255, 255, 0.2);
+  --theme-primary: #ffffff;
+  --theme-primary-hover: rgba(255, 255, 255, 0.85);
+  --theme-delete: #F43F5E
+}
+
+/* Mono Theme - schwarz-weiß mit Bewegung */
+[data-theme="mono"] {
+  --theme-bg: #000000;
+  --theme-surface: rgba(255, 255, 255, 0.1);
+  --theme-text: #ffffff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-border: rgba(255, 255, 255, 0.15);
+  --theme-primary: #ffffff;
+  --theme-primary-hover: rgba(255, 255, 255, 0.85);
+  --theme-delete: #F43F5E
+}
+
 /* ===== THEME UTILITY CLASSES ===== */
 @theme inline {
   --color-theme-bg: var(--theme-bg);
@@ -133,6 +157,78 @@ body {
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Rainbow Theme - animated colorful gradient background (knallig) */
+[data-theme="rainbow"] body {
+  background-image: linear-gradient(
+    165deg,
+    #4ade80 0%,
+    #facc15 20%,
+    #fb923c 40%,
+    #f472b6 60%,
+    #a78bfa 80%
+  ) !important;
+  background-size: 140% 140% !important;
+  animation: wave 2s ease-in-out infinite !important;
+}
+
+[data-theme="rainbow"] [class*="bg-theme-bg"] {
+  background-image: linear-gradient(
+    165deg,
+    #4ade80 0%,
+    #facc15 20%,
+    #fb923c 40%,
+    #f472b6 60%,
+    #a78bfa 80%
+  ) !important;
+  background-color: transparent !important;
+  background-size: 140% 140% !important;
+  animation: wave 2s ease-in-out infinite !important;
+}
+
+/* Mono Theme - animated black/white gradient background */
+[data-theme="mono"] body {
+  background-image: linear-gradient(
+    165deg,
+    #000000 0%,
+    #333333 25%,
+    #1a1a1a 50%,
+    #444444 75%,
+    #000000 100%
+  ) !important;
+  background-size: 200% 200% !important;
+  animation: wave-slow 4s ease-in-out infinite !important;
+}
+
+[data-theme="mono"] [class*="bg-theme-bg"] {
+  background-image: linear-gradient(
+    165deg,
+    #000000 0%,
+    #333333 25%,
+    #1a1a1a 50%,
+    #444444 75%,
+    #000000 100%
+  ) !important;
+  background-color: transparent !important;
+  background-size: 200% 200% !important;
+  animation: wave-slow 4s ease-in-out infinite !important;
+}
+
+/* Rainbow/Mono - Milchglas-Effekt für Surfaces */
+[data-theme="rainbow"] [class*="bg-theme-surface"],
+[data-theme="mono"] [class*="bg-theme-surface"] {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@keyframes wave-slow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Safe top padding utility */
