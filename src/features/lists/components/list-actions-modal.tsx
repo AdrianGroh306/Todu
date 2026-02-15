@@ -87,11 +87,11 @@ export const ListActionsModal = ({
                 <button
                   type="button"
                   aria-label="Änderungen speichern"
-                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-theme-primary text-theme-border transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-auto w-12 cursor-pointer items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleRenameSubmit}
                   disabled={renameDisabled}
                 >
-                  {isRenaming ? <Spinner size="sm" className="border-white" /> : <Save className="h-5 w-5" aria-hidden="true" />}
+                  {isRenaming ? <Spinner size="sm" className="border-theme-bg" /> : <Save className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
               <p className="flex justify-center text-xs text-theme-text-muted">oder</p>
@@ -117,7 +117,7 @@ export const ListActionsModal = ({
               <div className="flex justify-center">
                 <button
                   type="button"
-                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-theme-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center gap-2 cursor-pointer rounded-xl bg-theme-primary px-6 py-3 text-sm font-semibold text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={onLeave}
                   disabled={isLeaving}
                 >

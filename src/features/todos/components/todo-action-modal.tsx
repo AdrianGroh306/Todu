@@ -44,12 +44,12 @@ export const TodoActionModal = ({
           <button
             type="button"
             aria-label="Änderungen speichern"
-            className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-border transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
+            className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
             onClick={onSave}
             disabled={isSaveDisabled}
           >
             {isSaving ? (
-              <Spinner size="sm" className="border-white" />
+              <Spinner size="sm" className="border-theme-bg" />
             ) : (
               <Save className="h-5 w-5" aria-hidden="true" />
             )}

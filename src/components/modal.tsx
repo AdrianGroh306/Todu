@@ -23,7 +23,6 @@ export const Modal = ({
   titleActions,
   fullscreen = false,
 }: ModalProps) => {
-  // Sync visual viewport for keyboard handling
   useVisualViewport();
 
   if (!open) return null;

@@ -50,6 +50,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
     if (stored && THEMES.some((t) => t.id === stored)) {
       setThemeState(stored);
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setThemeState(prefersDark ? "dark" : "light");
     }
     setMounted(true);
   }, []);
