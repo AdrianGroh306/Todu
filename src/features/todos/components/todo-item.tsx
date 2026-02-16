@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import type { PointerEvent } from "react";
 import { Checkbox } from "@/components/checkbox";
 import type { Todo } from "@/features/todos/hooks/use-polling-todos";
@@ -8,11 +8,11 @@ const LONG_PRESS_MS = 500;
 type TodoItemProps = {
   todo: Todo;
   isExiting: boolean;
-  onToggle: () => void;
-  onLongPress: () => void;
+  onToggle: (todo: Todo) => void;
+  onLongPress: (todo: Todo) => void;
 };
 
-export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) => {
+export const TodoItem = memo(function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
   const disabled = isExiting;
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
@@ -37,7 +37,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
     pressTimerRef.current = setTimeout(() => {
       longPressTriggeredRef.current = true;
       pressTimerRef.current = null;
-      onLongPress();
+      onLongPress(todo);
     }, LONG_PRESS_MS);
   };
 
@@ -46,7 +46,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
       longPressTriggeredRef.current = false;
       return;
     }
-    onToggle();
+    onToggle(todo);
   };
 
   return (
@@ -61,7 +61,7 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
       onContextMenu={(event) => {
         event.preventDefault();
         longPressTriggeredRef.current = true;
-        onLongPress();
+        onLongPress(todo);
       }}
     >
       <div className="flex w-full font-semibold items-center gap-3">
@@ -83,4 +83,4 @@ export const TodoItem = ({ todo, isExiting, onToggle, onLongPress }: TodoItemPro
       </div>
     </li>
   );
-}
+});

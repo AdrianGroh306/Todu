@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActiveList } from "@/features/shared/providers/active-list-provider";
 import { useModalManager } from "@/features/shared/providers/modal-manager-provider";
 import { usePollingTodos, type Todo } from "@/features/todos/hooks/use-polling-todos";
@@ -66,7 +66,12 @@ export const TodoList = () => {
     openModal("completedTodos");
   };
 
-  const startExitAnimation = (todo: Todo) => {
+  const animatingIdsRef = useRef(animatingIds);
+  useEffect(() => {
+    animatingIdsRef.current = animatingIds;
+  }, [animatingIds]);
+
+  const startExitAnimation = useCallback((todo: Todo) => {
     setAnimatingIds((prev) => {
       if (prev.has(todo.id)) return prev;
       return new Set(prev).add(todo.id);
@@ -86,9 +91,9 @@ export const TodoList = () => {
       delete animationTimers.current[todo.id];
       // Don't invalidate here - the mutation's onSuccess already updates the cache
     }, EXIT_ANIMATION_MS);
-  };
+  }, []);
 
-  const clearExitAnimation = (id: string) => {
+  const clearExitAnimation = useCallback((id: string) => {
     if (animationTimers.current[id]) {
       clearTimeout(animationTimers.current[id]);
       delete animationTimers.current[id];
@@ -99,10 +104,10 @@ export const TodoList = () => {
       next.delete(id);
       return next;
     });
-  };
+  }, []);
 
-  const handleToggleTodo = (todo: Todo) => {
-    if (animatingIds.has(todo.id)) {
+  const handleToggleTodo = useCallback((todo: Todo) => {
+    if (animatingIdsRef.current.has(todo.id)) {
       return;
     }
     const nextDone = !todo.done;
@@ -116,7 +121,7 @@ export const TodoList = () => {
       { id: todo.id, done: nextDone },
       { onError: () => nextDone && clearExitAnimation(todo.id) },
     );
-  };
+  }, [startExitAnimation, clearExitAnimation, updateTodo]);
 
   const handleSubmit = () => {
     const trimmedText = text.trim();
@@ -135,10 +140,10 @@ export const TodoList = () => {
     );
   };
 
-  const openActionMenu = (todo: Todo) => {
+  const openActionMenu = useCallback((todo: Todo) => {
     setActionTodo(todo);
     setEditValue(todo.text);
-  };
+  }, []);
 
   const closeActionMenu = () => {
     setActionTodo(null);
@@ -212,8 +217,8 @@ export const TodoList = () => {
                   key={todo.id}
                   todo={todo}
                   isExiting={animatingIds.has(todo.id)}
-                  onToggle={() => handleToggleTodo(todo)}
-                  onLongPress={() => openActionMenu(todo)}
+                  onToggle={handleToggleTodo}
+                  onLongPress={openActionMenu}
                 />
               ))}
             </ul>
