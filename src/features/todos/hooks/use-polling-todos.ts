@@ -48,7 +48,6 @@ export const usePollingTodos = (listId: string | null) => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
     refetchInterval: 8 * 1000,
-    refetchIntervalInBackground: true,
   });
 
   const completedTodos = useMemo(() => (todos as Todo[]).filter((t: Todo) => t.done), [todos]);

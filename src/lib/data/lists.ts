@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import { supabase as serviceSupabase } from "@/lib/supabase";
 
 export type ListSummary = {
@@ -9,22 +8,15 @@ export type ListSummary = {
   role: "owner" | "editor" | "viewer";
 };
 
-/**
- * Server-side function to fetch all lists for the authenticated user
- * Used for initial data fetching in Server Components
- */
-export const getLists = async (): Promise<ListSummary[]> => {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+type MembershipRow = {
+  role: ListSummary["role"];
+  lists: { id: string; name: string; created_at: string; updated_at: string };
+};
 
-  if (!user) {
-    return [];
-  }
-
+export const getLists = async (userId: string): Promise<ListSummary[]> => {
   const { data, error } = await serviceSupabase
     .from("list_members")
     .select(`
-      list_id,
       role,
       lists!inner (
         id,
@@ -33,16 +25,16 @@ export const getLists = async (): Promise<ListSummary[]> => {
         updated_at
       )
     `)
-    .eq("user_id", user.id);
+    .eq("user_id", userId)
+    .returns<MembershipRow[]>();
 
   if (error) {
     console.error("Error fetching lists:", error);
     return [];
   }
 
-  // Sort by updated_at descending (newest first)
   return (data || [])
-    .map((item: any) => ({
+    .map((item) => ({
       id: item.lists.id,
       name: item.lists.name,
       created_at: item.lists.created_at,

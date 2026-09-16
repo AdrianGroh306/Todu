@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SplashScreen } from "@/components/splash-screen";
 import type { User, Session } from "@supabase/supabase-js";
@@ -9,7 +9,6 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  showSplash: boolean;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -18,7 +17,6 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   isLoading: true,
-  showSplash: true,
   signOut: async () => {},
   refreshUser: async () => {},
 });
@@ -31,13 +29,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showSplash, setShowSplash] = useState(true);
 
   const supabase = createClient();
-
-  const handleSplashComplete = useCallback(() => {
-    setShowSplash(false);
-  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,8 +74,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, showSplash, signOut, refreshUser }}>
-      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+    <AuthContext.Provider value={{ user, session, isLoading, signOut, refreshUser }}>
+      <SplashScreen />
       {children}
     </AuthContext.Provider>
   );

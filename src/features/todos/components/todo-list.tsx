@@ -196,7 +196,7 @@ export const TodoList = () => {
         <PullToRefresh
           onRefresh={handleRefresh}
           disabled={!hasActiveList || isPending}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 px-4 py-2 backdrop-blur"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-none rounded-2xl bg-theme-surface/80 px-4 py-2"
         >
           {isLoadingLists ? (
             <EmptyState>Listen werden geladen…</EmptyState>

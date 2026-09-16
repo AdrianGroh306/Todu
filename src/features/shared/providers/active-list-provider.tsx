@@ -37,14 +37,14 @@ export const ActiveListProvider = ({
   } = useLists();
   const [activeListId, setActiveListId] = useState<string | null>(initialActiveListId || null);
 
-  // Hydrate from localStorage on mount
+  // Server already resolved the list from the cookie; only fall back to localStorage without it
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (initialActiveListId) return;
     const stored = window.localStorage.getItem(ACTIVE_LIST_STORAGE_KEY);
     if (stored) {
       setActiveListId(stored);
     }
-  }, []);
+  }, [initialActiveListId]);
 
   // Persist selection
   useEffect(() => {

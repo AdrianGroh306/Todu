@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess } from "@/lib/list-access";
@@ -25,23 +25,21 @@ export async function PATCH(
   let todoId = "";
   try {
     ({ id: todoId } = await context.params);
-    const userUuid = await getUserId();
-    const { text, done } = (await request.json()) as {
-      text?: string;
-      done?: boolean;
-    };
+    const [userUuid, listId, { text, done }] = await Promise.all([
+      getUserId(),
+      getTodoListId(todoId),
+      request.json() as Promise<{ text?: string; done?: boolean }>,
+    ]);
 
     if (typeof text === "undefined" && typeof done === "undefined") {
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
-    const listId = await getTodoListId(todoId);
-    await ensureListAccess(listId, userUuid);
+    const { listName } = await ensureListAccess(listId, userUuid);
 
     const update: Record<string, unknown> = {};
     if (typeof text !== "undefined") update.text = text.trim();
     if (typeof done !== "undefined") update.done = done;
-
 
     const { data, error } = await supabase
       .from("todos")
@@ -54,17 +52,8 @@ export async function PATCH(
       throw error;
     }
 
-    // Send push notification to other list members (non-blocking)
-    const { data: listData } = await supabase
-      .from("lists")
-      .select("name")
-      .eq("id", listId)
-      .single();
-
-    if (listData?.name) {
-      notifyListMembers(listId, userUuid, listData.name).catch(() => {
-        // Ignore notification errors
-      });
+    if (listName) {
+      after(() => notifyListMembers(listId, userUuid, listName).catch(() => {}));
     }
 
     return NextResponse.json(data);
@@ -84,9 +73,8 @@ export async function DELETE(
   let todoId = "";
   try {
     ({ id: todoId } = await context.params);
-    const userUuid = await getUserId();
-    const listId = await getTodoListId(todoId);
-    await ensureListAccess(listId, userUuid);
+    const [userUuid, listId] = await Promise.all([getUserId(), getTodoListId(todoId)]);
+    const { listName } = await ensureListAccess(listId, userUuid);
 
     const { error } = await supabase
       .from("todos")
@@ -97,17 +85,8 @@ export async function DELETE(
       throw error;
     }
 
-    // Send push notification to other list members (non-blocking)
-    const { data: listData } = await supabase
-      .from("lists")
-      .select("name")
-      .eq("id", listId)
-      .single();
-
-    if (listData?.name) {
-      notifyListMembers(listId, userUuid, listData.name).catch(() => {
-        // Ignore notification errors
-      });
+    if (listName) {
+      after(() => notifyListMembers(listId, userUuid, listName).catch(() => {}));
     }
 
     return NextResponse.json({ success: true });

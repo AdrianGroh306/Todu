@@ -6,8 +6,8 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Exclude API routes and static assets from auth middleware
+  // Exclude API routes and static assets so they don't pay for an auth roundtrip
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)"
+    "/((?!api|_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|icons/|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"
   ]
 };

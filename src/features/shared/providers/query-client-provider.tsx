@@ -16,9 +16,9 @@ function makeQueryClient() {
 }
 
 function makePersister() {
-  if (typeof window === "undefined") return undefined;
+  // Without storage (server render) this is a no-op persister, so SSR still renders the tree.
   return createSyncStoragePersister({
-    storage: window.localStorage,
+    storage: typeof window === "undefined" ? undefined : window.localStorage,
     key: "todu-query-cache",
   });
 }
@@ -31,10 +31,6 @@ export const QueryClientProviderWrapper = ({
   const [client] = useState(() => makeQueryClient());
   const [persister] = useState(() => makePersister());
 
-  if (!persister) {
-    return null;
-  }
-
   return (
     <PersistQueryClientProvider
       client={client}
@@ -43,7 +39,6 @@ export const QueryClientProviderWrapper = ({
         maxAge: 1000 * 60 * 60 * 24, // 24h
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
-            // Don't persist presence queries
             const key = query.queryKey[0];
             if (key === "presence" || key === "profile") return false;
             return query.state.status === "success";

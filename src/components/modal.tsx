@@ -23,7 +23,7 @@ export const Modal = ({
   titleActions,
   fullscreen = false,
 }: ModalProps) => {
-  useVisualViewport();
+  useVisualViewport(open);
 
   if (!open) return null;
 

@@ -1,20 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorker } from "@/features/shared/service-worker";
 import { QueryClientProviderWrapper } from "@/features/shared/providers/query-client-provider";
 import { AuthProvider } from "@/features/auth/providers/auth-provider";
 import { ThemeProvider } from "@/features/shared/providers/theme-provider";
+import { THEME_INIT_SCRIPT } from "@/features/shared/constants/theme";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -55,6 +45,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Applies the stored theme before first paint so SSR HTML never flashes the wrong theme */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* iOS native splash screen - needs media queries for different devices */}
         <link rel="apple-touch-startup-image" href="/splash.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" />
         <link rel="apple-touch-startup-image" href="/splash.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" />
@@ -68,7 +60,7 @@ export default function RootLayout({
         <link rel="apple-touch-startup-image" href="/splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-theme-bg text-theme-text antialiased`}
+        className="bg-theme-bg text-theme-text antialiased"
       >
         <AuthProvider>
           <ThemeProvider>

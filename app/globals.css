@@ -149,6 +149,11 @@ body {
 }
 
 body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
   background: var(--theme-bg);
   color: var(--theme-text);
   font-family: "SF Mono", SFMono-Regular, ui-monospace, monospace;
@@ -272,6 +277,48 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ===== SPLASH (CSS-only, runs from first paint) ===== */
+.splash {
+  display: none;
+  animation: splash-out 180ms ease-out 520ms forwards;
+}
+
+.splash-forced {
+  display: flex;
+}
+
+@media (display-mode: standalone) {
+  .splash {
+    display: flex;
+  }
+}
+
+.splash-logo {
+  animation: bounce-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes splash-out {
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
 }
 
 /* Bounce-in animation for splash screen */

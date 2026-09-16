@@ -2,35 +2,9 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { THEME_STORAGE_KEY, THEMES, type ThemeId } from "@/features/shared/constants/theme";
 
-export type ThemeId =
-  | "dark"
-  | "light"
-  | "ocean"
-  | "forest"
-  | "sunset"
-  | "lavender"
-  | "rose"
-  | "rainbow"
-  | "mono";
-
-export type ThemeConfig = {
-  id: ThemeId;
-  name: string;
-  preview: string;
-};
-
-export const THEMES: ThemeConfig[] = [
-  { id: "dark", name: "Dark", preview: "bg-slate-900" },
-  { id: "light", name: "Light", preview: "bg-slate-100" },
-  { id: "ocean", name: "Ocean", preview: "bg-sky-600" },
-  { id: "forest", name: "Forest", preview: "bg-emerald-600" },
-  { id: "sunset", name: "Sunset", preview: "bg-orange-500" },
-  { id: "lavender", name: "Lavender", preview: "bg-purple-500" },
-  { id: "rose", name: "Rose", preview: "bg-rose-500" },
-  { id: "rainbow", name: "Rainbow", preview: "bg-gradient-to-br from-green-400 via-orange-500 to-purple-500" },
-  { id: "mono", name: "Mono", preview: "bg-gradient-to-br from-black via-gray-700 to-black" },
-];
+export { THEMES, type ThemeConfig, type ThemeId } from "@/features/shared/constants/theme";
 
 type ThemeContextValue = {
   theme: ThemeId;
@@ -39,48 +13,23 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const THEME_STORAGE_KEY = "todu-theme";
-
+// THEME_INIT_SCRIPT already set data-theme before hydration
+const readInitialTheme = (): ThemeId => {
+  if (typeof document === "undefined") return "dark";
+  const current = document.documentElement.getAttribute("data-theme") as ThemeId | null;
+  return current && THEMES.some((t) => t.id === current) ? current : "dark";
+};
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeId>("dark");
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<ThemeId>(readInitialTheme);
 
   useEffect(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
-    if (stored && THEMES.some((t) => t.id === stored)) {
-      setThemeState(stored);
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setThemeState(prefersDark ? "dark" : "light");
-    }
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    // Remove all theme classes
-    THEMES.forEach((t) => {
-      document.documentElement.classList.remove(`theme-${t.id}`);
-    });
-
-    // Add current theme class
-    document.documentElement.classList.add(`theme-${theme}`);
-    document.documentElement.setAttribute("data-theme", theme);
-
-    // Persist
+    const root = document.documentElement;
+    THEMES.forEach((t) => root.classList.remove(`theme-${t.id}`));
+    root.classList.add(`theme-${theme}`);
+    root.setAttribute("data-theme", theme);
     localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }, [theme, mounted]);
-
-  const setTheme = (newTheme: ThemeId) => {
-    setThemeState(newTheme);
-  };
-
-  // Prevent flash by not rendering until mounted
-  if (!mounted) {
-    return null;
-  }
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

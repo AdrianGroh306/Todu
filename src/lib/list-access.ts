@@ -6,13 +6,14 @@ export type ListMembershipRole = "owner" | "editor" | "viewer";
 type ListAccessRow = {
   id: string;
   user_id: string;
+  name: string;
   list_members: { user_id: string; role: ListMembershipRole }[];
 };
 
 export async function ensureListAccess(listId: string, userId: string) {
   const { data, error } = await supabase
     .from("lists")
-    .select("id, user_id, list_members(user_id, role)")
+    .select("id, user_id, name, list_members(user_id, role)")
     .eq("id", listId)
     .single<ListAccessRow>();
 
@@ -31,7 +32,7 @@ export async function ensureListAccess(listId: string, userId: string) {
     throw new UnauthorizedError("Access to this list is not allowed");
   }
 
-  return membership ?? { role: "owner" as ListMembershipRole };
+  return { role: membership?.role ?? ("owner" as ListMembershipRole), listName: data.name };
 }
 
 export async function ensureListOwnership(listId: string, userId: string) {

@@ -1,17 +1,22 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export class UnauthorizedError extends Error {}
 
-export async function getUserId(): Promise<string> {
+// getClaims verifies the JWT locally when the project uses asymmetric signing keys
+// (falls back to a network getUser otherwise). cache() dedupes it per request.
+export const getAuthUserId = cache(async (): Promise<string | null> => {
   const supabase = await createClient();
-  
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  return data?.claims.sub ?? null;
+});
 
-  if (!user?.id) {
+export async function getUserId(): Promise<string> {
+  const userId = await getAuthUserId();
+
+  if (!userId) {
     throw new UnauthorizedError("Unauthorized");
   }
 
-  return user.id;
+  return userId;
 }

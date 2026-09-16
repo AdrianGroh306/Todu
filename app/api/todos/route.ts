@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getUserId, UnauthorizedError } from "@/lib/api-auth";
 import { ensureListAccess } from "@/lib/list-access";
@@ -9,19 +9,22 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = await getUserId();
     const listId = new URL(request.url).searchParams.get("listId");
     if (!listId) {
       return NextResponse.json({ error: "listId is required" }, { status: 400 });
     }
 
-    await ensureListAccess(listId, userId);
+    const userId = await getUserId();
 
-    const { data, error } = await supabase
-      .from("todos")
-      .select("id, text, done, created_at")
-      .eq("list_id", listId)
-      .order("created_at", { ascending: false });
+    // Access check and query run in parallel; data is only returned if access passes.
+    const [, { data, error }] = await Promise.all([
+      ensureListAccess(listId, userId),
+      supabase
+        .from("todos")
+        .select("id, text, done, created_at")
+        .eq("list_id", listId)
+        .order("created_at", { ascending: false }),
+    ]);
 
     if (error) {
       throw error;
@@ -43,8 +46,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = await getUserId();
-    const { text, listId } = (await request.json()) as { text?: string; listId?: string };
+    const [userId, { text, listId }] = await Promise.all([
+      getUserId(),
+      request.json() as Promise<{ text?: string; listId?: string }>,
+    ]);
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -54,7 +59,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "listId is required" }, { status: 400 });
     }
 
-    await ensureListAccess(listId, userId);
+    const { listName } = await ensureListAccess(listId, userId);
 
     const { data, error } = await supabase
       .from("todos")
@@ -66,17 +71,8 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    // Send push notification to other list members (non-blocking)
-    const { data: listData } = await supabase
-      .from("lists")
-      .select("name")
-      .eq("id", listId)
-      .single();
-
-    if (listData?.name) {
-      notifyListMembers(listId, userId, listData.name).catch(() => {
-        // Ignore notification errors - don't break the main flow
-      });
+    if (listName) {
+      after(() => notifyListMembers(listId, userId, listName).catch(() => {}));
     }
 
     return NextResponse.json(data, { status: 201 });
