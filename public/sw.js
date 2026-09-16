@@ -1,5 +1,7 @@
 const CACHE_NAME = "todu-cache-v1.3.0";
-const OFFLINE_URLS = ["/", "/icons/icon-192.png", "/icons/icon-512.png"];
+const OFFLINE_URLS = ["/icons/icon-192.png", "/icons/icon-512.png"];
+const SHELL_URL = "/";
+const IS_DEV = ["localhost", "127.0.0.1"].includes(self.location.hostname);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -10,10 +12,37 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Listen for skip waiting message from the app
+const notifyClients = async (message) => {
+  const clientList = await self.clients.matchAll({ type: "window" });
+  clientList.forEach((client) => client.postMessage(message));
+};
+
+// The shell HTML contains user data: only keep it while the user is authenticated.
+const storeShell = async (response) => {
+  const cache = await caches.open(CACHE_NAME);
+  if (response.type === "opaqueredirect" || response.redirected || !response.ok) {
+    const hadShell = await cache.delete(SHELL_URL);
+    if (hadShell && response.type === "opaqueredirect") {
+      await notifyClients({ type: "SESSION_EXPIRED" });
+    }
+    return;
+  }
+  await cache.put(SHELL_URL, response);
+};
+
+const refreshShell = () =>
+  fetch(SHELL_URL, { credentials: "same-origin", redirect: "manual" })
+    .then(storeShell)
+    .catch(() => {});
+
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") {
+  const type = event.data?.type;
+  if (type === "SKIP_WAITING") {
     self.skipWaiting();
+  } else if (type === "REFRESH_SHELL" && !IS_DEV) {
+    event.waitUntil(refreshShell());
+  } else if (type === "CLEAR_SHELL") {
+    event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.delete(SHELL_URL)));
   }
 });
 
@@ -67,41 +96,73 @@ self.addEventListener("notificationclick", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Skip non-GET requests
   if (request.method !== "GET") return;
 
-  // Skip RSC/Next.js internal requests - let the browser handle them directly
   const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Hashed build assets are immutable. Caching them keeps a cached shell bootable after a deploy.
+  if (url.pathname.startsWith("/_next/static/")) {
+    if (IS_DEV) return;
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const copy = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          }),
+      ),
+    );
+    return;
+  }
+
   if (
     url.searchParams.has("_rsc") ||
     url.pathname.startsWith("/_next/") ||
-    request.headers.get("RSC") === "1"
+    request.headers.get("RSC") === "1" ||
+    url.pathname.startsWith("/api/")
   ) {
     return;
   }
 
-  // Never cache API responses – always hit the network for dynamic data
-  if (url.pathname.startsWith("/api/")) {
-    return;
-  }
-
-  // Always go to network for navigations so we don't show stale HTML on refresh
   if (request.mode === "navigate") {
+    // App start: show the last shell instantly and refresh it in the background.
+    if (url.pathname === SHELL_URL && !IS_DEV) {
+      event.respondWith(
+        caches.match(SHELL_URL).then((cached) => {
+          const network = fetch(request).then((response) => {
+            event.waitUntil(storeShell(response.clone()));
+            return response;
+          });
+
+          if (cached) {
+            event.waitUntil(network.catch(() => {}));
+            return cached;
+          }
+          return network;
+        }),
+      );
+      return;
+    }
+
     event.respondWith(
       fetch(request).catch(async () => {
-        const cached = await caches.match(request);
-        return cached ?? caches.match("/");
+        const cached = await caches.match(SHELL_URL);
+        return cached ?? Response.error();
       }),
     );
     return;
   }
 
-  // Cache-first for static assets only
+  // Other static assets: cache-first with background refresh
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)
         .then((response) => {
-          // Only cache successful responses
           if (response.ok && response.type === "basic") {
             const copy = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
@@ -109,7 +170,6 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          // Return cached version or a proper error response
           if (cached) return cached;
           return new Response("Offline", { status: 503, statusText: "Service Unavailable" });
         });

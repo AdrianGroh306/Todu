@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SplashScreen } from "@/components/splash-screen";
+import { postToServiceWorker } from "@/features/shared/service-worker";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
@@ -60,6 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [supabase.auth]);
 
   const signOut = async () => {
+    postToServiceWorker({ type: "CLEAR_SHELL" });
     await supabase.auth.signOut();
   };
 

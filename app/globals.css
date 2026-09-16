@@ -164,60 +164,64 @@ body {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-/* Rainbow Theme - animated colorful gradient background (knallig) */
-[data-theme="rainbow"] body {
-  background-image: linear-gradient(
-    165deg,
-    #4ade80 0%,
-    #facc15 20%,
-    #fb923c 40%,
-    #f472b6 60%,
-    #a78bfa 80%
-  ) !important;
-  background-size: 140% 140% !important;
-  animation: wave 2s ease-in-out infinite !important;
+/* Rainbow/Mono - animated gradient as ONE composited layer (transform only, no repaint per frame).
+   Page backgrounds are transparent so this layer shows through; fixed overlays get a static gradient. */
+[data-theme="rainbow"] {
+  --theme-gradient: linear-gradient(165deg, #4ade80 0%, #facc15 20%, #fb923c 40%, #f472b6 60%, #a78bfa 80%);
 }
 
-[data-theme="rainbow"] [class*="bg-theme-bg"] {
-  background-image: linear-gradient(
-    165deg,
-    #4ade80 0%,
-    #facc15 20%,
-    #fb923c 40%,
-    #f472b6 60%,
-    #a78bfa 80%
-  ) !important;
+[data-theme="mono"] {
+  --theme-gradient: linear-gradient(165deg, #000000 0%, #333333 25%, #1a1a1a 50%, #444444 75%, #000000 100%);
+}
+
+[data-theme="rainbow"] body::before,
+[data-theme="mono"] body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--theme-gradient);
+  will-change: transform;
+}
+
+[data-theme="rainbow"] body::before {
+  animation: wave-layer 2s ease-in-out infinite;
+}
+
+[data-theme="mono"] body::before {
+  animation: wave-layer-slow 4s ease-in-out infinite;
+}
+
+[data-theme="rainbow"] [class*="bg-theme-bg"]:not(.fixed),
+[data-theme="mono"] [class*="bg-theme-bg"]:not(.fixed) {
   background-color: transparent !important;
-  background-size: 140% 140% !important;
-  animation: wave 2s ease-in-out infinite !important;
 }
 
-/* Mono Theme - animated black/white gradient background */
-[data-theme="mono"] body {
-  background-image: linear-gradient(
-    165deg,
-    #000000 0%,
-    #333333 25%,
-    #1a1a1a 50%,
-    #444444 75%,
-    #000000 100%
-  ) !important;
-  background-size: 200% 200% !important;
-  animation: wave-slow 4s ease-in-out infinite !important;
-}
-
-[data-theme="mono"] [class*="bg-theme-bg"] {
-  background-image: linear-gradient(
-    165deg,
-    #000000 0%,
-    #333333 25%,
-    #1a1a1a 50%,
-    #444444 75%,
-    #000000 100%
-  ) !important;
+[data-theme="rainbow"] .fixed[class*="bg-theme-bg"],
+[data-theme="mono"] .fixed[class*="bg-theme-bg"] {
+  background-image: var(--theme-gradient) !important;
   background-color: transparent !important;
-  background-size: 200% 200% !important;
-  animation: wave-slow 4s ease-in-out infinite !important;
+}
+
+@keyframes wave-layer {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(4%, -4%, 0); }
+  40% { transform: translate3d(-4%, 4%, 0); }
+  60% { transform: translate3d(4%, 4%, 0); }
+  80% { transform: translate3d(-4%, -4%, 0); }
+}
+
+@keyframes wave-layer-slow {
+  0%, 100% { transform: translate3d(8%, 0, 0); }
+  50% { transform: translate3d(-8%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="rainbow"] body::before,
+  [data-theme="mono"] body::before {
+    animation: none;
+  }
 }
 
 /* Rainbow/Mono - Milchglas-Effekt für Surfaces */
@@ -225,15 +229,6 @@ body {
 [data-theme="mono"] [class*="bg-theme-surface"] {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-}
-
-@keyframes wave-slow {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
 
 /* Safe top padding utility */
@@ -338,23 +333,3 @@ textarea,
     transform: scale(1);
   }
 }
-
-/* Wave animation for splash gradient */
-@keyframes wave {
-  0%, 100% {
-    background-position: 50% 50%;
-  }
-  20% {
-    background-position: 40% 60%;
-  }
-  40% {
-    background-position: 60% 40%;
-  }
-  60% {
-    background-position: 40% 40%;
-  }
-  80% {
-    background-position: 60% 60%;
-  }
-}
-

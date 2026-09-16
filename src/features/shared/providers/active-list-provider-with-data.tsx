@@ -11,6 +11,7 @@ type ActiveListProviderWithDataProps = {
   initialLists: ListSummary[];
   initialActiveListId: string | null;
   initialTodos: Todo[];
+  renderedAt: number;
 };
 
 export const ActiveListProviderWithData = ({
@@ -18,15 +19,18 @@ export const ActiveListProviderWithData = ({
   initialLists,
   initialActiveListId,
   initialTodos,
+  renderedAt,
 }: ActiveListProviderWithDataProps) => {
   const queryClient = useQueryClient();
 
+  // The HTML may come from the service worker cache: stamping the server render time lets
+  // newer persisted data win on restore and marks old snapshots stale so they refetch.
   if (!queryClient.getQueryData(["lists"])) {
-    queryClient.setQueryData(["lists"], initialLists);
+    queryClient.setQueryData(["lists"], initialLists, { updatedAt: renderedAt });
   }
 
   if (initialActiveListId && !queryClient.getQueryData(["todos", initialActiveListId])) {
-    queryClient.setQueryData(["todos", initialActiveListId], initialTodos);
+    queryClient.setQueryData(["todos", initialActiveListId], initialTodos, { updatedAt: renderedAt });
   }
 
   return (

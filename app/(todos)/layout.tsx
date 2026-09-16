@@ -7,14 +7,8 @@ import { getLists } from "@/lib/data/lists";
 import { getTodosForList } from "@/lib/data/todos";
 import { ACTIVE_LIST_STORAGE_KEY } from "@/features/shared/constants/storage";
 
-export default async function TodosLayout({ children }: { children: React.ReactNode }) {
-  const [userId, cookieStore] = await Promise.all([getAuthUserId(), cookies()]);
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  const storedActiveListId = cookieStore.get(ACTIVE_LIST_STORAGE_KEY)?.value ?? null;
+async function loadInitialState(userId: string, storedActiveListId: string | null) {
+  const fetchedAt = Date.now();
 
   // Fetch todos for the remembered list in parallel; only used once membership is confirmed.
   const [lists, speculativeTodos] = await Promise.all([
@@ -24,16 +18,30 @@ export default async function TodosLayout({ children }: { children: React.ReactN
 
   const storedIsValid =
     storedActiveListId !== null && lists.some((list) => list.id === storedActiveListId);
-  const initialActiveListId = storedIsValid ? storedActiveListId : lists[0]?.id ?? null;
-  const initialTodos = storedIsValid
-    ? speculativeTodos
-    : await getTodosForList(initialActiveListId);
+  const activeListId = storedIsValid ? storedActiveListId : lists[0]?.id ?? null;
+  const todos = storedIsValid ? speculativeTodos : await getTodosForList(activeListId);
+
+  return { lists, activeListId, todos, fetchedAt };
+}
+
+export default async function TodosLayout({ children }: { children: React.ReactNode }) {
+  const [userId, cookieStore] = await Promise.all([getAuthUserId(), cookies()]);
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const { lists, activeListId, todos, fetchedAt } = await loadInitialState(
+    userId,
+    cookieStore.get(ACTIVE_LIST_STORAGE_KEY)?.value ?? null,
+  );
 
   return (
     <ActiveListProviderWithData
       initialLists={lists}
-      initialActiveListId={initialActiveListId}
-      initialTodos={initialTodos}
+      initialActiveListId={activeListId}
+      initialTodos={todos}
+      renderedAt={fetchedAt}
     >
       <ModalManagerProvider>{children}</ModalManagerProvider>
     </ActiveListProviderWithData>

@@ -123,14 +123,6 @@ export default function SignUp() {
     setEmailSent(true);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-theme-bg">
-        <span className="loading loading-spinner loading-md text-theme-muted" />
-      </div>
-    );
-  }
-
   if (emailSent) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-theme-bg px-6">
