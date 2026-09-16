@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useLists, type ListSummary } from "@/features/lists/hooks/use-lists";
 import { ACTIVE_LIST_STORAGE_KEY } from "@/features/shared/constants/storage";
+import { postToServiceWorker } from "@/features/shared/service-worker";
 
 type ActiveListContextValue = {
   lists: ListSummary[];
@@ -35,20 +36,30 @@ export const ActiveListProvider = ({
     deleteList,
     leaveList,
   } = useLists();
-  const [activeListId, setActiveListId] = useState<string | null>(initialActiveListId || null);
+  const [activeListId, setActiveListIdState] = useState<string | null>(initialActiveListId || null);
+  // Read before the persist effect overwrites it: the HTML may be a cached snapshot with an older selection
+  const [storedAtMount] = useState(() =>
+    typeof window === "undefined" ? null : window.localStorage.getItem(ACTIVE_LIST_STORAGE_KEY),
+  );
+  const userHasSelectedRef = useRef(false);
+  const hasPersistedRef = useRef(false);
 
-  // Server already resolved the list from the cookie; only fall back to localStorage without it
+  const setActiveListId = useCallback((id: string | null) => {
+    userHasSelectedRef.current = true;
+    setActiveListIdState(id);
+  }, []);
+
+  // Restore the last selection once its list is known (it may only arrive with the persisted cache)
   useEffect(() => {
-    if (initialActiveListId) return;
-    const stored = window.localStorage.getItem(ACTIVE_LIST_STORAGE_KEY);
-    if (stored) {
-      setActiveListId(stored);
+    if (userHasSelectedRef.current || !storedAtMount || storedAtMount === activeListId) return;
+    if (lists.some((list) => list.id === storedAtMount)) {
+      userHasSelectedRef.current = true;
+      setActiveListIdState(storedAtMount);
     }
-  }, [initialActiveListId]);
+  }, [lists, storedAtMount, activeListId]);
 
   // Persist selection
   useEffect(() => {
-    if (typeof window === "undefined") return;
     if (activeListId) {
       window.localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
       document.cookie = `${ACTIVE_LIST_STORAGE_KEY}=${activeListId}; path=/; max-age=31536000; SameSite=Lax`;
@@ -56,17 +67,23 @@ export const ActiveListProvider = ({
       window.localStorage.removeItem(ACTIVE_LIST_STORAGE_KEY);
       document.cookie = `${ACTIVE_LIST_STORAGE_KEY}=; path=/; max-age=0; SameSite=Lax`;
     }
+
+    // Keep the cached app shell on the selected list
+    if (hasPersistedRef.current) {
+      postToServiceWorker({ type: "REFRESH_SHELL" });
+    }
+    hasPersistedRef.current = true;
   }, [activeListId]);
 
   // Ensure there is always a valid active list once data is loaded
   useEffect(() => {
     if (isLoadingLists) return;
     if (lists.length === 0) {
-      setActiveListId(null);
+      setActiveListIdState(null);
       return;
     }
     if (!activeListId || !lists.some((list) => list.id === activeListId)) {
-      setActiveListId(lists[0].id);
+      setActiveListIdState(lists[0].id);
     }
   }, [lists, isLoadingLists, activeListId]);
 
@@ -86,7 +103,7 @@ export const ActiveListProvider = ({
       deleteList,
       leaveList,
     }),
-    [lists, activeList, isLoadingLists, createList, renameList, deleteList, leaveList],
+    [lists, activeList, setActiveListId, isLoadingLists, createList, renameList, deleteList, leaveList],
   );
 
   return <ActiveListContext.Provider value={value}>{children}</ActiveListContext.Provider>;
