@@ -40,7 +40,7 @@ export const UserAvatar = ({ size = "md", children }: UserAvatarProps) => {
     <button
       type="button"
       onClick={() => openModal("profile")}
-      className="group inline-flex items-center -space-x-3 rounded-full p-1 transition hover:ring-2 hover:ring-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary"
+      className="press group inline-flex items-center -space-x-3 rounded-full p-1 transition hover:ring-2 hover:ring-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary"
       aria-label="Profil öffnen"
     >
       <span

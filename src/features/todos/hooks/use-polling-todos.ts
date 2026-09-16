@@ -11,6 +11,8 @@ export type Todo = {
   text: string;
   done: boolean;
   created_at: string;
+  // Keeps the React key stable when the optimistic todo is swapped for the server one
+  clientId?: string;
 };
 
 export type PresenceUser = {
@@ -40,7 +42,14 @@ export const usePollingTodos = (listId: string | null) => {
       const data = await jsonFetch<Todo[]>(
         `/api/todos?listId=${encodeURIComponent(listId ?? "")}`
       );
-      return data;
+      const clientIds = new Map(
+        (queryClient.getQueryData<Todo[]>(queryKey) ?? [])
+          .filter((todo) => todo.clientId)
+          .map((todo) => [todo.id, todo.clientId]),
+      );
+      return clientIds.size === 0
+        ? data
+        : data.map((todo) => ({ ...todo, clientId: clientIds.get(todo.id) }));
     },
     enabled: hasActiveList,
     staleTime: 5 * 1000,
@@ -70,7 +79,7 @@ export const usePollingTodos = (listId: string | null) => {
     },
     onMutate: async ({ text }) => {
       if (!hasActiveList || !listId) {
-        return { previousTodos: undefined };
+        return { previousTodos: undefined, optimisticId: undefined };
       }
       await queryClient.cancelQueries({ queryKey });
       const previousTodos = queryClient.getQueryData<Todo[]>(queryKey) ?? [];
@@ -84,7 +93,7 @@ export const usePollingTodos = (listId: string | null) => {
 
       queryClient.setQueryData(queryKey, [optimisticTodo, ...previousTodos]);
 
-      return { previousTodos };
+      return { previousTodos, optimisticId: optimisticTodo.id };
     },
     onError: (_error, _variables, context) => {
       if (context?.previousTodos) {
@@ -92,9 +101,11 @@ export const usePollingTodos = (listId: string | null) => {
       }
       void queryClient.invalidateQueries({ queryKey });
     },
-    onSuccess: (newTodo) => {
+    onSuccess: (newTodo, _variables, context) => {
       queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
-        current.map((todo) => (todo.id.startsWith("optimistic-") ? newTodo : todo))
+        current.map((todo) =>
+          todo.id === context?.optimisticId ? { ...newTodo, clientId: context.optimisticId } : todo
+        )
       );
     },
   });
@@ -136,7 +147,9 @@ export const usePollingTodos = (listId: string | null) => {
     },
     onSuccess: (updatedTodo) => {
       queryClient.setQueryData<Todo[]>(queryKey, (current = []) =>
-        current.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+        current.map((todo) =>
+          todo.id === updatedTodo.id ? { ...updatedTodo, clientId: todo.clientId } : todo
+        )
       );
     },
   });

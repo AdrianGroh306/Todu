@@ -26,13 +26,11 @@ export const TodoActionModal = ({
   isSaving,
   isDeleting,
 }: TodoActionModalProps) => {
-  if (!todo) return null;
-
   const isSaveDisabled =
-    !editValue.trim() || editValue.trim() === todo.text.trim() || isSaving;
+    !todo || !editValue.trim() || editValue.trim() === todo.text.trim() || isSaving;
 
   return (
-    <Modal open={open} onClose={onClose} title="Todo-Aktionen">
+    <Modal open={open && Boolean(todo)} onClose={onClose} title="Todo-Aktionen">
       <div className="space-y-4">
         <div className="flex flex-row gap-2">
           <input
@@ -44,7 +42,7 @@ export const TodoActionModal = ({
           <button
             type="button"
             aria-label="Änderungen speichern"
-            className="flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
+            className="press flex items-center cursor-pointer justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover disabled:cursor-not-allowed disabled:opacity-50 h-auto w-12"
             onClick={onSave}
             disabled={isSaveDisabled}
           >
@@ -60,7 +58,7 @@ export const TodoActionModal = ({
         <div className="flex justify-center">
           <button
             type="button"
-            className="rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="press rounded-xl bg-rose-500 cursor-pointer px-12 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={onDelete}
             disabled={isDeleting}
           >

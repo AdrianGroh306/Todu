@@ -46,7 +46,7 @@ export const TodoInput = ({
       />
       <button
         type="submit"
-        className="flex h-13 w-13 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover cursor-pointer"
+        className="press flex h-13 w-13 items-center justify-center rounded-xl bg-theme-primary text-theme-bg transition hover:bg-theme-primary-hover cursor-pointer"
         aria-label="Todo hinzufügen"
         disabled={disabled || !value.trim() || isCreating}
       >

@@ -60,20 +60,18 @@ export const PendingInviteModal = () => {
     }
   };
 
-  if (!user || isLoading || !invite) return null;
-
   return (
     <Modal
-      open
+      open={Boolean(user && !isLoading && invite)}
       onClose={() => handleRespond("decline")}
       title="Liste beitreten?"
       fullscreen
     >
       <div className="space-y-4 text-sm text-theme-text">
         <p>
-          Du wurdest eingeladen, der Liste <strong>{invite.listName}</strong> beizutreten.
+          Du wurdest eingeladen, der Liste <strong>{invite?.listName}</strong> beizutreten.
         </p>
-        {invite.inviterUsername ? (
+        {invite?.inviterUsername ? (
           <p className="text-theme-text-muted">Einladung von @{invite.inviterUsername}</p>
         ) : null}
         {errorMessage ? <p className="text-rose-400">{errorMessage}</p> : null}

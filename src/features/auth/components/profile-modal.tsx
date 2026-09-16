@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/providers/auth-provider";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfileData } from "@/lib/data/profile";
 import { CloseButton } from "@/components/close-button";
+import { FullscreenSheet } from "@/components/sheet";
 import { ProfilePage } from "./profile-page";
 
 type ProfileModalProps = {
@@ -36,16 +37,14 @@ export const ProfileModal = ({ open, onClose }: ProfileModalProps) => {
     },
   });
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-theme-bg pt-safe">
+    <FullscreenSheet open={open}>
       {isLoading || isPending ? (
         <ProfileSkeleton onClose={onClose} />
       ) : (
         <ProfilePage initialProfile={data ?? null} onClose={onClose} />
       )}
-    </div>
+    </FullscreenSheet>
   );
 };
 

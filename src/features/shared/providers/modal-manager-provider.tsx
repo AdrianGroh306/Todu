@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { CompletedTodosPage } from "@/features/todos/components/completed-todos-page";
 import { ProfileModal } from "@/features/auth/components/profile-modal";
 import { UpdateToast } from "@/components/update-toast";
+import { FullscreenSheet } from "@/components/sheet";
 
 type ModalKey = "profile" | "completedTodos" | null;
 
@@ -33,10 +34,10 @@ export const ModalManagerProvider = ({ children }: { children: React.ReactNode }
 
   return (
     <ModalManagerContext.Provider value={value}>
-      {children}
-      {activeModal === "completedTodos" ? (
+      <div className="app-shell h-full">{children}</div>
+      <FullscreenSheet open={activeModal === "completedTodos"}>
         <CompletedTodosPage onClose={closeModal} />
-      ) : null}
+      </FullscreenSheet>
       <ProfileModal open={activeModal === "profile"} onClose={closeModal} />
       <UpdateToast />
     </ModalManagerContext.Provider>

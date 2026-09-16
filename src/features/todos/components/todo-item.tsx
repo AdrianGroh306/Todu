@@ -1,4 +1,4 @@
-import { memo, useRef } from "react";
+import { memo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Checkbox } from "@/components/checkbox";
 import type { Todo } from "@/features/todos/hooks/use-polling-todos";
@@ -13,11 +13,12 @@ type TodoItemProps = {
 };
 
 export const TodoItem = memo(function TodoItem({ todo, isExiting, onToggle, onLongPress }: TodoItemProps) {
-  const disabled = isExiting;
+  // Only todos created on this device animate in; captured once so the class survives the id swap
+  const [animateEnter] = useState(() => todo.id.startsWith("optimistic-"));
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
 
-  const clearLongPress = (event?: PointerEvent<HTMLLIElement>) => {
+  const clearLongPress = (event?: PointerEvent<HTMLDivElement>) => {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current);
       pressTimerRef.current = null;
@@ -50,36 +51,34 @@ export const TodoItem = memo(function TodoItem({ todo, isExiting, onToggle, onLo
   };
 
   return (
-    <li
-      className={`group flex items-center justify-between px-4 py-3 transition-all duration-200 ease-out ${
-        isExiting ? "pointer-events-none translate-x-4 opacity-0" : "opacity-100"
-      }`}
-      onPointerDown={handlePointerDown}
-      onPointerUp={clearLongPress}
-      onPointerLeave={() => clearLongPress()}
-      onPointerCancel={clearLongPress}
-      onContextMenu={(event) => {
-        event.preventDefault();
-        longPressTriggeredRef.current = true;
-        onLongPress(todo);
-      }}
-    >
-      <div className="flex w-full font-semibold items-center gap-3">
-        <span
-          className={`flex-1 text-base transition-all duration-200 ${
-            todo.done ? "text-theme-text-muted line-through" : "text-theme-text"
-          }`}
-        >
-          {todo.text}
-        </span>
-        <label className="p-1 -m-1 cursor-pointer">
-          <Checkbox
-            checked={todo.done}
-            onChange={handleCheckboxChange}
-            disabled={disabled}
-            aria-disabled={disabled}
-          />
-        </label>
+    <li className={`todo-item ${animateEnter ? "todo-enter" : ""} ${isExiting ? "todo-exit" : ""}`}>
+      <div className="todo-clip">
+        <div className="todo-row">
+          <div
+            className="press-row flex w-full items-center gap-3 px-4 py-3 font-semibold"
+            onPointerDown={handlePointerDown}
+            onPointerUp={clearLongPress}
+            onPointerLeave={() => clearLongPress()}
+            onPointerCancel={clearLongPress}
+            onContextMenu={(event) => {
+              event.preventDefault();
+              longPressTriggeredRef.current = true;
+              onLongPress(todo);
+            }}
+          >
+            <span className={`todo-text flex-1 text-base ${todo.done ? "is-done" : ""}`}>
+              <span className="todo-strike">{todo.text}</span>
+            </span>
+            <label className="p-1 -m-1 cursor-pointer">
+              <Checkbox
+                checked={todo.done}
+                onChange={handleCheckboxChange}
+                disabled={isExiting}
+                aria-disabled={isExiting}
+              />
+            </label>
+          </div>
+        </div>
       </div>
     </li>
   );

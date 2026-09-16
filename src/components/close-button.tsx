@@ -14,7 +14,7 @@ export const CloseButton = ({
     <button
       type="button"
       aria-label={ariaLabel}
-      className={`relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-theme-surface text-theme-text transition hover:text-theme-primary before:absolute before:-inset-2 before:content-[''] ${className ?? ""}`}
+      className={`press relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-theme-surface text-theme-text transition hover:text-theme-primary before:absolute before:-inset-2 before:content-[''] ${className ?? ""}`}
       {...props}
     >
       <X className="h-5 w-5" />

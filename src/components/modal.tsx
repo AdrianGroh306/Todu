@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { CloseButton } from "@/components/close-button";
+import { BottomSheet, FullscreenSheet } from "@/components/sheet";
 import { useVisualViewport } from "@/features/shared/hooks/use-visual-viewport";
 
 type ModalProps = {
@@ -25,40 +26,33 @@ export const Modal = ({
 }: ModalProps) => {
   useVisualViewport(open);
 
-  if (!open) return null;
+  const header = (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-1">
+        <h2 className="text-lg font-bold text-theme-text">{title}</h2>
+        {titleActions}
+      </div>
+      <CloseButton onClick={onClose} ariaLabel="Schließen" />
+    </div>
+  );
+
+  if (fullscreen) {
+    return (
+      <FullscreenSheet open={open}>
+        <section className="flex h-full w-full flex-col gap-4 px-4 pb-8 safe-top safe-bottom">
+          {header}
+          {children}
+          {footer}
+        </section>
+      </FullscreenSheet>
+    );
+  }
 
   return (
-    <div
-      className={
-        fullscreen
-          ? "fixed inset-x-0 top-0 z-50 bg-theme-bg pt-safe"
-          : "fixed inset-0 z-50 flex items-center justify-center bg-theme-bg/80 p-4 backdrop-blur"
-      }
-      style={fullscreen ? { height: "var(--vvh, 100dvh)" } : undefined}
-      role="dialog"
-      aria-modal
-      onClick={fullscreen ? undefined : onClose}
-    >
-      <section
-        className={
-          fullscreen
-            ? "flex h-full w-full flex-col gap-4 px-4 pb-8 safe-top safe-bottom"
-            : "flex w-full max-w-xl flex-col gap-4 rounded-2xl bg-theme-surface px-6 py-8 shadow-2xl max-h-full"
-        }
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <h2 className="text-lg font-bold text-theme-text">{title}</h2>
-            {titleActions}
-          </div>
-          <CloseButton onClick={onClose} ariaLabel="Profil schließen"/>
-        </div>
-
-        {children}
-
-        {footer}
-      </section>
-    </div>
+    <BottomSheet open={open} onClose={onClose}>
+      {header}
+      {children}
+      {footer}
+    </BottomSheet>
   );
 };

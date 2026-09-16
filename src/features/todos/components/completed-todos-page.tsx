@@ -115,8 +115,7 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
   const isLoading = isPending && completedTodos.length === 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-theme-bg pt-safe">
-      <main className="mx-auto flex h-full max-w-3xl flex-col px-4 pb-4 safe-top text-theme-text">
+    <main className="mx-auto flex h-full w-full max-w-3xl flex-col px-4 pb-4 safe-top text-theme-text">
         <header className="flex shrink-0 items-center justify-between py-4">
           <div className="w-8" />
           <div className="flex items-center gap-2 text-theme-text">
@@ -180,7 +179,7 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
 
         <footer className="shrink-0 py-4 safe-bottom">
           <button
-            className="mx-auto flex items-center gap-2 rounded-full bg-theme-delete px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="press mx-auto flex items-center gap-2 rounded-full bg-theme-delete px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleClearCompleted}
             disabled={isLoading || completedTodos.length === 0 || clearCompleted.isPending}
           >
@@ -188,8 +187,6 @@ export const CompletedTodosPage = ({ onClose }: CompletedTodosPageProps) => {
             Alle löschen
           </button>
         </footer>
-      </main>
-
-    </div>
+    </main>
   );
 };

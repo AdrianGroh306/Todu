@@ -12,7 +12,8 @@ import { TodoItem } from "./todo-item";
 import { TodoActionModal } from "./todo-action-modal";
 import { PendingInviteModal } from "@/features/lists/components/pending-invite-modal";
 
-const EXIT_ANIMATION_MS = 280;
+// Strike-through (≈200 ms) followed by the row collapsing (≈260 ms), see .todo-exit
+const EXIT_ANIMATION_MS = 500;
 
 type TimerMap = Record<string, ReturnType<typeof setTimeout>>;
 
@@ -214,7 +215,7 @@ export const TodoList = () => {
             <ul>
               {visibleTodos.map((todo) => (
                 <TodoItem
-                  key={todo.id}
+                  key={todo.clientId ?? todo.id}
                   todo={todo}
                   isExiting={animatingIds.has(todo.id)}
                   onToggle={handleToggleTodo}
