@@ -1,4 +1,4 @@
-const CACHE_NAME = "todu-cache-v1.4.0";
+const CACHE_NAME = "todu-cache-v1.4.1";
 const OFFLINE_URLS = ["/icons/icon-192.png", "/icons/icon-512.png"];
 const SHELL_URL = "/";
 const IS_DEV = ["localhost", "127.0.0.1"].includes(self.location.hostname);
